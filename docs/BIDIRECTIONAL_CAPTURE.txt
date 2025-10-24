@@ -1,0 +1,3605 @@
+
+
+Frame     : 806
+Time      : 35.634717000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 808
+Time      : 35.672611000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 828
+Time      : 35.914940000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB01FF
+
+Frame     : 832
+Time      : 36.016660000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0220
+
+Frame     : 833
+Time      : 36.017092000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0417
+
+Frame     : 834
+Time      : 36.066723000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0E21
+
+Frame     : 835
+Time      : 36.067407000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0821
+
+Frame     : 836
+Time      : 36.115047000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0B1C
+
+Frame     : 837
+Time      : 36.116085000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0205
+
+Frame     : 838
+Time      : 36.163713000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0506
+
+Frame     : 839
+Time      : 36.212849000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0308
+
+Frame     : 840
+Time      : 36.267353000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0315
+
+Frame     : 841
+Time      : 36.268685000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0318
+
+Frame     : 842
+Time      : 36.310146000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB1119
+
+Frame     : 843
+Time      : 36.311138000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB1119
+
+Frame     : 844
+Time      : 36.358972000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB1119
+
+Frame     : 845
+Time      : 36.407459000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB1119
+
+Frame     : 846
+Time      : 36.408183000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB1019
+
+Frame     : 847
+Time      : 36.455833000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0207
+
+Frame     : 848
+Time      : 36.504334000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 849
+Time      : 36.504628000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 850
+Time      : 36.554129000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB101C
+
+Frame     : 851
+Time      : 36.556776000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0D1C
+
+Frame     : 852
+Time      : 36.602222000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB071C
+
+Frame     : 853
+Time      : 36.651700000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB081C
+
+Frame     : 854
+Time      : 36.699951000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB071C
+
+Frame     : 855
+Time      : 36.700922000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB111C
+
+Frame     : 856
+Time      : 36.748468000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB091C
+
+Frame     : 857
+Time      : 36.749150000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 858
+Time      : 36.797173000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 859
+Time      : 36.846360000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 860
+Time      : 36.848096000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0E1C
+
+Frame     : 861
+Time      : 36.894862000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 862
+Time      : 36.944210000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 863
+Time      : 37.870810000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 864
+Time      : 37.918564000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 867
+Time      : 38.894050000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 868
+Time      : 38.896047000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 869
+Time      : 39.919666000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 870
+Time      : 39.921791000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 871
+Time      : 40.051320000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 874
+Time      : 40.357258000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 875
+Time      : 40.358612000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 876
+Time      : 40.404711000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 877
+Time      : 40.405432000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB111C
+
+Frame     : 878
+Time      : 40.453962000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0A1C
+
+Frame     : 879
+Time      : 40.455214000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 880
+Time      : 40.895132000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 881
+Time      : 40.898636000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 882
+Time      : 41.230521000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 885
+Time      : 41.576287000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 886
+Time      : 41.577375000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB071C
+
+Frame     : 887
+Time      : 41.623769000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 888
+Time      : 41.625123000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0E1C
+
+Frame     : 889
+Time      : 41.672394000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 890
+Time      : 41.917798000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 891
+Time      : 41.919507000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 892
+Time      : 42.419987000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 895
+Time      : 42.748901000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 896
+Time      : 42.750670000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB071C
+
+Frame     : 897
+Time      : 42.793956000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB071C
+
+Frame     : 898
+Time      : 42.845993000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0E1C
+
+Frame     : 899
+Time      : 42.847112000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 900
+Time      : 42.940627000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 901
+Time      : 42.988471000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 902
+Time      : 43.659513000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 905
+Time      : 44.015505000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 906
+Time      : 44.016233000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB071C
+
+Frame     : 907
+Time      : 44.061001000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 908
+Time      : 44.110264000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0E1C
+
+Frame     : 909
+Time      : 44.111222000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 910
+Time      : 44.207569000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 911
+Time      : 44.256380000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 912
+Time      : 45.139737000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 914
+Time      : 45.232625000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 916
+Time      : 45.279640000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 917
+Time      : 45.477047000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 918
+Time      : 45.523451000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 919
+Time      : 45.572082000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 920
+Time      : 45.573028000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0E1C
+
+Frame     : 921
+Time      : 45.621277000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 922
+Time      : 46.257782000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 923
+Time      : 46.259234000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 924
+Time      : 46.325837000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 927
+Time      : 46.450363000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 928
+Time      : 47.231642000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 929
+Time      : 47.232631000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 930
+Time      : 47.305059000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 933
+Time      : 47.425900000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 934
+Time      : 48.254860000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 935
+Time      : 48.255910000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 936
+Time      : 48.478564000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 939
+Time      : 48.596248000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 940
+Time      : 49.235250000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 941
+Time      : 49.236766000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 942
+Time      : 49.346536000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 945
+Time      : 49.472665000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 946
+Time      : 50.253390000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 947
+Time      : 50.254647000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 948
+Time      : 50.269208000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 951
+Time      : 50.399199000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 952
+Time      : 51.229758000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 953
+Time      : 51.231865000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 954
+Time      : 51.233738000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 957
+Time      : 51.373766000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 958
+Time      : 52.252317000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 959
+Time      : 52.253858000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 960
+Time      : 52.267812000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 963
+Time      : 52.398028000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 964
+Time      : 53.139250000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 967
+Time      : 53.275123000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 968
+Time      : 53.276205000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 969
+Time      : 53.323865000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 970
+Time      : 54.123791000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 973
+Time      : 54.250127000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 974
+Time      : 54.251036000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 975
+Time      : 54.298786000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 976
+Time      : 55.022274000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 979
+Time      : 55.127751000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 980
+Time      : 55.225967000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 981
+Time      : 55.274078000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 982
+Time      : 56.163535000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 984
+Time      : 56.249406000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 986
+Time      : 56.298318000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 987
+Time      : 56.346362000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 988
+Time      : 57.048101000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 991
+Time      : 57.176768000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 992
+Time      : 57.224103000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 993
+Time      : 57.272747000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 994
+Time      : 57.873620000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 997
+Time      : 58.005035000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 998
+Time      : 58.249143000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 999
+Time      : 58.250804000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1000
+Time      : 58.701643000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1003
+Time      : 58.832952000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1004
+Time      : 59.276026000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1005
+Time      : 59.305527000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1006
+Time      : 59.541456000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1009
+Time      : 59.661864000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1010
+Time      : 60.248372000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1011
+Time      : 60.249495000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1019
+Time      : 60.352076000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1044
+Time      : 60.539575000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1056
+Time      : 61.131357000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1059
+Time      : 61.270812000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1060
+Time      : 61.271861000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1061
+Time      : 61.320823000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1063
+Time      : 61.985724000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1066
+Time      : 62.101588000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1067
+Time      : 62.246217000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1068
+Time      : 62.294558000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1069
+Time      : 62.746732000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1072
+Time      : 62.878893000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1073
+Time      : 63.271475000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1074
+Time      : 63.272959000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1075
+Time      : 63.521478000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1078
+Time      : 63.661057000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1079
+Time      : 64.247388000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1080
+Time      : 64.293101000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1081
+Time      : 64.314946000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1084
+Time      : 64.439653000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1086
+Time      : 65.128862000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1089
+Time      : 65.268038000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1090
+Time      : 65.269142000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1091
+Time      : 65.316859000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1092
+Time      : 65.863149000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1095
+Time      : 66.001913000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1096
+Time      : 66.242709000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1097
+Time      : 66.291994000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1098
+Time      : 66.606202000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1101
+Time      : 66.731118000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1102
+Time      : 67.268114000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1103
+Time      : 67.269260000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1104
+Time      : 67.349010000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1107
+Time      : 67.462420000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1108
+Time      : 68.111189000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1111
+Time      : 68.244699000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1112
+Time      : 68.290910000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1113
+Time      : 68.293510000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1114
+Time      : 68.873510000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1117
+Time      : 69.021958000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1118
+Time      : 69.267913000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1119
+Time      : 69.314087000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1120
+Time      : 69.629567000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1123
+Time      : 69.753545000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1124
+Time      : 70.291334000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1125
+Time      : 70.293079000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1126
+Time      : 70.383300000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1129
+Time      : 70.484323000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1130
+Time      : 71.047452000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1133
+Time      : 71.168156000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1134
+Time      : 71.264560000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1135
+Time      : 71.313041000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1136
+Time      : 71.734089000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1139
+Time      : 71.849356000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1140
+Time      : 72.291051000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1141
+Time      : 72.292808000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1142
+Time      : 72.471658000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1145
+Time      : 72.581146000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1146
+Time      : 73.201512000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1149
+Time      : 73.312030000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1150
+Time      : 73.314832000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1151
+Time      : 73.364360000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1152
+Time      : 73.878404000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1155
+Time      : 73.995631000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1156
+Time      : 74.291241000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1157
+Time      : 74.336678000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1158
+Time      : 74.510071000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1161
+Time      : 74.632976000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1162
+Time      : 75.182172000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1165
+Time      : 75.310053000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1166
+Time      : 75.313946000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1167
+Time      : 75.359658000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1168
+Time      : 75.892326000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1171
+Time      : 75.993067000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1172
+Time      : 76.288895000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1173
+Time      : 76.334693000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1174
+Time      : 76.601730000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1177
+Time      : 76.725096000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1178
+Time      : 77.298651000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1179
+Time      : 77.309823000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1180
+Time      : 77.310645000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1183
+Time      : 77.414339000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1184
+Time      : 77.985330000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1187
+Time      : 78.091557000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1188
+Time      : 78.285525000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1189
+Time      : 78.332981000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1190
+Time      : 78.678927000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1193
+Time      : 78.820874000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1194
+Time      : 79.309554000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1195
+Time      : 79.311076000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1196
+Time      : 79.404588000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1199
+Time      : 79.552753000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1200
+Time      : 80.075255000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1203
+Time      : 80.189655000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1204
+Time      : 80.283818000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1205
+Time      : 80.331586000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1206
+Time      : 80.751165000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1209
+Time      : 80.867807000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1210
+Time      : 81.310959000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1211
+Time      : 81.312421000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1212
+Time      : 81.403767000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1215
+Time      : 81.552542000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1216
+Time      : 82.088358000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1219
+Time      : 82.233068000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1220
+Time      : 82.332918000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1221
+Time      : 82.333695000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1222
+Time      : 82.838522000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1225
+Time      : 82.964755000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1226
+Time      : 83.306822000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1227
+Time      : 83.307845000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1228
+Time      : 83.504825000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1231
+Time      : 83.647039000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1232
+Time      : 84.194406000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1235
+Time      : 84.329752000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1236
+Time      : 84.330790000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1237
+Time      : 84.387581000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1238
+Time      : 84.841064000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1241
+Time      : 84.963841000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1242
+Time      : 85.305004000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1243
+Time      : 85.353230000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1244
+Time      : 85.555080000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1247
+Time      : 85.695409000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1248
+Time      : 86.273772000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1249
+Time      : 86.329590000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1251
+Time      : 86.331492000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1253
+Time      : 86.378738000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1254
+Time      : 86.968786000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1257
+Time      : 87.111219000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1258
+Time      : 87.304314000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1259
+Time      : 87.352127000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1260
+Time      : 87.625044000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1263
+Time      : 87.743640000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1264
+Time      : 88.315129000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1265
+Time      : 88.327680000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1266
+Time      : 88.328259000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1269
+Time      : 88.426929000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1270
+Time      : 89.066744000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1273
+Time      : 89.205056000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1274
+Time      : 89.303569000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1275
+Time      : 89.350918000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1276
+Time      : 89.773835000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1279
+Time      : 89.891909000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1280
+Time      : 90.327824000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1281
+Time      : 90.328911000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1282
+Time      : 90.466317000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1285
+Time      : 90.620068000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1286
+Time      : 91.193012000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1289
+Time      : 91.302779000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1290
+Time      : 91.350629000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1291
+Time      : 91.351994000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1292
+Time      : 91.858169000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1295
+Time      : 91.983411000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1296
+Time      : 92.328684000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1297
+Time      : 92.338361000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1298
+Time      : 92.585217000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1301
+Time      : 93.316011000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1302
+Time      : 93.348635000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1303
+Time      : 93.349226000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1306
+Time      : 94.058613000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1309
+Time      : 94.324018000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1310
+Time      : 94.325140000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1311
+Time      : 94.766178000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1314
+Time      : 95.348905000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1315
+Time      : 95.351331000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1316
+Time      : 95.426624000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1319
+Time      : 96.323342000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1320
+Time      : 96.370898000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1321
+Time      : 96.911007000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1322
+Time      : 97.347710000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1323
+Time      : 97.349005000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1324
+Time      : 98.322682000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1325
+Time      : 98.323914000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1326
+Time      : 99.347979000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1327
+Time      : 99.349099000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1328
+Time      : 100.320907000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1329
+Time      : 100.322366000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1330
+Time      : 101.343426000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1331
+Time      : 101.343958000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1332
+Time      : 102.320605000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1333
+Time      : 102.367331000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1334
+Time      : 103.345768000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1335
+Time      : 103.349237000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1336
+Time      : 104.320971000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1337
+Time      : 104.366008000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1338
+Time      : 105.343040000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1339
+Time      : 105.345082000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1340
+Time      : 106.318015000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1341
+Time      : 106.364767000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1342
+Time      : 107.342087000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1343
+Time      : 107.348647000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1344
+Time      : 107.398686000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1347
+Time      : 107.539700000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 1348
+Time      : 108.224121000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1351
+Time      : 108.364070000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1352
+Time      : 108.365543000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1353
+Time      : 108.412916000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 1354
+Time      : 108.942830000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1357
+Time      : 109.046558000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 1358
+Time      : 109.341340000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1359
+Time      : 109.387308000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1360
+Time      : 109.678150000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1363
+Time      : 109.826349000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 1364
+Time      : 110.317369000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1365
+Time      : 110.367153000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1366
+Time      : 110.368389000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1369
+Time      : 110.461051000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 1370
+Time      : 111.340918000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1371
+Time      : 111.386364000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1372
+Time      : 112.005661000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1375
+Time      : 112.166414000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0B1C
+
+Frame     : 1376
+Time      : 112.362771000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1377
+Time      : 112.365572000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1378
+Time      : 112.732116000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1381
+Time      : 112.849736000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0C1C
+
+Frame     : 1382
+Time      : 113.339556000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1383
+Time      : 113.387844000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1384
+Time      : 113.486317000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1387
+Time      : 113.629779000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0C1C
+
+Frame     : 1388
+Time      : 114.228748000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1391
+Time      : 114.359865000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1392
+Time      : 114.360845000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1393
+Time      : 114.457922000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0F1C
+
+Frame     : 1394
+Time      : 114.908651000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1397
+Time      : 115.043043000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0F1C
+
+Frame     : 1398
+Time      : 115.336878000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1399
+Time      : 115.383510000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1400
+Time      : 116.105105000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1403
+Time      : 116.555187000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0207
+
+Frame     : 1404
+Time      : 116.556084000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0205
+
+Frame     : 1405
+Time      : 117.894228000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1408
+Time      : 119.781590000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1411
+Time      : 120.309562000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0207
+
+Frame     : 1412
+Time      : 120.356665000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 1413
+Time      : 120.357323000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1414
+Time      : 120.406185000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB101C
+
+Frame     : 1415
+Time      : 120.454369000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0D1C
+
+Frame     : 1416
+Time      : 120.462414000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB071C
+
+Frame     : 1417
+Time      : 120.503020000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB081C
+
+Frame     : 1418
+Time      : 120.551554000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB071C
+
+Frame     : 1419
+Time      : 120.552959000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB111C
+
+Frame     : 1420
+Time      : 120.599712000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB091C
+
+Frame     : 1421
+Time      : 120.600470000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1422
+Time      : 120.649010000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1423
+Time      : 120.697750000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1424
+Time      : 120.698716000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0F1C
+
+Frame     : 1425
+Time      : 120.747069000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1426
+Time      : 120.796017000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1427
+Time      : 121.092106000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0207
+
+Frame     : 1428
+Time      : 121.136216000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0205
+
+Frame     : 1429
+Time      : 122.873570000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1432
+Time      : 125.282946000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0207
+
+Frame     : 1433
+Time      : 125.328791000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 1434
+Time      : 125.329510000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1435
+Time      : 125.377901000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB101C
+
+Frame     : 1436
+Time      : 125.432928000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0D1C
+
+Frame     : 1437
+Time      : 125.434138000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB071C
+
+Frame     : 1438
+Time      : 125.523967000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB081C
+
+Frame     : 1439
+Time      : 125.524615000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB071C
+
+Frame     : 1440
+Time      : 125.525290000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB111C
+
+Frame     : 1441
+Time      : 125.572392000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB091C
+
+Frame     : 1442
+Time      : 125.573038000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1443
+Time      : 125.621624000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1444
+Time      : 125.670183000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1445
+Time      : 125.671155000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0F1C
+
+Frame     : 1446
+Time      : 125.719760000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1447
+Time      : 125.768302000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1448
+Time      : 125.792912000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1451
+Time      : 126.160258000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0207
+
+Frame     : 1452
+Time      : 126.206382000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0205
+
+Frame     : 1453
+Time      : 128.362930000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1456
+Time      : 130.792910000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0207
+
+Frame     : 1457
+Time      : 130.837643000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 1458
+Time      : 130.838709000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0410
+
+Frame     : 1459
+Time      : 130.887075000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB101C
+
+Frame     : 1460
+Time      : 130.888082000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0D1C
+
+Frame     : 1461
+Time      : 130.935550000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB071C
+
+Frame     : 1462
+Time      : 130.984097000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB081C
+
+Frame     : 1463
+Time      : 130.985021000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB071C
+
+Frame     : 1464
+Time      : 131.033174000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB111C
+
+Frame     : 1465
+Time      : 131.081381000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB091C
+
+Frame     : 1466
+Time      : 131.082133000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1467
+Time      : 131.129933000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1468
+Time      : 131.130621000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1469
+Time      : 131.179554000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0F1C
+
+Frame     : 1470
+Time      : 131.227644000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1471
+Time      : 131.228548000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1472
+Time      : 131.395137000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1475
+Time      : 131.522637000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1476
+Time      : 132.054884000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1479
+Time      : 132.203382000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1480
+Time      : 132.251313000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1481
+Time      : 132.252001000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1482
+Time      : 132.671701000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1485
+Time      : 132.788844000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1486
+Time      : 133.203918000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1487
+Time      : 133.227260000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1489
+Time      : 133.276067000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1491
+Time      : 133.324975000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1492
+Time      : 133.744796000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1495
+Time      : 133.861436000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1496
+Time      : 134.253670000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1497
+Time      : 134.257213000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1498
+Time      : 134.415028000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1501
+Time      : 134.542625000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1502
+Time      : 135.098718000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1505
+Time      : 135.225670000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1506
+Time      : 135.280753000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1507
+Time      : 135.281466000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1508
+Time      : 135.705425000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1511
+Time      : 135.810853000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1512
+Time      : 136.250074000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1513
+Time      : 136.297735000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1514
+Time      : 136.316388000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1517
+Time      : 136.443885000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1518
+Time      : 136.899369000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1521
+Time      : 137.028867000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1522
+Time      : 137.275968000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1523
+Time      : 137.279011000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1524
+Time      : 138.121716000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1527
+Time      : 138.248200000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB090F
+
+Frame     : 1528
+Time      : 138.296103000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1529
+Time      : 138.302405000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1530
+Time      : 138.827658000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1533
+Time      : 138.930312000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB090F
+
+Frame     : 1534
+Time      : 139.274933000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1535
+Time      : 139.320493000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1536
+Time      : 139.513499000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1539
+Time      : 139.662584000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB090F
+
+Frame     : 1540
+Time      : 140.208297000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1541
+Time      : 140.296145000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1543
+Time      : 140.297500000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1545
+Time      : 140.345856000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB090F
+
+Frame     : 1546
+Time      : 140.844008000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1549
+Time      : 140.978626000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB090F
+
+Frame     : 1550
+Time      : 141.271219000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1551
+Time      : 141.272460000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1552
+Time      : 142.296995000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1553
+Time      : 142.298639000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1554
+Time      : 142.613645000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1557
+Time      : 143.272215000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1558
+Time      : 143.318102000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1559
+Time      : 143.460792000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1562
+Time      : 144.210344000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1563
+Time      : 144.294370000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1565
+Time      : 144.302534000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1567
+Time      : 144.925090000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1570
+Time      : 145.268810000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1571
+Time      : 145.316584000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1572
+Time      : 145.667811000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1575
+Time      : 145.951044000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB090F
+
+Frame     : 1576
+Time      : 145.999161000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0901
+
+Frame     : 1577
+Time      : 146.293426000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1578
+Time      : 146.296526000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1579
+Time      : 147.268671000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1580
+Time      : 147.315548000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1581
+Time      : 148.293430000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1582
+Time      : 148.295449000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1583
+Time      : 149.268803000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1584
+Time      : 149.314408000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1585
+Time      : 150.294191000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1586
+Time      : 150.295770000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1587
+Time      : 151.267640000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1588
+Time      : 151.313160000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1589
+Time      : 152.291690000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1590
+Time      : 152.293759000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1591
+Time      : 153.266054000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1592
+Time      : 153.311781000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1593
+Time      : 154.140448000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1596
+Time      : 154.286757000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1597
+Time      : 154.287519000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1598
+Time      : 155.205034000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1601
+Time      : 155.312646000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1602
+Time      : 155.313616000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1603
+Time      : 155.988419000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1606
+Time      : 156.286269000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1607
+Time      : 156.287419000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1608
+Time      : 156.708608000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1611
+Time      : 157.261956000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1612
+Time      : 157.309630000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1613
+Time      : 157.437785000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1616
+Time      : 158.287140000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1617
+Time      : 158.288235000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1618
+Time      : 159.310304000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1619
+Time      : 159.312086000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1620
+Time      : 160.285023000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1621
+Time      : 160.286027000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1622
+Time      : 161.311058000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1623
+Time      : 161.312617000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1624
+Time      : 162.286122000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1625
+Time      : 162.288116000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1626
+Time      : 163.309097000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1627
+Time      : 163.311074000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1628
+Time      : 164.285098000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1629
+Time      : 164.289665000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1630
+Time      : 165.308338000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1631
+Time      : 165.311829000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1632
+Time      : 166.283128000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1633
+Time      : 166.286976000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1634
+Time      : 167.306130000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1635
+Time      : 167.309890000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1636
+Time      : 168.281646000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1637
+Time      : 168.283456000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1638
+Time      : 169.304051000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1639
+Time      : 169.305544000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1640
+Time      : 170.280630000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1641
+Time      : 170.282177000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1642
+Time      : 171.306307000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1643
+Time      : 171.316409000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1644
+Time      : 172.278752000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1645
+Time      : 172.324558000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1646
+Time      : 173.304086000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1647
+Time      : 173.305586000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1648
+Time      : 174.277676000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1649
+Time      : 174.323462000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1650
+Time      : 175.301678000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1651
+Time      : 175.304221000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1652
+Time      : 176.274380000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1653
+Time      : 176.322825000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1654
+Time      : 177.300787000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1655
+Time      : 177.302279000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1656
+Time      : 178.274350000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1657
+Time      : 178.320955000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1658
+Time      : 179.300052000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1659
+Time      : 179.306820000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1660
+Time      : 180.274742000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1661
+Time      : 180.319390000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1662
+Time      : 181.298673000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1663
+Time      : 181.301051000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1664
+Time      : 182.270508000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1665
+Time      : 182.318664000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1666
+Time      : 183.297507000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1667
+Time      : 183.300378000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1668
+Time      : 184.271639000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1669
+Time      : 184.317295000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1670
+Time      : 185.296100000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1671
+Time      : 185.297657000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1672
+Time      : 186.271897000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1673
+Time      : 186.316743000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1674
+Time      : 187.293844000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1675
+Time      : 187.294819000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1676
+Time      : 188.240445000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1677
+Time      : 188.266046000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1679
+Time      : 188.316993000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1681
+Time      : 188.363840000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0E1C
+
+Frame     : 1682
+Time      : 189.297341000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1683
+Time      : 189.300325000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1684
+Time      : 189.459500000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1687
+Time      : 189.582749000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0B1C
+
+Frame     : 1688
+Time      : 190.268016000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1689
+Time      : 190.313504000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1690
+Time      : 191.291440000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1691
+Time      : 191.292311000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1692
+Time      : 192.315794000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1693
+Time      : 192.317422000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1694
+Time      : 193.290935000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB051C
+
+Frame     : 1695
+Time      : 193.294291000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB061C
+
+Frame     : 1696
+Time      : 193.780237000
+Direction :  RECV
+Handle    : 0x000c (WRITE - APP SENDS)
+Value     : AB020C
+
+Frame     : 1699
+Time      : 194.167757000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0207
+
+Frame     : 1700
+Time      : 194.213867000
+Direction :  RECV
+Handle    : 0x000e (NOTIFY - RADIO SENDS)
+Value     : AB0205
+
+
+
+

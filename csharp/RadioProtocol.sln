@@ -1,0 +1,33 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RadioProtocol.Core", "src\RadioProtocol.Core\RadioProtocol.Core.csproj", "{C5E8A7D4-1B9C-4A2E-8F7D-3E6B9C4A5D7F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RadioProtocol.Console", "src\RadioProtocol.Console\RadioProtocol.Console.csproj", "{F2D8B6A1-3C4E-5F7A-9B8D-2E5C8A7F6D9B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RadioProtocol.Tests", "tests\RadioProtocol.Tests\RadioProtocol.Tests.csproj", "{A9F7C3D2-4E6B-8A9D-5C7F-1B4A8D6E9F2A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C5E8A7D4-1B9C-4A2E-8F7D-3E6B9C4A5D7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5E8A7D4-1B9C-4A2E-8F7D-3E6B9C4A5D7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5E8A7D4-1B9C-4A2E-8F7D-3E6B9C4A5D7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5E8A7D4-1B9C-4A2E-8F7D-3E6B9C4A5D7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2D8B6A1-3C4E-5F7A-9B8D-2E5C8A7F6D9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2D8B6A1-3C4E-5F7A-9B8D-2E5C8A7F6D9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2D8B6A1-3C4E-5F7A-9B8D-2E5C8A7F6D9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2D8B6A1-3C4E-5F7A-9B8D-2E5C8A7F6D9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9F7C3D2-4E6B-8A9D-5C7F-1B4A8D6E9F2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9F7C3D2-4E6B-8A9D-5C7F-1B4A8D6E9F2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9F7C3D2-4E6B-8A9D-5C7F-1B4A8D6E9F2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9F7C3D2-4E6B-8A9D-5C7F-1B4A8D6E9F2A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
