@@ -17,8 +17,8 @@ public abstract record BaseMessage
     /// </summary>
     public abstract MessageType MessageType { get; }
     
-    protected BaseMessage(byte radioId = ProtocolConstants.DEFAULT_RADIO_ID)
+    protected BaseMessage(int radioId = ProtocolConstants.DEFAULT_RADIO_ID)
     {
-        RadioId = radioId;
+        RadioId = (byte)radioId;
     }
 }

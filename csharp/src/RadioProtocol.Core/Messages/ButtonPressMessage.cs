@@ -17,7 +17,7 @@ public record ButtonPressMessage : BaseMessage
     /// </summary>
     public override MessageType MessageType => MessageType.BUTTON_PRESS;
     
-    public ButtonPressMessage(ButtonType buttonType, byte radioId = ProtocolConstants.DEFAULT_RADIO_ID) 
+    public ButtonPressMessage(ButtonType buttonType, int radioId = ProtocolConstants.DEFAULT_RADIO_ID) 
         : base(radioId)
     {
         ButtonType = buttonType;

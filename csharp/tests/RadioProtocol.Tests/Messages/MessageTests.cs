@@ -1,6 +1,7 @@
 using FluentAssertions;
 using RadioProtocol.Core.Constants;
 using RadioProtocol.Core.Messages;
+using RadioProtocol.Core.Models;
 using Xunit;
 
 namespace RadioProtocol.Tests.Messages;
@@ -133,7 +134,7 @@ public class MessageTests
 
         // Assert
         message.ButtonType.Should().Be(buttonType);
-        message.RadioId.Should().Be(radioId);
+        message.RadioId.Should().Be((byte)radioId);
         message.MessageType.Should().Be(MessageType.BUTTON_PRESS);
     }
 
@@ -149,7 +150,7 @@ public class MessageTests
 
         // Assert
         message.ChannelNumber.Should().Be(channelNumber);
-        message.RadioId.Should().Be(radioId);
+        message.RadioId.Should().Be((byte)radioId);
         message.MessageType.Should().Be(MessageType.CHANNEL_COMMAND);
     }
 
@@ -163,7 +164,7 @@ public class MessageTests
         var message = new SyncRequestMessage(radioId);
 
         // Assert
-        message.RadioId.Should().Be(radioId);
+        message.RadioId.Should().Be((byte)radioId);
         message.MessageType.Should().Be(MessageType.SYNC_REQUEST);
     }
 
@@ -177,7 +178,7 @@ public class MessageTests
         var message = new StatusRequestMessage(radioId);
 
         // Assert
-        message.RadioId.Should().Be(radioId);
+        message.RadioId.Should().Be((byte)radioId);
         message.MessageType.Should().Be(MessageType.STATUS_REQUEST);
     }
 

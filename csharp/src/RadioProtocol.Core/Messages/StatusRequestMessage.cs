@@ -12,7 +12,7 @@ public record StatusRequestMessage : BaseMessage
     /// </summary>
     public override MessageType MessageType => MessageType.STATUS_REQUEST;
     
-    public StatusRequestMessage(byte radioId = ProtocolConstants.DEFAULT_RADIO_ID) 
+    public StatusRequestMessage(int radioId = ProtocolConstants.DEFAULT_RADIO_ID) 
         : base(radioId)
     {
     }

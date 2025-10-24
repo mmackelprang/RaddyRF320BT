@@ -12,7 +12,7 @@ public record SyncRequestMessage : BaseMessage
     /// </summary>
     public override MessageType MessageType => MessageType.SYNC_REQUEST;
     
-    public SyncRequestMessage(byte radioId = ProtocolConstants.DEFAULT_RADIO_ID) 
+    public SyncRequestMessage(int radioId = ProtocolConstants.DEFAULT_RADIO_ID) 
         : base(radioId)
     {
     }
