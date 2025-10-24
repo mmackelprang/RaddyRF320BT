@@ -10,6 +10,18 @@ public static class ProtocolConstants
     /// <summary>Protocol start byte (0xAB)</summary>
     public const byte PROTOCOL_START_BYTE = 0xAB;
     
+    /// <summary>Message version</summary>
+    public const byte MESSAGE_VERSION = 0x20;
+    
+    /// <summary>Default radio ID</summary>
+    public const byte DEFAULT_RADIO_ID = 0x01;
+    
+    /// <summary>Maximum message length</summary>
+    public const int MAX_MESSAGE_LENGTH = 255;
+    
+    /// <summary>Minimum message length</summary>
+    public const int MIN_MESSAGE_LENGTH = 4;
+    
     /// <summary>Standard message length for button commands</summary>
     public const byte MESSAGE_LENGTH_STANDARD = 0x02;
     

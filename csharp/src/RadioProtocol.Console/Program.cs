@@ -321,7 +321,7 @@ class Program
 
         WriteColorLine("Running automated demo...", ConsoleColor.Green);
 
-        var commands = new[]
+        var commands = new (string name, Func<Task<RadioProtocol.Core.Models.CommandResult>> commandFunc)[]
         {
             ("Handshake", () => _radioManager.SendHandshakeAsync(_cancellationTokenSource.Token)),
             ("Number 1", () => _radioManager.PressNumberAsync(1, false, _cancellationTokenSource.Token)),

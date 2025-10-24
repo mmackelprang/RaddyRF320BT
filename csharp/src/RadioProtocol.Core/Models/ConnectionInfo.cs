@@ -15,4 +15,22 @@ public record ConnectionInfo
     public int SignalStrength { get; init; }
     public string? ErrorMessage { get; init; }
     public DateTime Timestamp { get; init; } = DateTime.Now;
+    
+    /// <summary>
+    /// Constructor for ConnectionInfo
+    /// </summary>
+    public ConnectionInfo(ConnectionState state, string? deviceAddress, DateTime timestamp, string? errorMessage)
+    {
+        State = state;
+        DeviceAddress = deviceAddress;
+        Timestamp = timestamp;
+        ErrorMessage = errorMessage;
+    }
+    
+    /// <summary>
+    /// Default constructor for record init syntax
+    /// </summary>
+    public ConnectionInfo()
+    {
+    }
 }

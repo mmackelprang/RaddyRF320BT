@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RadioProtocol.Core;
 using RadioProtocol.Core.Constants;
 using RadioProtocol.Core.Protocol;
 using RadioProtocol.Tests.Mocks;

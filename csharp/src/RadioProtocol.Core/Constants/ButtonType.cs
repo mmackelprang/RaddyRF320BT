@@ -22,21 +22,27 @@ public enum ButtonType : byte
     SubBand = 0x17,
     BandLongPress = 0x29,
     Back = 0x0B,
+    BACK = 0x0B,  // Alias for tests
     Point = 0x0C,
     Frequency = 0x0D,
     
     // Navigation arrows
     UpShort = 0x0E,
     UpLong = 0x0F,
+    CHANNEL_UP = 0x0E,  // Alias for tests
     DownShort = 0x10,
     DownLong = 0x11,
+    CHANNEL_DOWN = 0x10,  // Alias for tests
     
     // Volume control
     VolumeUp = 0x12,
+    VOLUME_UP = 0x12,  // Alias for tests
     VolumeDown = 0x13,
+    VOLUME_DOWN = 0x13,  // Alias for tests
     
     // Power and system
     Power = 0x14,
+    POWER = 0x14,  // Alias for tests
     PowerLong = 0x45,
     Bluetooth = 0x1C,
     
@@ -102,5 +108,11 @@ public enum ButtonType : byte
     PlusLong = 0x44,
     EnterLong = 0x46,
     PointLong = 0x47,
-    DeleteLong = 0x48
+    DeleteLong = 0x48,
+    
+    // Additional button types for test compatibility
+    PTT = 0x50,  // Push-to-talk
+    MENU = 0x51,
+    SELECT = 0x52,
+    SCAN = 0x53
 }
