@@ -89,14 +89,14 @@ public static class ProtocolUtils
     /// <returns>True if valid protocol message</returns>
     public static bool IsValidProtocolMessage(byte[] data)
     {
-        if (data == null || data.Length < 2)
+        if (data == null)
+            return false;
+        
+        if (data.Length < 2)
             return false;
 
-        // Check for protocol start byte
-        if (data[0] != ProtocolConstants.ProtocolStartByte)
-            return false;
-
-        return true;
+        // Check for protocol start byte (0xAB)
+        return data[0] == 0xAB;
     }
 
     /// <summary>
