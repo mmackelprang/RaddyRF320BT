@@ -1,4 +1,4 @@
-# Radio Bluetooth Protocol Project
+# Raddy RF320 Bluetooth Protocol
 
 This project contains a comprehensive implementation and documentation of a Bluetooth protocol for controlling the Raddy RF320 device. The project includes both the original Java reverse-engineered code, some bluetooth packet captures and a modern C# implementation with enhanced features.
 
@@ -458,3 +458,4 @@ Potential improvements:
 ## Contact & Support
 
 This documentation was generated through reverse engineering of decompiled Android APK smali code for the purpose of understanding the Bluetooth radio communication protocol.
+
