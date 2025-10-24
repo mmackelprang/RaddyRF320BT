@@ -63,12 +63,24 @@ public class RadioProtocolParser
         var hexString = Convert.ToHexString(data).ToLowerInvariant();
         _logger.LogDebug($"Parsing data: {hexString}");
 
-        // Extract command identifier (first 6 characters)
+        // Extract command identifier and try to find matching packet type
         var commandId = hexString.Length >= ProtocolConstants.CommandIdLength 
             ? hexString[..ProtocolConstants.CommandIdLength] 
             : hexString;
 
-        var packetType = CommandTypeMap.GetValueOrDefault(commandId, ResponsePacketType.Unknown);
+        // Try to match command type - look for exact matches in the map at different lengths
+        var packetType = ResponsePacketType.Unknown;
+        
+        // Try progressively shorter prefixes, preferring longer exact matches
+        for (int len = Math.Min(hexString.Length, 6); len >= 4 && packetType == ResponsePacketType.Unknown; len--)
+        {
+            var prefix = hexString[..len];
+            if (CommandTypeMap.ContainsKey(prefix))
+            {
+                packetType = CommandTypeMap[prefix];
+                break;
+            }
+        }
         
         var responsePacket = new ResponsePacket
         {

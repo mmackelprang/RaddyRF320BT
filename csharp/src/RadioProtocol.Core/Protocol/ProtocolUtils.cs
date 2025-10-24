@@ -130,4 +130,37 @@ public static class ProtocolUtils
         // Message type is typically at index 2 after start byte and length
         return data[2];
     }
+
+    /// <summary>
+    /// Build a protocol message with checksum
+    /// </summary>
+    /// <param name="messageType">Type of message</param>
+    /// <param name="radioId">Radio ID</param>
+    /// <param name="payload">Message payload data</param>
+    /// <returns>Complete message with checksum</returns>
+    public static byte[] BuildMessage(MessageType messageType, byte radioId, byte[] payload)
+    {
+        if (payload == null)
+            payload = Array.Empty<byte>();
+
+        // Message format: Start + Type + RadioId + Payload + Checksum
+        var messageLength = 3 + payload.Length + 1; // start, type, radioId, payload, checksum
+        var message = new byte[messageLength];
+        
+        message[0] = ProtocolConstants.ProtocolStartByte;
+        message[1] = (byte)messageType;
+        message[2] = radioId;
+        
+        if (payload.Length > 0)
+        {
+            Array.Copy(payload, 0, message, 3, payload.Length);
+        }
+        
+        // Calculate and add checksum
+        var dataForChecksum = new byte[messageLength - 1];
+        Array.Copy(message, 0, dataForChecksum, 0, messageLength - 1);
+        message[messageLength - 1] = CalculateChecksum(dataForChecksum);
+        
+        return message;
+    }
 }
