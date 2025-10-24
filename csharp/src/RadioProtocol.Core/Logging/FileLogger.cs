@@ -19,7 +19,7 @@ public class FileLogger : ILogger
         _minLevel = minLevel;
     }
 
-    public IDisposable BeginScope<TState>(TState state) => NullScope.Instance;
+    public IDisposable? BeginScope<TState>(TState state) where TState : notnull => NullScope.Instance;
 
     public bool IsEnabled(LogLevel logLevel) => logLevel >= _minLevel;
 

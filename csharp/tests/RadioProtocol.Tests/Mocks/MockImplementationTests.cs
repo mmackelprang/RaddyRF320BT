@@ -232,13 +232,13 @@ public class MockBluetoothConnectionTests
     }
 
     [Fact]
-    public void ClearSentCommands_ShouldRemoveAllSentData()
+    public async Task ClearSentCommands_ShouldRemoveAllSentData()
     {
         // Arrange
         using var connection = new MockBluetoothConnection();
-        connection.ConnectAsync("00:11:22:33:44:55").Wait();
-        connection.SendDataAsync(new byte[] { 0x01 }).Wait();
-        connection.SendDataAsync(new byte[] { 0x02 }).Wait();
+        await connection.ConnectAsync("00:11:22:33:44:55");
+        await connection.SendDataAsync(new byte[] { 0x01 });
+        await connection.SendDataAsync(new byte[] { 0x02 });
 
         // Act
         connection.ClearSentCommands();
