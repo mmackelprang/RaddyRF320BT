@@ -247,7 +247,7 @@ public class RadioManager : IRadioManager
     public async Task<bool> SendSyncRequestAsync(CancellationToken cancellationToken = default)
     {
         _logger.LogInfo("Sending sync request");
-        var command = _commandBuilder.BuildHandshakeCommand(); // Using handshake as sync for now
+        var command = _commandBuilder.BuildSyncRequestCommand();
         var result = await SendCommandAsync(command, cancellationToken);
         return result.Success;
     }
@@ -258,10 +258,9 @@ public class RadioManager : IRadioManager
     public async Task<bool> SendStatusRequestAsync(CancellationToken cancellationToken = default)
     {
         _logger.LogInfo("Sending status request");
-        // Status requests would need specific implementation
-        // For now, return true to allow tests to pass
-        await Task.CompletedTask;
-        return true;
+        var command = _commandBuilder.BuildStatusRequestCommand();
+        var result = await SendCommandAsync(command, cancellationToken);
+        return result.Success;
     }
 
     /// <summary>

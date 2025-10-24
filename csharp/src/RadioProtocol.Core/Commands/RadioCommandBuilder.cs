@@ -46,6 +46,28 @@ public class RadioCommandBuilder
     }
 
     /// <summary>
+    /// Build sync request command
+    /// </summary>
+    /// <returns>Sync request command packet</returns>
+    public byte[] BuildSyncRequestCommand()
+    {
+        var command = BuildCommand((byte)MessageType.SyncRequest, 0x00);
+        _logger.LogMessageSent("SyncRequest", new { CommandHex = Convert.ToHexString(command) });
+        return command;
+    }
+
+    /// <summary>
+    /// Build status request command
+    /// </summary>
+    /// <returns>Status request command packet</returns>
+    public byte[] BuildStatusRequestCommand()
+    {
+        var command = BuildCommand((byte)MessageType.StatusRequest, 0x00);
+        _logger.LogMessageSent("StatusRequest", new { CommandHex = Convert.ToHexString(command) });
+        return command;
+    }
+
+    /// <summary>
     /// Build acknowledgment success response
     /// </summary>
     /// <returns>ACK success packet</returns>

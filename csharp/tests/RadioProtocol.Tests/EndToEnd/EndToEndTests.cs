@@ -47,11 +47,11 @@ public class EndToEndTests
         var syncResult = await radioManager.SendSyncRequestAsync();
         syncResult.Should().BeTrue();
 
-        // Verify sync request was sent correctly
-        bluetoothConnection.SentCommands.Should().HaveCount(1);
-        var syncCommand = bluetoothConnection.SentCommands[0];
+        // Verify sync request was sent correctly (should have handshake from connect + sync request)
+        bluetoothConnection.SentCommands.Should().HaveCount(2);
+        var syncCommand = bluetoothConnection.SentCommands[1]; // Second command is the sync request
         syncCommand[0].Should().Be(ProtocolConstants.ProtocolStartByte);
-        syncCommand[1].Should().Be((byte)MessageType.SyncRequest);
+        syncCommand[2].Should().Be((byte)MessageType.SyncRequest); // Command type is at index 2
 
         // Act & Assert - Step 3: Send status request  
         _output.WriteLine("Step 3: Sending status request...");
@@ -68,8 +68,8 @@ public class EndToEndTests
         var channelResult = await radioManager.SendChannelCommandAsync(5);
         channelResult.Should().BeTrue();
 
-        // Verify all commands were sent
-        bluetoothConnection.SentCommands.Should().HaveCount(4);
+        // Verify all commands were sent (handshake + sync + status + button + channel = 5)
+        bluetoothConnection.SentCommands.Should().HaveCount(5);
 
         // Act & Assert - Step 6: Disconnect
         _output.WriteLine("Step 6: Disconnecting...");
@@ -78,8 +78,8 @@ public class EndToEndTests
 
         // Verify logging captured all activities
         logger.LogEntries.Should().NotBeEmpty();
-        logger.MessagesSent.Should().HaveCount(4);
-        logger.MessagesReceived.Should().HaveCount(3);
+        logger.MessagesSent.Should().HaveCount(5); // handshake, sync, status, button, channel
+        logger.MessagesReceived.Should().HaveCount(3); // sync response, status response, button response
 
         _output.WriteLine($"Test completed successfully. Sent {bluetoothConnection.SentCommands.Count} commands.");
     }
