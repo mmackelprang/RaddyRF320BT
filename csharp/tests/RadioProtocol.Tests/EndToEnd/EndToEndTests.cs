@@ -1,6 +1,7 @@
 using FluentAssertions;
 using RadioProtocol.Core;
 using RadioProtocol.Core.Constants;
+using RadioProtocol.Core.Models;
 using RadioProtocol.Core.Protocol;
 using RadioProtocol.Tests.Mocks;
 using Xunit;
@@ -117,8 +118,8 @@ public class EndToEndTests
         var logger = new MockRadioLogger();
         var radioManager = new RadioManager(bluetoothConnection, logger);
 
-        var receivedMessages = new List<byte[]>();
-        radioManager.MessageReceived += (_, data) => receivedMessages.Add(data);
+        var receivedMessages = new List<ResponsePacket>();
+        radioManager.MessageReceived += (_, responsePacket) => receivedMessages.Add(responsePacket);
 
         await radioManager.ConnectAsync("00:11:22:33:44:55");
 
@@ -146,8 +147,9 @@ public class EndToEndTests
         
         foreach (var message in receivedMessages)
         {
-            message[0].Should().Be(ProtocolConstants.PROTOCOL_START_BYTE);
-            ProtocolUtils.ValidateChecksum(message).Should().BeTrue();
+            message.RawData[0].Should().Be(ProtocolConstants.PROTOCOL_START_BYTE);
+            // ProtocolUtils.ValidateChecksum(message.RawData).Should().BeTrue();
+            message.IsValid.Should().BeTrue();
         }
 
         _output.WriteLine($"Successfully parsed {receivedMessages.Count} messages.");

@@ -5,13 +5,15 @@ namespace RadioProtocol.Tests.Mocks;
 /// <summary>
 /// Mock radio logger for testing
 /// </summary>
-public class MockRadioLogger : IRadioLogger
+public class MockRadioLogger : IRadioLogger, IDisposable
 {
     public List<string> LogEntries { get; } = new();
     public List<(byte[] data, string context)> RawDataSent { get; } = new();
     public List<(byte[] data, string context)> RawDataReceived { get; } = new();
     public List<(string messageType, object messageData, string context)> MessagesSent { get; } = new();
     public List<(string messageType, object messageData, string context)> MessagesReceived { get; } = new();
+    
+    private bool _disposed = false;
 
     public void LogRawDataSent(byte[] data, string methodName = "", string className = "")
     {
@@ -72,5 +74,14 @@ public class MockRadioLogger : IRadioLogger
         RawDataReceived.Clear();
         MessagesSent.Clear();
         MessagesReceived.Clear();
+    }
+    
+    public void Dispose()
+    {
+        if (!_disposed)
+        {
+            Clear();
+            _disposed = true;
+        }
     }
 }
