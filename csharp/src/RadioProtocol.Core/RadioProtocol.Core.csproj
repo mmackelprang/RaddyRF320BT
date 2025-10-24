@@ -21,8 +21,10 @@
   </ItemGroup>
 
   <!-- Windows-specific packages -->
+  <!-- Note: When actual Windows Bluetooth LE implementation is needed, use Microsoft.Windows.SDK.Contracts -->
+  <!-- or a Windows-specific target framework like net8.0-windows10.0.19041.0 to access WinRT APIs -->
   <ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' AND $([MSBuild]::IsOSPlatform('Windows')) ">
-    <PackageReference Include="Windows.Devices.Bluetooth" Version="1.0.0" />
+    <!-- Windows.Devices.Bluetooth is not a NuGet package - placeholder implementation currently used -->
   </ItemGroup>
 
   <!-- Linux/Raspberry Pi packages -->
