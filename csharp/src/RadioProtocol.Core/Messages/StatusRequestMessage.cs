@@ -10,9 +10,9 @@ public record StatusRequestMessage : BaseMessage
     /// <summary>
     /// Message type for status request
     /// </summary>
-    public override MessageType MessageType => MessageType.STATUS_REQUEST;
+    public override MessageType MessageType => MessageType.StatusRequest;
     
-    public StatusRequestMessage(int radioId = ProtocolConstants.DEFAULT_RADIO_ID) 
+    public StatusRequestMessage(int radioId = ProtocolConstants.DefaultRadioId) 
         : base(radioId)
     {
     }

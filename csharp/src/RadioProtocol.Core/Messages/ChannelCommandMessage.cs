@@ -15,9 +15,9 @@ public record ChannelCommandMessage : BaseMessage
     /// <summary>
     /// Message type for channel command
     /// </summary>
-    public override MessageType MessageType => MessageType.CHANNEL_COMMAND;
+    public override MessageType MessageType => MessageType.ChannelCommand;
     
-    public ChannelCommandMessage(int channelNumber, int radioId = ProtocolConstants.DEFAULT_RADIO_ID) 
+    public ChannelCommandMessage(int channelNumber, int radioId = ProtocolConstants.DefaultRadioId) 
         : base(radioId)
     {
         if (channelNumber < 0 || channelNumber > 255)

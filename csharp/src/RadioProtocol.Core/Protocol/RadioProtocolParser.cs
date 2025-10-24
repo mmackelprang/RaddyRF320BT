@@ -49,7 +49,7 @@ public class RadioProtocolParser
     {
         _logger.LogRawDataReceived(data);
 
-        if (data == null || data.Length < ProtocolConstants.MIN_PACKET_LENGTH)
+        if (data == null || data.Length < ProtocolConstants.MinPacketLength)
         {
             _logger.LogWarning($"Invalid data packet received - length: {data?.Length ?? 0}");
             return new ResponsePacket 
@@ -64,8 +64,8 @@ public class RadioProtocolParser
         _logger.LogDebug($"Parsing data: {hexString}");
 
         // Extract command identifier (first 6 characters)
-        var commandId = hexString.Length >= ProtocolConstants.COMMAND_ID_LENGTH 
-            ? hexString[..ProtocolConstants.COMMAND_ID_LENGTH] 
+        var commandId = hexString.Length >= ProtocolConstants.CommandIdLength 
+            ? hexString[..ProtocolConstants.CommandIdLength] 
             : hexString;
 
         var packetType = CommandTypeMap.GetValueOrDefault(commandId, ResponsePacketType.Unknown);
@@ -125,7 +125,7 @@ public class RadioProtocolParser
 
     private RadioStatus ParseFrequencyStatus(string hexData)
     {
-        if (hexData.Length < ProtocolConstants.MIN_FREQ_STATUS_LENGTH)
+        if (hexData.Length < ProtocolConstants.MinFreqStatusLength)
         {
             _logger.LogWarning("Frequency status packet too short");
             return new RadioStatus { RawData = hexData };
@@ -155,7 +155,7 @@ public class RadioProtocolParser
 
     private FrequencyInfo ParseBandInfo(string hexData)
     {
-        if (hexData.Length < ProtocolConstants.MIN_BAND_INFO_LENGTH)
+        if (hexData.Length < ProtocolConstants.MinBandInfoLength)
         {
             _logger.LogWarning("Band info packet too short");
             return new FrequencyInfo { RawData = hexData };

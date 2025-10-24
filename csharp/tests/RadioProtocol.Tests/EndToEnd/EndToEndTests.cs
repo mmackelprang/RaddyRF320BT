@@ -50,8 +50,8 @@ public class EndToEndTests
         // Verify sync request was sent correctly
         bluetoothConnection.SentCommands.Should().HaveCount(1);
         var syncCommand = bluetoothConnection.SentCommands[0];
-        syncCommand[0].Should().Be(ProtocolConstants.PROTOCOL_START_BYTE);
-        syncCommand[1].Should().Be((byte)MessageType.SYNC_REQUEST);
+        syncCommand[0].Should().Be(ProtocolConstants.ProtocolStartByte);
+        syncCommand[1].Should().Be((byte)MessageType.SyncRequest);
 
         // Act & Assert - Step 3: Send status request  
         _output.WriteLine("Step 3: Sending status request...");
@@ -60,7 +60,7 @@ public class EndToEndTests
 
         // Act & Assert - Step 4: Send button press
         _output.WriteLine("Step 4: Sending button press...");
-        var buttonResult = await radioManager.SendButtonPressAsync(ButtonType.PTT);
+        var buttonResult = await radioManager.SendButtonPressAsync(ButtonType.Ptt);
         buttonResult.Should().BeTrue();
 
         // Act & Assert - Step 5: Send channel command
@@ -94,7 +94,7 @@ public class EndToEndTests
 
         // Act & Assert - Try to send command without connection
         _output.WriteLine("Testing error handling for disconnected state...");
-        var result = await radioManager.SendButtonPressAsync(ButtonType.POWER);
+        var result = await radioManager.SendButtonPressAsync(ButtonType.Power);
         result.Should().BeFalse();
 
         // Connect and then simulate error
@@ -147,7 +147,7 @@ public class EndToEndTests
         
         foreach (var message in receivedMessages)
         {
-            message.RawData[0].Should().Be(ProtocolConstants.PROTOCOL_START_BYTE);
+            message.RawData[0].Should().Be(ProtocolConstants.ProtocolStartByte);
             // ProtocolUtils.ValidateChecksum(message.RawData).Should().BeTrue();
             message.IsValid.Should().BeTrue();
         }
@@ -179,7 +179,7 @@ public class EndToEndTests
         
         for (int i = 0; i < 100; i++)
         {
-            tasks.Add(radioManager.SendButtonPressAsync(ButtonType.PTT));
+            tasks.Add(radioManager.SendButtonPressAsync(ButtonType.Ptt));
         }
 
         var results = await Task.WhenAll(tasks);
@@ -215,7 +215,7 @@ public class EndToEndTests
         // Act - Mix different types of concurrent operations
         _output.WriteLine("Concurrency test: Mixed operations...");
         var buttonTasks = Enumerable.Range(0, 20)
-            .Select(_ => radioManager.SendButtonPressAsync(ButtonType.PTT));
+            .Select(_ => radioManager.SendButtonPressAsync(ButtonType.Ptt));
         
         var channelTasks = Enumerable.Range(1, 15)
             .Select(channel => radioManager.SendChannelCommandAsync(channel));

@@ -30,10 +30,10 @@ public class RadioCommandBuilderTests
         var command = _commandBuilder.BuildButtonCommand(buttonType);
 
         // Assert
-        command.Should().HaveCount(ProtocolConstants.COMMAND_PACKET_SIZE);
-        command[0].Should().Be(ProtocolConstants.PROTOCOL_START_BYTE);
-        command[1].Should().Be(ProtocolConstants.MESSAGE_LENGTH_STANDARD);
-        command[2].Should().Be(ProtocolConstants.COMMAND_TYPE_BUTTON);
+        command.Should().HaveCount(ProtocolConstants.CommandPacketSize);
+        command[0].Should().Be(ProtocolConstants.ProtocolStartByte);
+        command[1].Should().Be(ProtocolConstants.MessageLengthStandard);
+        command[2].Should().Be(ProtocolConstants.CommandTypeButton);
         command[3].Should().Be((byte)buttonType);
         
         // Verify checksum
@@ -49,10 +49,10 @@ public class RadioCommandBuilderTests
 
         // Assert
         command.Should().HaveCount(4);
-        command[0].Should().Be(ProtocolConstants.PROTOCOL_START_BYTE);
-        command[1].Should().Be(ProtocolConstants.MESSAGE_LENGTH_HANDSHAKE);
-        command[2].Should().Be(ProtocolConstants.DATA_HANDSHAKE);
-        command[3].Should().Be(ProtocolConstants.PROTOCOL_START_BYTE);
+        command[0].Should().Be(ProtocolConstants.ProtocolStartByte);
+        command[1].Should().Be(ProtocolConstants.MessageLengthHandshake);
+        command[2].Should().Be(ProtocolConstants.DataHandshake);
+        command[3].Should().Be(ProtocolConstants.ProtocolStartByte);
     }
 
     [Theory]
