@@ -63,10 +63,10 @@ public class MessageTests
     }
 
     [Theory]
-    [InlineData(ButtonType.Power, "POWER")]
-    [InlineData(ButtonType.VolumeUp, "VOLUME_UP")]
-    [InlineData(ButtonType.Ptt, "PTT")]
-    [InlineData(ButtonType.Menu, "MENU")]
+    [InlineData(ButtonType.Power, "Power")]
+    [InlineData(ButtonType.VolumeUp, "VolumeUp")]
+    [InlineData(ButtonType.Ptt, "Ptt")]
+    [InlineData(ButtonType.Menu, "Menu")]
     public void ButtonType_ToString_ShouldReturnCorrectName(ButtonType buttonType, string expectedName)
     {
         // Act
@@ -77,9 +77,9 @@ public class MessageTests
     }
 
     [Theory]
-    [InlineData(MessageType.ButtonPress, "BUTTON_PRESS")]
-    [InlineData(MessageType.SyncRequest, "SYNC_REQUEST")]
-    [InlineData(MessageType.StatusResponse, "STATUS_RESPONSE")]
+    [InlineData(MessageType.ButtonPress, "ButtonPress")]
+    [InlineData(MessageType.SyncRequest, "SyncRequest")]
+    [InlineData(MessageType.StatusResponse, "StatusResponse")]
     public void MessageType_ToString_ShouldReturnCorrectName(MessageType messageType, string expectedName)
     {
         // Act
