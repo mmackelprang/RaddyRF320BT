@@ -20,7 +20,7 @@ Verified the build and log format of the RaddyRF320BT C# Radio Protocol Library 
 
 ### 1. Added .gitignore File
 - Created comprehensive .gitignore to exclude build artifacts (bin/, obj/, logs/)
-- Removed accidentally committed obj/ directories from git history
+- Removed accidentally committed obj/ directories using git rm
 
 ### 2. Fixed Missing Model Properties
 Added `RawData` property to the following model classes:
