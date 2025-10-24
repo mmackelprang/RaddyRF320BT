@@ -241,7 +241,7 @@ public class EndToEndTests
     }
 
     [Fact(Skip = "Requires proper Dispose implementation in RadioManager")]
-    public void ResourceCleanup_ShouldDisposeCorrectly()
+    public async Task ResourceCleanup_ShouldDisposeCorrectly()
     {
         // Arrange
         MockBluetoothConnection? bluetoothConnection = null;
@@ -256,7 +256,7 @@ public class EndToEndTests
         using (logger = new MockRadioLogger())
         using (radioManager = new RadioManager(bluetoothConnection, logger))
         {
-            radioManager.ConnectAsync("00:11:22:33:44:55").Wait();
+            await radioManager.ConnectAsync("00:11:22:33:44:55");
             bluetoothConnection.IsConnected.Should().BeTrue();
         }
 
