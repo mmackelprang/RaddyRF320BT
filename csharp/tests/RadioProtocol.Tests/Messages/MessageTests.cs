@@ -1,6 +1,7 @@
 using FluentAssertions;
 using RadioProtocol.Core.Constants;
 using RadioProtocol.Core.Messages;
+using RadioProtocol.Core.Models;
 using Xunit;
 
 namespace RadioProtocol.Tests.Messages;
@@ -14,40 +15,40 @@ public class MessageTests
     public void ProtocolConstants_ShouldHaveCorrectValues()
     {
         // Assert
-        ProtocolConstants.PROTOCOL_START_BYTE.Should().Be(0xAB);
-        ProtocolConstants.MESSAGE_VERSION.Should().Be(0x20);
-        ProtocolConstants.DEFAULT_RADIO_ID.Should().Be(0x01);
-        ProtocolConstants.MAX_MESSAGE_LENGTH.Should().Be(255);
-        ProtocolConstants.MIN_MESSAGE_LENGTH.Should().Be(4);
+        ProtocolConstants.ProtocolStartByte.Should().Be(0xAB);
+        ProtocolConstants.MessageVersion.Should().Be(0x20);
+        ProtocolConstants.DefaultRadioId.Should().Be(0x01);
+        ProtocolConstants.MaxMessageLength.Should().Be(255);
+        ProtocolConstants.MinMessageLength.Should().Be(4);
     }
 
     [Fact]
     public void ButtonType_ShouldHaveExpectedValues()
     {
         // Assert - Check some key button types
-        ButtonType.POWER.Should().Be(ButtonType.POWER);
-        ButtonType.VOLUME_UP.Should().Be(ButtonType.VOLUME_UP);
-        ButtonType.VOLUME_DOWN.Should().Be(ButtonType.VOLUME_DOWN);
-        ButtonType.CHANNEL_UP.Should().Be(ButtonType.CHANNEL_UP);
-        ButtonType.CHANNEL_DOWN.Should().Be(ButtonType.CHANNEL_DOWN);
-        ButtonType.PTT.Should().Be(ButtonType.PTT);
-        ButtonType.MENU.Should().Be(ButtonType.MENU);
-        ButtonType.SELECT.Should().Be(ButtonType.SELECT);
-        ButtonType.BACK.Should().Be(ButtonType.BACK);
-        ButtonType.SCAN.Should().Be(ButtonType.SCAN);
+        ButtonType.Power.Should().Be(ButtonType.Power);
+        ButtonType.VolumeUp.Should().Be(ButtonType.VolumeUp);
+        ButtonType.VolumeDown.Should().Be(ButtonType.VolumeDown);
+        ButtonType.ChannelUp.Should().Be(ButtonType.ChannelUp);
+        ButtonType.ChannelDown.Should().Be(ButtonType.ChannelDown);
+        ButtonType.Ptt.Should().Be(ButtonType.Ptt);
+        ButtonType.Menu.Should().Be(ButtonType.Menu);
+        ButtonType.Select.Should().Be(ButtonType.Select);
+        ButtonType.Back.Should().Be(ButtonType.Back);
+        ButtonType.Scan.Should().Be(ButtonType.Scan);
     }
 
     [Fact]
     public void MessageType_ShouldHaveExpectedValues()
     {
         // Assert
-        MessageType.BUTTON_PRESS.Should().Be(MessageType.BUTTON_PRESS);
-        MessageType.CHANNEL_COMMAND.Should().Be(MessageType.CHANNEL_COMMAND);
-        MessageType.SYNC_REQUEST.Should().Be(MessageType.SYNC_REQUEST);
-        MessageType.SYNC_RESPONSE.Should().Be(MessageType.SYNC_RESPONSE);
-        MessageType.STATUS_REQUEST.Should().Be(MessageType.STATUS_REQUEST);
-        MessageType.STATUS_RESPONSE.Should().Be(MessageType.STATUS_RESPONSE);
-        MessageType.GENERAL_RESPONSE.Should().Be(MessageType.GENERAL_RESPONSE);
+        MessageType.ButtonPress.Should().Be(MessageType.ButtonPress);
+        MessageType.ChannelCommand.Should().Be(MessageType.ChannelCommand);
+        MessageType.SyncRequest.Should().Be(MessageType.SyncRequest);
+        MessageType.SyncResponse.Should().Be(MessageType.SyncResponse);
+        MessageType.StatusRequest.Should().Be(MessageType.StatusRequest);
+        MessageType.StatusResponse.Should().Be(MessageType.StatusResponse);
+        MessageType.GeneralResponse.Should().Be(MessageType.GeneralResponse);
     }
 
     [Fact]
@@ -62,10 +63,10 @@ public class MessageTests
     }
 
     [Theory]
-    [InlineData(ButtonType.POWER, "POWER")]
-    [InlineData(ButtonType.VOLUME_UP, "VOLUME_UP")]
-    [InlineData(ButtonType.PTT, "PTT")]
-    [InlineData(ButtonType.MENU, "MENU")]
+    [InlineData(ButtonType.Power, "Power")]
+    [InlineData(ButtonType.VolumeUp, "VolumeUp")]
+    [InlineData(ButtonType.Ptt, "Ptt")]
+    [InlineData(ButtonType.Menu, "Menu")]
     public void ButtonType_ToString_ShouldReturnCorrectName(ButtonType buttonType, string expectedName)
     {
         // Act
@@ -76,9 +77,9 @@ public class MessageTests
     }
 
     [Theory]
-    [InlineData(MessageType.BUTTON_PRESS, "BUTTON_PRESS")]
-    [InlineData(MessageType.SYNC_REQUEST, "SYNC_REQUEST")]
-    [InlineData(MessageType.STATUS_RESPONSE, "STATUS_RESPONSE")]
+    [InlineData(MessageType.ButtonPress, "ButtonPress")]
+    [InlineData(MessageType.SyncRequest, "SyncRequest")]
+    [InlineData(MessageType.StatusResponse, "StatusResponse")]
     public void MessageType_ToString_ShouldReturnCorrectName(MessageType messageType, string expectedName)
     {
         // Act
@@ -125,7 +126,7 @@ public class MessageTests
     public void ButtonPressMessage_ShouldCreateCorrectly()
     {
         // Arrange
-        var buttonType = ButtonType.PTT;
+        var buttonType = ButtonType.Ptt;
         var radioId = 0x02;
 
         // Act
@@ -133,8 +134,8 @@ public class MessageTests
 
         // Assert
         message.ButtonType.Should().Be(buttonType);
-        message.RadioId.Should().Be(radioId);
-        message.MessageType.Should().Be(MessageType.BUTTON_PRESS);
+        message.RadioId.Should().Be((byte)radioId);
+        message.MessageType.Should().Be(MessageType.ButtonPress);
     }
 
     [Fact]
@@ -149,8 +150,8 @@ public class MessageTests
 
         // Assert
         message.ChannelNumber.Should().Be(channelNumber);
-        message.RadioId.Should().Be(radioId);
-        message.MessageType.Should().Be(MessageType.CHANNEL_COMMAND);
+        message.RadioId.Should().Be((byte)radioId);
+        message.MessageType.Should().Be(MessageType.ChannelCommand);
     }
 
     [Fact]
@@ -163,8 +164,8 @@ public class MessageTests
         var message = new SyncRequestMessage(radioId);
 
         // Assert
-        message.RadioId.Should().Be(radioId);
-        message.MessageType.Should().Be(MessageType.SYNC_REQUEST);
+        message.RadioId.Should().Be((byte)radioId);
+        message.MessageType.Should().Be(MessageType.SyncRequest);
     }
 
     [Fact]
@@ -177,8 +178,8 @@ public class MessageTests
         var message = new StatusRequestMessage(radioId);
 
         // Assert
-        message.RadioId.Should().Be(radioId);
-        message.MessageType.Should().Be(MessageType.STATUS_REQUEST);
+        message.RadioId.Should().Be((byte)radioId);
+        message.MessageType.Should().Be(MessageType.StatusRequest);
     }
 
     [Theory]
@@ -210,7 +211,7 @@ public class MessageTests
     public void Messages_ShouldAcceptValidRadioIds(byte radioId)
     {
         // Act & Assert
-        var buttonAct = () => new ButtonPressMessage(ButtonType.POWER, radioId);
+        var buttonAct = () => new ButtonPressMessage(ButtonType.Power, radioId);
         var channelAct = () => new ChannelCommandMessage(1, radioId);
         var syncAct = () => new SyncRequestMessage(radioId);
         var statusAct = () => new StatusRequestMessage(radioId);
@@ -227,7 +228,7 @@ public class MessageTests
         // Arrange
         var success = true;
         var data = new byte[] { 0x01, 0x02, 0x03 };
-        var messageType = MessageType.STATUS_RESPONSE;
+        var messageType = MessageType.StatusResponse;
 
         // Act
         var message = new ResponseMessage(success, data, messageType);
@@ -242,11 +243,11 @@ public class MessageTests
     public void ResponseMessage_WithEmptyData_ShouldCreateCorrectly()
     {
         // Act
-        var message = new ResponseMessage(false, Array.Empty<byte>(), MessageType.GENERAL_RESPONSE);
+        var message = new ResponseMessage(false, Array.Empty<byte>(), MessageType.GeneralResponse);
 
         // Assert
         message.Success.Should().BeFalse();
         message.Data.Should().BeEmpty();
-        message.MessageType.Should().Be(MessageType.GENERAL_RESPONSE);
+        message.MessageType.Should().Be(MessageType.GeneralResponse);
     }
 }

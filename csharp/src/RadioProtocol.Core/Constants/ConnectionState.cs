@@ -8,6 +8,7 @@ public enum ConnectionState
     Disconnected,
     Connecting,
     Connected,
+    Disconnecting,
     DiscoveringServices,
     Ready,
     Error

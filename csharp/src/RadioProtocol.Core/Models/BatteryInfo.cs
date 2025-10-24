@@ -9,5 +9,6 @@ public record BatteryInfo
     public bool IsCharging { get; init; }
     public bool IsLowBattery { get; init; }
     public string? PowerSource { get; init; }
+    public string? RawData { get; init; }
     public DateTime Timestamp { get; init; } = DateTime.Now;
 }

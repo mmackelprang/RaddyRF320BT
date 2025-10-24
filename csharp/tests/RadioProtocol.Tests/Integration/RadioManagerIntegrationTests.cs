@@ -159,10 +159,10 @@ public class RadioManagerIntegrationTests : IDisposable
         result.Success.Should().BeTrue();
         result.SentData.Should().NotBeNull();
         result.SentData.Should().HaveCount(4);
-        result.SentData![0].Should().Be(ProtocolConstants.PROTOCOL_START_BYTE);
-        result.SentData![1].Should().Be(ProtocolConstants.MESSAGE_LENGTH_HANDSHAKE);
-        result.SentData![2].Should().Be(ProtocolConstants.DATA_HANDSHAKE);
-        result.SentData![3].Should().Be(ProtocolConstants.PROTOCOL_START_BYTE);
+        result.SentData![0].Should().Be(ProtocolConstants.ProtocolStartByte);
+        result.SentData![1].Should().Be(ProtocolConstants.MessageLengthHandshake);
+        result.SentData![2].Should().Be(ProtocolConstants.DataHandshake);
+        result.SentData![3].Should().Be(ProtocolConstants.ProtocolStartByte);
     }
 
     [Fact]
@@ -323,8 +323,8 @@ public class SystemEndToEndTests : IDisposable
         // Act - Test special function buttons
         var specialButtons = new[]
         {
-            ButtonType.SOS,
-            ButtonType.SOSLong,
+            ButtonType.Sos,
+            ButtonType.SosLong,
             ButtonType.AlarmClick,
             ButtonType.AlarmLong,
             ButtonType.Bluetooth,

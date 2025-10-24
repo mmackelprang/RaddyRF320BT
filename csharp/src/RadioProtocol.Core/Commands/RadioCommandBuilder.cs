@@ -22,7 +22,7 @@ public class RadioCommandBuilder
     /// <returns>Command packet bytes</returns>
     public byte[] BuildButtonCommand(ButtonType buttonType)
     {
-        var command = BuildCommand(ProtocolConstants.COMMAND_TYPE_BUTTON, (byte)buttonType);
+        var command = BuildCommand(ProtocolConstants.CommandTypeButton, (byte)buttonType);
         _logger.LogMessageSent("ButtonPress", new { ButtonType = buttonType, CommandHex = Convert.ToHexString(command) });
         return command;
     }
@@ -35,13 +35,35 @@ public class RadioCommandBuilder
     {
         var command = new byte[]
         {
-            ProtocolConstants.PROTOCOL_START_BYTE,
-            ProtocolConstants.MESSAGE_LENGTH_HANDSHAKE,
-            ProtocolConstants.DATA_HANDSHAKE,
-            ProtocolConstants.PROTOCOL_START_BYTE
+            ProtocolConstants.ProtocolStartByte,
+            ProtocolConstants.MessageLengthHandshake,
+            ProtocolConstants.DataHandshake,
+            ProtocolConstants.ProtocolStartByte
         };
         
         _logger.LogMessageSent("Handshake", new { CommandHex = Convert.ToHexString(command) });
+        return command;
+    }
+
+    /// <summary>
+    /// Build sync request command
+    /// </summary>
+    /// <returns>Sync request command packet</returns>
+    public byte[] BuildSyncRequestCommand()
+    {
+        var command = BuildCommand((byte)MessageType.SyncRequest, 0x00);
+        _logger.LogMessageSent("SyncRequest", new { CommandHex = Convert.ToHexString(command) });
+        return command;
+    }
+
+    /// <summary>
+    /// Build status request command
+    /// </summary>
+    /// <returns>Status request command packet</returns>
+    public byte[] BuildStatusRequestCommand()
+    {
+        var command = BuildCommand((byte)MessageType.StatusRequest, 0x00);
+        _logger.LogMessageSent("StatusRequest", new { CommandHex = Convert.ToHexString(command) });
         return command;
     }
 
@@ -51,7 +73,7 @@ public class RadioCommandBuilder
     /// <returns>ACK success packet</returns>
     public byte[] BuildAckSuccessCommand()
     {
-        var command = BuildCommand(ProtocolConstants.COMMAND_TYPE_ACK, ProtocolConstants.DATA_SUCCESS);
+        var command = BuildCommand(ProtocolConstants.CommandTypeAck, ProtocolConstants.DataSuccess);
         _logger.LogMessageSent("AckSuccess", new { CommandHex = Convert.ToHexString(command) });
         return command;
     }
@@ -62,7 +84,7 @@ public class RadioCommandBuilder
     /// <returns>ACK failure packet</returns>
     public byte[] BuildAckFailureCommand()
     {
-        var command = BuildCommand(ProtocolConstants.COMMAND_TYPE_ACK, ProtocolConstants.DATA_FAILURE);
+        var command = BuildCommand(ProtocolConstants.CommandTypeAck, ProtocolConstants.DataFailure);
         _logger.LogMessageSent("AckFailure", new { CommandHex = Convert.ToHexString(command) });
         return command;
     }
@@ -75,9 +97,9 @@ public class RadioCommandBuilder
     /// <returns>Complete command packet with checksum</returns>
     public byte[] BuildCommand(byte commandType, byte commandData)
     {
-        var cmd = new byte[ProtocolConstants.COMMAND_PACKET_SIZE];
-        cmd[0] = ProtocolConstants.PROTOCOL_START_BYTE;
-        cmd[1] = ProtocolConstants.MESSAGE_LENGTH_STANDARD;
+        var cmd = new byte[ProtocolConstants.CommandPacketSize];
+        cmd[0] = ProtocolConstants.ProtocolStartByte;
+        cmd[1] = ProtocolConstants.MessageLengthStandard;
         cmd[2] = commandType;
         cmd[3] = commandData;
         
@@ -110,7 +132,7 @@ public class RadioCommandBuilder
     /// <returns>True if checksum is valid</returns>
     public static bool VerifyChecksum(byte[] command)
     {
-        if (command == null || command.Length < ProtocolConstants.COMMAND_PACKET_SIZE)
+        if (command == null || command.Length < ProtocolConstants.CommandPacketSize)
         {
             return false;
         }

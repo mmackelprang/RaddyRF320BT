@@ -10,5 +10,6 @@ public record ModulationInfo
     public bool IsNarrowband { get; init; }
     public bool IsWideband { get; init; }
     public string? FilterType { get; init; }
+    public string? RawData { get; init; }
     public DateTime Timestamp { get; init; } = DateTime.Now;
 }

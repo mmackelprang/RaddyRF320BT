@@ -199,7 +199,7 @@ public static class TestUtilities
 /// Custom test collection for managing shared test resources
 /// </summary>
 [Xunit.CollectionDefinition("RadioProtocol Tests")]
-public class RadioProtocolTestCollection : ICollectionFixture<RadioProtocolTestFixture>
+public class RadioProtocolTestCollection : Xunit.ICollectionFixture<RadioProtocolTestFixture>
 {
 }
 

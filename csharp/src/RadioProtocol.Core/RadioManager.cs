@@ -77,6 +77,23 @@ public class RadioManager : IRadioManager
         _logger.LogInfo("RadioManager initialized");
     }
 
+    /// <summary>
+    /// Constructor for testing with dependency injection
+    /// </summary>
+    public RadioManager(IBluetoothConnection bluetoothConnection, IRadioLogger logger)
+    {
+        _logger = logger;
+        _bluetoothConnection = bluetoothConnection;
+        _commandBuilder = new RadioCommandBuilder(_logger);
+        _protocolParser = new RadioProtocolParser(_logger);
+
+        // Subscribe to Bluetooth events
+        _bluetoothConnection.ConnectionStateChanged += OnConnectionStateChanged;
+        _bluetoothConnection.DataReceived += OnDataReceived;
+
+        _logger.LogInfo("RadioManager initialized with injected dependencies");
+    }
+
     public async Task<bool> ConnectAsync(string deviceAddress, CancellationToken cancellationToken = default)
     {
         _logger.LogInfo($"Connecting to radio device: {deviceAddress}");
@@ -222,6 +239,49 @@ public class RadioManager : IRadioManager
         _logger.LogInfo("Sending handshake");
         var command = _commandBuilder.BuildHandshakeCommand();
         return await SendCommandAsync(command, cancellationToken);
+    }
+
+    /// <summary>
+    /// Send a sync request message (test-compatible method)
+    /// </summary>
+    public async Task<bool> SendSyncRequestAsync(CancellationToken cancellationToken = default)
+    {
+        _logger.LogInfo("Sending sync request");
+        var command = _commandBuilder.BuildSyncRequestCommand();
+        var result = await SendCommandAsync(command, cancellationToken);
+        return result.Success;
+    }
+
+    /// <summary>
+    /// Send a status request message (test-compatible method)
+    /// </summary>
+    public async Task<bool> SendStatusRequestAsync(CancellationToken cancellationToken = default)
+    {
+        _logger.LogInfo("Sending status request");
+        var command = _commandBuilder.BuildStatusRequestCommand();
+        var result = await SendCommandAsync(command, cancellationToken);
+        return result.Success;
+    }
+
+    /// <summary>
+    /// Send a button press message (test-compatible method)
+    /// </summary>
+    public async Task<bool> SendButtonPressAsync(ButtonType buttonType, CancellationToken cancellationToken = default)
+    {
+        var result = await PressButtonAsync(buttonType, cancellationToken);
+        return result.Success;
+    }
+
+    /// <summary>
+    /// Send a channel command message (test-compatible method)
+    /// </summary>
+    public async Task<bool> SendChannelCommandAsync(int channelNumber, CancellationToken cancellationToken = default)
+    {
+        _logger.LogInfo($"Sending channel command: {channelNumber}");
+        // Use number button for channel selection
+        var command = CommonCommands.NumberButton(channelNumber, _logger);
+        var result = await SendCommandAsync(command, cancellationToken);
+        return result.Success;
     }
 
     private void OnConnectionStateChanged(object? sender, ConnectionInfo connectionInfo)

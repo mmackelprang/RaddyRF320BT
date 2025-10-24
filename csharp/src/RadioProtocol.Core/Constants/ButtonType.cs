@@ -28,8 +28,10 @@ public enum ButtonType : byte
     // Navigation arrows
     UpShort = 0x0E,
     UpLong = 0x0F,
+    ChannelUp = 0x0E,
     DownShort = 0x10,
     DownLong = 0x11,
+    ChannelDown = 0x10,
     
     // Volume control
     VolumeUp = 0x12,
@@ -70,8 +72,8 @@ public enum ButtonType : byte
     RecordClick = 0x2D,
     
     // Emergency
-    SOS = 0x2A,
-    SOSLong = 0x2B,
+    Sos = 0x2A,
+    SosLong = 0x2B,
     AlarmClick = 0x31,
     AlarmLong = 0x32,
     
@@ -102,5 +104,11 @@ public enum ButtonType : byte
     PlusLong = 0x44,
     EnterLong = 0x46,
     PointLong = 0x47,
-    DeleteLong = 0x48
+    DeleteLong = 0x48,
+    
+    // Additional button types
+    Ptt = 0x50,  // Push-to-talk
+    Menu = 0x51,
+    Select = 0x52,
+    Scan = 0x53
 }
