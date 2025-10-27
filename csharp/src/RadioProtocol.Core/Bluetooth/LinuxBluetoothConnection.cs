@@ -23,7 +23,7 @@ public class LinuxBluetoothConnection : BluetoothConnectionBase
 
     private ConnectionInfo _connectionStatus;
     private IAdapter1? _adapter;
-    private IDevice1? _device;
+    private Device? _device;
     private IGattService1? _service;
     private IGattCharacteristic1? _writeCharacteristic;
     private IGattCharacteristic1? _notifyCharacteristic;
@@ -107,8 +107,15 @@ public class LinuxBluetoothConnection : BluetoothConnectionBase
             _logger.LogInfo("Services resolved.");
 
             var services = await _device.GetServicesAsync();
-            _service = (await Task.WhenAll(services.Select(async s => new { service = s, characteristics = await s.GetCharacteristicsAsync() })))
-                .FirstOrDefault(s => s.characteristics.Any(c => c.GetUUIDAsync().Result == NotifyCharacteristicUuid.ToString()))?.service;
+            foreach (var service in services)
+            {
+                var characteristics = await service.GetCharacteristicsAsync();
+                if (characteristics.Any(c => c.GetUUIDAsync().Result == NotifyCharacteristicUuid.ToString()))
+                {
+                    _service = service;
+                    break;
+                }
+            }
 
 
             if (_service == null)
