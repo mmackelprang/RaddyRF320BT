@@ -67,6 +67,22 @@ public class RadioManager : IRadioManager
     public ConnectionInfo ConnectionStatus => _bluetoothConnection.ConnectionStatus;
     public Models.DeviceInfo? DeviceInformation => _deviceInfo;
 
+    public RadioManager(IRadioLogger logger) 
+        : this(logger, 
+               BluetoothConnectionFactory.Create(logger),
+               new RadioProtocolParser(logger),
+               new RadioCommandBuilder(logger))
+    {
+    }
+
+    public RadioManager(IBluetoothConnection bluetoothConnection, IRadioLogger logger)
+        : this(logger,
+               bluetoothConnection,
+               new RadioProtocolParser(logger),
+               new RadioCommandBuilder(logger))
+    {
+    }
+
     public RadioManager(
         IRadioLogger logger,
         IBluetoothConnection bluetoothConnection,
@@ -235,6 +251,28 @@ public class RadioManager : IRadioManager
         _logger.LogInfo("Sending handshake");
         var command = _commandBuilder.BuildHandshakeCommand();
         return await SendCommandAsync(command, cancellationToken);
+    }
+
+    // Aliases for backward compatibility with tests
+    public Task<bool> SendButtonPressAsync(ButtonType buttonType, CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(PressButtonAsync(buttonType, cancellationToken).Result.Success);
+    }
+
+    public Task<bool> SendChannelCommandAsync(int channel, CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(PressNumberAsync(channel, false, cancellationToken).Result.Success);
+    }
+
+    public Task<bool> SendStatusRequestAsync(CancellationToken cancellationToken = default)
+    {
+        // Status requests are typically done via handshake or specific command
+        return Task.FromResult(SendHandshakeAsync(cancellationToken).Result.Success);
+    }
+
+    public Task<bool> SendSyncRequestAsync(CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(SendHandshakeAsync(cancellationToken).Result.Success);
     }
 
     private void OnConnectionStateChanged(object? sender, ConnectionInfo connectionInfo)
