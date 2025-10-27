@@ -3,7 +3,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
-#endif
+using RadioProtocol.Core.Constants;
 using RadioProtocol.Core.Logging;
 using RadioProtocol.Core.Models;
 using System;
@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 
 namespace RadioProtocol.Core.Bluetooth;
 
-#if WINDOWS
 /// <summary>
 /// Windows-specific Bluetooth LE implementation
 /// </summary>
@@ -97,7 +96,7 @@ public class WindowsBluetoothConnection : BluetoothConnectionBase
 
             _device.ConnectionStatusChanged += OnConnectionStatusChanged;
 
-            var gattResult = await _device.GetGattServicesAsync(BluetoothCacheMode.Uncached, cancellationToken);
+            var gattResult = await _device.GetGattServicesAsync(BluetoothCacheMode.Uncached);
             if (gattResult.Status != GattCommunicationStatus.Success)
             {
                 throw new Exception($"Failed to get GATT services: {gattResult.Status}");

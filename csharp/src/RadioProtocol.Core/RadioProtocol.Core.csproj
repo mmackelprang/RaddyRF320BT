@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -11,6 +11,7 @@
     <Authors>Radio Protocol Team</Authors>
     <Description>Cross-platform Bluetooth radio protocol library for RF320 and compatible devices</Description>
     <PackageTags>bluetooth;radio;protocol;cross-platform</PackageTags>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
@@ -26,7 +27,7 @@
 
   <!-- Windows-specific packages -->
   <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
-    <PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.22621.3233" />
+    
   </ItemGroup>
 
   <!-- Linux/Raspberry Pi packages -->

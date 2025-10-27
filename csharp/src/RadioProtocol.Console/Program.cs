@@ -6,6 +6,7 @@ using RadioProtocol.Core;
 using RadioProtocol.Core.Constants;
 using RadioProtocol.Core.Logging;
 using RadioProtocol.Core.Models;
+using Serilog;
 
 namespace RadioProtocol.Console;
 
@@ -17,6 +18,7 @@ class Program
     private static IRadioManager? _radioManager;
     private static ILogger<Program>? _logger;
     private static readonly CancellationTokenSource _cancellationTokenSource = new();
+    private static String _address = String.Empty;
 
     static async Task Main(string[] args)
     {
@@ -34,9 +36,8 @@ class Program
             var configuration = host.Services.GetRequiredService<IConfiguration>();
             
             // Initialize radio manager
-            var logPath = configuration["RadioSettings:LogFilePath"] ?? "logs/radio-protocol.log";
             _radioManager = new RadioManagerBuilder()
-                .WithFileLogging(logPath)
+                .WithLogger(host.Services.GetRequiredService<IRadioLogger>())
                 .Build();
 
             // Setup event handlers
@@ -71,6 +72,20 @@ class Program
 
     private static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
+            .UseSerilog((context, services, loggerConfiguration) => loggerConfiguration
+                .ReadFrom.Configuration(context.Configuration)
+                .ReadFrom.Services(services)
+                .Enrich.FromLogContext()
+                .WriteTo.File(
+                    path: "logs/radio-protocol-.log",
+                    rollingInterval: RollingInterval.Day,
+                    retainedFileCountLimit: 2,
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
+                ))
+            .ConfigureServices((context, services) =>
+            {
+                services.AddSingleton<IRadioLogger, RadioLogger>();
+            })
             .ConfigureAppConfiguration((context, config) =>
             {
                 config.AddJsonFile("appsettings.json", optional: false);
@@ -78,7 +93,6 @@ class Program
             .ConfigureLogging((context, logging) =>
             {
                 logging.ClearProviders();
-                logging.AddConsole();
             });
 
     private static void SetupEventHandlers()
@@ -104,11 +118,11 @@ class Program
 
         _radioManager.MessageReceived += (sender, packet) =>
         {
-            WriteColorLine($"Received: {packet.PacketType} - {packet.HexData}", ConsoleColor.Cyan);
-            if (packet.ParsedData != null)
-            {
-                WriteColorLine($"  Parsed: {packet.ParsedData}", ConsoleColor.Blue);
-            }
+//            WriteColorLine($"Received: {packet.PacketType} - {packet.HexData}", ConsoleColor.Cyan);
+//            if (packet.ParsedData != null)
+//            {
+//                WriteColorLine($"  Parsed: {packet.ParsedData}", ConsoleColor.Blue);
+//            }
         };
 
         _radioManager.StatusUpdated += (sender, status) =>
@@ -122,27 +136,33 @@ class Program
         };
     }
 
+    private static void PrintCommands()
+    {
+        System.Console.WriteLine("Available Commands:");
+        System.Console.WriteLine("  connect [address] - Connect to radio device");
+        System.Console.WriteLine("  scan              - Show devices visible");
+        System.Console.WriteLine("  disconnect        - Disconnect from device");
+        System.Console.WriteLine("  handshake         - Send handshake command");
+        System.Console.WriteLine("  number <0-9>      - Press number button");
+        System.Console.WriteLine("  number <0-9> long - Press number button (long)");
+        System.Console.WriteLine("  volume up/down    - Adjust volume");
+        System.Console.WriteLine("  nav up/down       - Navigate up/down");
+        System.Console.WriteLine("  nav up/down long  - Navigate up/down (long press)");
+        System.Console.WriteLine("  button <type>     - Press specific button");
+        System.Console.WriteLine("  demo              - Run automated demo");
+        System.Console.WriteLine("  test              - Run test sequence");
+        System.Console.WriteLine("  status            - Show current status");
+        System.Console.WriteLine("  help              - Show this help");
+        System.Console.WriteLine("  quit              - Exit application");
+        System.Console.WriteLine();
+    }
+
     private static async Task RunDemoAsync(IConfiguration configuration)
     {
         var deviceAddress = configuration["RadioSettings:DeviceAddress"] ?? "00:11:22:33:44:55";
         var autoConnect = configuration.GetValue<bool>("RadioSettings:AutoConnect");
 
-        System.Console.WriteLine("Available Commands:");
-        System.Console.WriteLine("  connect [address] - Connect to radio device");
-        System.Console.WriteLine("  disconnect        - Disconnect from device");
-        System.Console.WriteLine("  handshake        - Send handshake command");
-        System.Console.WriteLine("  number <0-9>     - Press number button");
-        System.Console.WriteLine("  number <0-9> long - Press number button (long)");
-        System.Console.WriteLine("  volume up/down   - Adjust volume");
-        System.Console.WriteLine("  nav up/down      - Navigate up/down");
-        System.Console.WriteLine("  nav up/down long - Navigate up/down (long press)");
-        System.Console.WriteLine("  button <type>    - Press specific button");
-        System.Console.WriteLine("  demo            - Run automated demo");
-        System.Console.WriteLine("  test            - Run test sequence");
-        System.Console.WriteLine("  status          - Show current status");
-        System.Console.WriteLine("  help            - Show this help");
-        System.Console.WriteLine("  quit            - Exit application");
-        System.Console.WriteLine();
+        PrintCommands();
 
         if (autoConnect)
         {
@@ -181,7 +201,15 @@ class Program
         {
             case "connect":
                 var address = args.Length > 0 ? args[0] : "00:11:22:33:44:55";
+                if(_address != String.Empty)
+                {
+                    address = _address;
+                }
                 await ConnectToDevice(address);
+                break;
+
+            case "scan":
+                await ScanForDevices();
                 break;
 
             case "disconnect":
@@ -222,7 +250,7 @@ class Program
                 break;
 
             case "help":
-                // Help already shown above
+                PrintCommands();
                 break;
 
             case "quit":
@@ -236,13 +264,35 @@ class Program
         }
     }
 
+    private static async Task ScanForDevices()
+    {
+        if (_radioManager == null) return;
+
+        WriteColorLine($"Scanning for devices:", ConsoleColor.Yellow);
+        var devices = await _radioManager.ScanForDevicesAsync(_cancellationTokenSource.Token);
+
+        foreach (var d in devices)
+        {
+            if (d.Name.Contains("RF320"))
+            {
+                _address = d.Address;
+                WriteColorLine($"  {d.Name} - {d.Address}", ConsoleColor.Green);
+
+            }
+            else
+            {
+                WriteColorLine($"  {d.Name} - {d.Address}", ConsoleColor.Gray);
+            }
+        }
+    }
+
     private static async Task ConnectToDevice(string deviceAddress)
     {
         if (_radioManager == null) return;
 
         WriteColorLine($"Connecting to device: {deviceAddress}", ConsoleColor.Yellow);
         var success = await _radioManager.ConnectAsync(deviceAddress, _cancellationTokenSource.Token);
-        
+
         if (success)
         {
             WriteColorLine("Connected successfully!", ConsoleColor.Green);
