@@ -1,10 +1,13 @@
-using System.Collections.Concurrent;
-using RadioProtocol.Core.Bluetooth;
-using RadioProtocol.Core.Commands;
-using RadioProtocol.Core.Constants;
-using RadioProtocol.Core.Logging;
 using RadioProtocol.Core.Models;
+using RadioProtocol.Core.Bluetooth;
+using BluetoothDeviceInfo = RadioProtocol.Core.Bluetooth.DeviceInfo;
 using RadioProtocol.Core.Protocol;
+using RadioProtocol.Core.Logging;
+using RadioProtocol.Core.Commands;
+using System.Collections.Concurrent;
+using System.IO;
+using Microsoft.Extensions.Logging;
+using RadioProtocol.Core.Constants;
 
 namespace RadioProtocol.Core;
 
@@ -16,8 +19,9 @@ public interface IRadioManager : IDisposable
     event EventHandler<ConnectionInfo>? ConnectionStateChanged;
     event EventHandler<ResponsePacket>? MessageReceived;
     event EventHandler<RadioStatus>? StatusUpdated;
-    event EventHandler<DeviceInfo>? DeviceInfoReceived;
+    event EventHandler<Models.DeviceInfo>? DeviceInfoReceived;
     
+    Task<IEnumerable<BluetoothDeviceInfo>> ScanForDevicesAsync(CancellationToken cancellationToken = default);
     Task<bool> ConnectAsync(string deviceAddress, CancellationToken cancellationToken = default);
     Task DisconnectAsync();
     Task<CommandResult> SendCommandAsync(byte[] command, CancellationToken cancellationToken = default);
@@ -32,7 +36,7 @@ public interface IRadioManager : IDisposable
     bool IsConnected { get; }
     ConnectionInfo ConnectionStatus { get; }
     RadioStatus? CurrentStatus { get; }
-    DeviceInfo? DeviceInformation { get; }
+    Models.DeviceInfo? DeviceInformation { get; }
 }
 
 /// <summary>
@@ -42,56 +46,48 @@ public class RadioManager : IRadioManager
 {
     private readonly IBluetoothConnection _bluetoothConnection;
     private readonly RadioCommandBuilder _commandBuilder;
-    private readonly RadioProtocolParser _protocolParser;
+    private readonly IRadioPacketParser _packetParser;
     private readonly IRadioLogger _logger;
     
     private readonly ConcurrentQueue<ResponsePacket> _responseQueue = new();
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly SemaphoreSlim _commandSemaphore = new(1, 1);
     
-    private RadioStatus? _currentStatus;
-    private DeviceInfo? _deviceInfo;
+    private RadioStatus? _status;
+    private Models.DeviceInfo? _deviceInfo;
     private volatile bool _disposed;
 
     public event EventHandler<ConnectionInfo>? ConnectionStateChanged;
     public event EventHandler<ResponsePacket>? MessageReceived;
     public event EventHandler<RadioStatus>? StatusUpdated;
-    public event EventHandler<DeviceInfo>? DeviceInfoReceived;
+    public event EventHandler<Models.DeviceInfo>? DeviceInfoReceived;
 
     public bool IsConnected => _bluetoothConnection.IsConnected;
+    public RadioStatus? CurrentStatus => _status;
     public ConnectionInfo ConnectionStatus => _bluetoothConnection.ConnectionStatus;
-    public RadioStatus? CurrentStatus => _currentStatus;
-    public DeviceInfo? DeviceInformation => _deviceInfo;
+    public Models.DeviceInfo? DeviceInformation => _deviceInfo;
 
-    public RadioManager(IRadioLogger logger)
-    {
-        _logger = logger;
-        _bluetoothConnection = BluetoothConnectionFactory.Create(_logger);
-        _commandBuilder = new RadioCommandBuilder(_logger);
-        _protocolParser = new RadioProtocolParser(_logger);
-
-        // Subscribe to Bluetooth events
-        _bluetoothConnection.ConnectionStateChanged += OnConnectionStateChanged;
-        _bluetoothConnection.DataReceived += OnDataReceived;
-
-        _logger.LogInfo("RadioManager initialized");
-    }
-
-    /// <summary>
-    /// Constructor for testing with dependency injection
-    /// </summary>
-    public RadioManager(IBluetoothConnection bluetoothConnection, IRadioLogger logger)
+    public RadioManager(
+        IRadioLogger logger,
+        IBluetoothConnection bluetoothConnection,
+        IRadioPacketParser packetParser,
+        RadioCommandBuilder commandBuilder)
     {
         _logger = logger;
         _bluetoothConnection = bluetoothConnection;
-        _commandBuilder = new RadioCommandBuilder(_logger);
-        _protocolParser = new RadioProtocolParser(_logger);
+        _packetParser = packetParser;
+        _commandBuilder = commandBuilder;
 
-        // Subscribe to Bluetooth events
-        _bluetoothConnection.ConnectionStateChanged += OnConnectionStateChanged;
         _bluetoothConnection.DataReceived += OnDataReceived;
+        _bluetoothConnection.ConnectionStateChanged += OnConnectionStateChanged;
+    }
 
-        _logger.LogInfo("RadioManager initialized with injected dependencies");
+    public async Task<IEnumerable<BluetoothDeviceInfo>> ScanForDevicesAsync(CancellationToken cancellationToken = default)
+    {
+        _logger.LogInfo("Starting device scan...");
+        var devices = await _bluetoothConnection.ScanForDevicesAsync(cancellationToken);
+        _logger.LogInfo($"Device scan complete. Found {devices.Count()} devices.");
+        return devices;
     }
 
     public async Task<bool> ConnectAsync(string deviceAddress, CancellationToken cancellationToken = default)
@@ -241,49 +237,6 @@ public class RadioManager : IRadioManager
         return await SendCommandAsync(command, cancellationToken);
     }
 
-    /// <summary>
-    /// Send a sync request message (test-compatible method)
-    /// </summary>
-    public async Task<bool> SendSyncRequestAsync(CancellationToken cancellationToken = default)
-    {
-        _logger.LogInfo("Sending sync request");
-        var command = _commandBuilder.BuildSyncRequestCommand();
-        var result = await SendCommandAsync(command, cancellationToken);
-        return result.Success;
-    }
-
-    /// <summary>
-    /// Send a status request message (test-compatible method)
-    /// </summary>
-    public async Task<bool> SendStatusRequestAsync(CancellationToken cancellationToken = default)
-    {
-        _logger.LogInfo("Sending status request");
-        var command = _commandBuilder.BuildStatusRequestCommand();
-        var result = await SendCommandAsync(command, cancellationToken);
-        return result.Success;
-    }
-
-    /// <summary>
-    /// Send a button press message (test-compatible method)
-    /// </summary>
-    public async Task<bool> SendButtonPressAsync(ButtonType buttonType, CancellationToken cancellationToken = default)
-    {
-        var result = await PressButtonAsync(buttonType, cancellationToken);
-        return result.Success;
-    }
-
-    /// <summary>
-    /// Send a channel command message (test-compatible method)
-    /// </summary>
-    public async Task<bool> SendChannelCommandAsync(int channelNumber, CancellationToken cancellationToken = default)
-    {
-        _logger.LogInfo($"Sending channel command: {channelNumber}");
-        // Use number button for channel selection
-        var command = CommonCommands.NumberButton(channelNumber, _logger);
-        var result = await SendCommandAsync(command, cancellationToken);
-        return result.Success;
-    }
-
     private void OnConnectionStateChanged(object? sender, ConnectionInfo connectionInfo)
     {
         _logger.LogInfo($"Connection state changed: {connectionInfo.State}");
@@ -292,45 +245,27 @@ public class RadioManager : IRadioManager
 
     private void OnDataReceived(object? sender, byte[] data)
     {
-        try
-        {
-            var responsePacket = _protocolParser.ParseReceivedData(data);
-            
-            // Queue the response for command correlation
-            _responseQueue.Enqueue(responsePacket);
-            
-            // Update internal state based on response type
-            UpdateInternalState(responsePacket);
-            
-            // Notify listeners
-            MessageReceived?.Invoke(this, responsePacket);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error processing received data");
-        }
-    }
+        var responsePacket = _packetParser.Parse(data);
 
-    private void UpdateInternalState(ResponsePacket responsePacket)
-    {
+        if (responsePacket == null)
+        {
+            _logger.LogWarning("Failed to parse response packet.");
+            return;
+        }
+
+        _logger.LogMessageReceived(responsePacket.PacketType.ToString(), responsePacket);
+
+        MessageReceived?.Invoke(this, responsePacket);
+
         switch (responsePacket.PacketType)
         {
-            case ResponsePacketType.FrequencyStatus when responsePacket.ParsedData is RadioStatus status:
-                _currentStatus = status;
-                StatusUpdated?.Invoke(this, status);
-                break;
-                
-            case ResponsePacketType.DeviceInfo when responsePacket.ParsedData is DeviceInfo deviceInfo:
+            case ResponsePacketType.DeviceInfo when responsePacket.ParsedData is Models.DeviceInfo deviceInfo:
                 _deviceInfo = deviceInfo;
-                DeviceInfoReceived?.Invoke(this, deviceInfo);
+                DeviceInfoReceived?.Invoke(this, _deviceInfo);
                 break;
-                
-            case ResponsePacketType.Volume when responsePacket.ParsedData is AudioInfo audioInfo:
-                if (_currentStatus != null)
-                {
-                    _currentStatus = _currentStatus with { VolumeLevel = audioInfo.VolumeLevel };
-                    StatusUpdated?.Invoke(this, _currentStatus);
-                }
+            case ResponsePacketType.Status when responsePacket.ParsedData is RadioStatus status:
+                _status = status;
+                StatusUpdated?.Invoke(this, _status);
                 break;
         }
     }
@@ -387,7 +322,11 @@ public class RadioManagerBuilder
             _logger = new RadioLogger(simpleLogger);
         }
 
-        return new RadioManager(_logger);
+        var bluetoothConnection = BluetoothConnectionFactory.Create(_logger);
+        var packetParser = newRadioPacketParser(_logger);
+        var commandBuilder = new RadioCommandBuilder(_logger);
+
+        return new RadioManager(_logger, bluetoothConnection, packetParser, commandBuilder);
     }
 }
 
