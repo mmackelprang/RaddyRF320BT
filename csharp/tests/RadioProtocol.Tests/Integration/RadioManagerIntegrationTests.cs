@@ -22,11 +22,7 @@ public class RadioManagerIntegrationTests : IDisposable
         _mockBluetooth = new MockBluetoothConnection();
         
         // Create RadioManager with mock dependencies
-        _radioManager = new RadioManager(_logger);
-        
-        // Replace the internal Bluetooth connection with our mock
-        // Note: In a real implementation, we'd need dependency injection
-        // For now, we'll test the public interface
+        _radioManager = new RadioManager(_mockBluetooth, _logger);
     }
 
     [Fact]
@@ -190,12 +186,14 @@ public class RadioManagerIntegrationTests : IDisposable
 public class SystemEndToEndTests : IDisposable
 {
     private readonly MockRadioLogger _logger;
+    private readonly MockBluetoothConnection _mockBluetooth;
     private readonly RadioManager _radioManager;
 
     public SystemEndToEndTests()
     {
         _logger = new MockRadioLogger();
-        _radioManager = new RadioManager(_logger);
+        _mockBluetooth = new MockBluetoothConnection();
+        _radioManager = new RadioManager(_mockBluetooth, _logger);
     }
 
     [Fact]
