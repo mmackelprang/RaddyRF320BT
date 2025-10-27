@@ -1,6 +1,7 @@
 using RadioProtocol.Core.Bluetooth;
 using RadioProtocol.Core.Constants;
 using RadioProtocol.Core.Models;
+using BluetoothDeviceInfo = RadioProtocol.Core.Bluetooth.DeviceInfo;
 
 namespace RadioProtocol.Tests.Mocks;
 
@@ -34,6 +35,17 @@ public class MockBluetoothConnection : IBluetoothConnection
             DeviceAddress = "00:11:22:33:44:55",
             Timestamp = DateTime.Now
         };
+    }
+
+    public Task<IEnumerable<BluetoothDeviceInfo>> ScanForDevicesAsync(CancellationToken cancellationToken = default)
+    {
+        // Return a mock device for testing
+        var devices = new List<BluetoothDeviceInfo>
+        {
+            new BluetoothDeviceInfo("Mock Radio Device", "00:11:22:33:44:55"),
+            new BluetoothDeviceInfo("Mock Radio Device 2", "11:22:33:44:55:66")
+        };
+        return Task.FromResult<IEnumerable<BluetoothDeviceInfo>>(devices);
     }
 
     public Task<bool> ConnectAsync(string deviceAddress, CancellationToken cancellationToken = default)

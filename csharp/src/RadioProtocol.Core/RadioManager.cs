@@ -46,7 +46,7 @@ public class RadioManager : IRadioManager
 {
     private readonly IBluetoothConnection _bluetoothConnection;
     private readonly RadioCommandBuilder _commandBuilder;
-    private readonly IRadioPacketParser _packetParser;
+    private readonly RadioProtocolParser _packetParser;
     private readonly IRadioLogger _logger;
     
     private readonly ConcurrentQueue<ResponsePacket> _responseQueue = new();
@@ -70,7 +70,7 @@ public class RadioManager : IRadioManager
     public RadioManager(
         IRadioLogger logger,
         IBluetoothConnection bluetoothConnection,
-        IRadioPacketParser packetParser,
+        RadioProtocolParser packetParser,
         RadioCommandBuilder commandBuilder)
     {
         _logger = logger;
@@ -245,7 +245,7 @@ public class RadioManager : IRadioManager
 
     private void OnDataReceived(object? sender, byte[] data)
     {
-        var responsePacket = _packetParser.Parse(data);
+        var responsePacket = _packetParser.ParseReceivedData(data);
 
         if (responsePacket == null)
         {
@@ -263,7 +263,7 @@ public class RadioManager : IRadioManager
                 _deviceInfo = deviceInfo;
                 DeviceInfoReceived?.Invoke(this, _deviceInfo);
                 break;
-            case ResponsePacketType.Status when responsePacket.ParsedData is RadioStatus status:
+            case ResponsePacketType.FrequencyStatus when responsePacket.ParsedData is RadioStatus status:
                 _status = status;
                 StatusUpdated?.Invoke(this, _status);
                 break;
@@ -323,7 +323,7 @@ public class RadioManagerBuilder
         }
 
         var bluetoothConnection = BluetoothConnectionFactory.Create(_logger);
-        var packetParser = newRadioPacketParser(_logger);
+        var packetParser = new RadioProtocolParser(_logger);
         var commandBuilder = new RadioCommandBuilder(_logger);
 
         return new RadioManager(_logger, bluetoothConnection, packetParser, commandBuilder);
