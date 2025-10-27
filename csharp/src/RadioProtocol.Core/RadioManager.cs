@@ -254,25 +254,29 @@ public class RadioManager : IRadioManager
     }
 
     // Aliases for backward compatibility with tests
-    public Task<bool> SendButtonPressAsync(ButtonType buttonType, CancellationToken cancellationToken = default)
+    public async Task<bool> SendButtonPressAsync(ButtonType buttonType, CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(PressButtonAsync(buttonType, cancellationToken).Result.Success);
+        var result = await PressButtonAsync(buttonType, cancellationToken);
+        return result.Success;
     }
 
-    public Task<bool> SendChannelCommandAsync(int channel, CancellationToken cancellationToken = default)
+    public async Task<bool> SendChannelCommandAsync(int channel, CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(PressNumberAsync(channel, false, cancellationToken).Result.Success);
+        var result = await PressNumberAsync(channel, false, cancellationToken);
+        return result.Success;
     }
 
-    public Task<bool> SendStatusRequestAsync(CancellationToken cancellationToken = default)
+    public async Task<bool> SendStatusRequestAsync(CancellationToken cancellationToken = default)
     {
         // Status requests are typically done via handshake or specific command
-        return Task.FromResult(SendHandshakeAsync(cancellationToken).Result.Success);
+        var result = await SendHandshakeAsync(cancellationToken);
+        return result.Success;
     }
 
-    public Task<bool> SendSyncRequestAsync(CancellationToken cancellationToken = default)
+    public async Task<bool> SendSyncRequestAsync(CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(SendHandshakeAsync(cancellationToken).Result.Success);
+        var result = await SendHandshakeAsync(cancellationToken);
+        return result.Success;
     }
 
     private void OnConnectionStateChanged(object? sender, ConnectionInfo connectionInfo)
