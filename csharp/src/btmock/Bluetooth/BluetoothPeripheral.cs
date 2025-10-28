@@ -1,5 +1,12 @@
 using BtMock.Config;
 using Microsoft.Extensions.Logging;
+#if WINDOWS
+using Windows.Devices.Bluetooth;
+using Windows.Devices.Bluetooth.Advertisement;
+using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using Windows.Storage.Streams;
+using System.Runtime.InteropServices.WindowsRuntime;
+#endif
 
 namespace BtMock.Bluetooth;
 
@@ -23,6 +30,13 @@ public class BluetoothPeripheral
     // Simulated connection state
     private readonly List<byte[]> _notificationQueue = new();
     private readonly object _lock = new();
+
+#if WINDOWS
+    private GattServiceProvider? _serviceProvider;
+    private GattLocalCharacteristic? _writeCharacteristic;
+    private GattLocalCharacteristic? _notifyCharacteristic;
+    private IReadOnlyList<GattSubscribedClient>? _subscribedClients;
+#endif
 
     /// <summary>
     /// Event raised when a message is received from a connected controller.
@@ -83,23 +97,66 @@ public class BluetoothPeripheral
     private async Task InitializePlatformBluetoothAsync()
     {
         #if WINDOWS
-        // Windows-specific initialization using UWP APIs
         _logger.LogInformation("Initializing Windows Bluetooth LE peripheral");
-        
-        // Note: Windows.Devices.Bluetooth.Advertisement namespace provides
-        // BluetoothLEAdvertisementPublisher for advertising
-        // Windows.Devices.Bluetooth.GenericAttributeProfile provides
-        // GattServiceProvider for GATT server functionality
-        
-        // For a full implementation, you would:
-        // 1. Create a GattServiceProvider with the configured service UUID
-        // 2. Add characteristics (WriteCharacteristicUUID and NotifyCharacteristicUUID)
-        // 3. Set up characteristic write event handlers
-        // 4. Start a BluetoothLEAdvertisementPublisher
-        
-        await Task.Delay(500); // Simulated initialization delay
-        _logger.LogInformation("Windows Bluetooth initialization simulated");
-        
+
+        // 1. Create a GattServiceProvider
+        var serviceUuid = Guid.Parse(_config.ServiceUUID);
+        var result = await GattServiceProvider.CreateAsync(serviceUuid);
+
+        if (result.Error != BluetoothError.Success)
+        {
+            throw new InvalidOperationException($"Could not create GATT service provider: {result.Error}");
+        }
+        _serviceProvider = result.ServiceProvider;
+        _logger.LogInformation($"GATT service provider created for UUID: {_serviceProvider.Service.Uuid}");
+
+        // 2. Create Write Characteristic
+        var writeUuid = Guid.Parse(_config.WriteCharacteristicUUID);
+        var writeParameters = new GattLocalCharacteristicParameters
+        {
+            CharacteristicProperties = GattCharacteristicProperties.WriteWithoutResponse,
+            WriteProtectionLevel = GattProtectionLevel.Plain,
+            UserDescription = "Radio Write Characteristic"
+        };
+        var charResult = await _serviceProvider.Service.CreateCharacteristicAsync(writeUuid, writeParameters);
+        if (charResult.Error != BluetoothError.Success)
+        {
+            throw new InvalidOperationException($"Could not create write characteristic: {charResult.Error}");
+        }
+        _writeCharacteristic = charResult.Characteristic;
+        _writeCharacteristic.WriteRequested += OnWriteRequested;
+        _logger.LogInformation($"Write characteristic created: {_writeCharacteristic.Uuid}");
+
+        // 3. Create Notify Characteristic
+        var notifyUuid = Guid.Parse(_config.NotifyCharacteristicUUID);
+        var notifyParameters = new GattLocalCharacteristicParameters
+        {
+            CharacteristicProperties = GattCharacteristicProperties.Notify,
+            WriteProtectionLevel = GattProtectionLevel.Plain,
+            UserDescription = "Radio Notify Characteristic"
+        };
+        charResult = await _serviceProvider.Service.CreateCharacteristicAsync(notifyUuid, notifyParameters);
+        if (charResult.Error != BluetoothError.Success)
+        {
+            throw new InvalidOperationException($"Could not create notify characteristic: {charResult.Error}");
+        }
+        _notifyCharacteristic = charResult.Characteristic;
+        _notifyCharacteristic.SubscribedClientsChanged += OnSubscribedClientsChanged;
+        _logger.LogInformation($"Notify characteristic created: {_notifyCharacteristic.Uuid}");
+
+        // 4. Start Advertising Service and Device Name
+        var advertisement = new BluetoothLEAdvertisement();
+        advertisement.LocalName = _config.DeviceName;
+        advertisement.ServiceUuids.Add(serviceUuid);
+
+        var advParameters = new GattServiceProviderAdvertisingParameters
+        {
+            IsDiscoverable = true,
+            IsConnectable = true,
+        };
+        _serviceProvider.StartAdvertising(advParameters);
+        _logger.LogInformation($"GATT service advertising started with device name '{_config.DeviceName}'.");
+
         #else
         // Non-Windows platforms can use InTheHand.BluetoothLE or other libraries
         _logger.LogInformation("Initializing cross-platform Bluetooth LE peripheral");
@@ -110,48 +167,42 @@ public class BluetoothPeripheral
         await Task.Delay(500); // Simulated initialization delay
         _logger.LogInformation("Cross-platform Bluetooth initialization simulated");
         #endif
-        
-        // Simulate a connection being established after a short delay
-        _ = Task.Run(async () =>
-        {
-            await Task.Delay(2000); // Simulate connection after 2 seconds
-            SimulateConnection();
-        });
     }
 
-    /// <summary>
-    /// Simulates a Bluetooth connection being established.
-    /// In a real implementation, this would be triggered by actual connection events.
-    /// </summary>
-    private void SimulateConnection()
+    #if WINDOWS
+    private void OnSubscribedClientsChanged(GattLocalCharacteristic sender, object args)
     {
-        lock (_lock)
+        _subscribedClients = sender.SubscribedClients;
+        _isConnected = _subscribedClients.Count > 0;
+        var status = _isConnected ? "Connected" : "Disconnected";
+        var deviceId = _isConnected ? _subscribedClients[0].Session.DeviceId.Id : "";
+
+        OnConnectionStatusChanged(status, deviceId);
+        _logger.LogInformation($"Subscribed clients changed. Count: {_subscribedClients.Count}");
+    }
+
+    private async void OnWriteRequested(GattLocalCharacteristic sender, GattWriteRequestedEventArgs args)
+    {
+        using var deferral = args.GetDeferral();
+        var request = await args.GetRequestAsync();
+        if (request == null)
         {
-            _isConnected = true;
+            _logger.LogWarning("Received a null write request.");
+            return;
         }
-        
-        OnConnectionStatusChanged("Connected", "Simulated-Device-ID");
-        
-        // Simulate receiving some test messages
-        _ = Task.Run(async () =>
-        {
-            await Task.Delay(1000);
-            SimulateIncomingMessage(new byte[] { 0xAB, 0x01, 0xFF, 0xAB }); // Handshake
-            
-            await Task.Delay(2000);
-            SimulateIncomingMessage(new byte[] { 0xAB, 0x02, 0x0C, 0x14, 0xCB }); // Power button
-        });
-    }
 
-    /// <summary>
-    /// Simulates receiving an incoming message from a connected controller.
-    /// This is for testing purposes; in a real implementation, this would be
-    /// triggered by actual write events from the GATT characteristic.
-    /// </summary>
-    private void SimulateIncomingMessage(byte[] data)
-    {
+        var reader = DataReader.FromBuffer(request.Value);
+        var data = new byte[reader.UnconsumedBufferLength];
+        reader.ReadBytes(data);
+
         OnMessageReceived(DateTime.Now, data);
+
+        if (request.Option == GattWriteOption.WriteWithResponse)
+        {
+            request.Respond();
+        }
     }
+    #endif
 
     /// <summary>
     /// Sends a notification to the connected controller via the notify characteristic.
@@ -169,6 +220,17 @@ public class BluetoothPeripheral
         {
             _logger.LogInformation($"Sending notification: {data.Length} bytes");
             
+            #if WINDOWS
+            if (_notifyCharacteristic != null && _subscribedClients != null && _subscribedClients.Count > 0)
+            {
+                await _notifyCharacteristic.NotifyValueAsync(data.AsBuffer());
+                _logger.LogInformation("Notification sent successfully via GATT.");
+            }
+            else
+            {
+                _logger.LogWarning("Cannot send notification, characteristic or subscribed clients not available.");
+            }
+            #else
             // In a real implementation, this would use the GATT NotifyCharacteristic
             // to send data to subscribed clients
             
@@ -180,7 +242,8 @@ public class BluetoothPeripheral
             // Simulate async send operation
             await Task.Delay(50); // Simulate transmission delay
             
-            _logger.LogInformation("Notification sent successfully");
+            _logger.LogInformation("Notification sent successfully (simulated)");
+            #endif
         }
         catch (Exception ex)
         {
@@ -198,6 +261,25 @@ public class BluetoothPeripheral
         {
             _logger.LogInformation("Stopping Bluetooth peripheral");
             
+            #if WINDOWS
+            if (_serviceProvider != null && _isAdvertising)
+            {
+                _serviceProvider.StopAdvertising();
+            }
+            _serviceProvider = null;
+            
+            if (_writeCharacteristic != null)
+            {
+                _writeCharacteristic.WriteRequested -= OnWriteRequested;
+                _writeCharacteristic = null;
+            }
+            if (_notifyCharacteristic != null)
+            {
+                _notifyCharacteristic.SubscribedClientsChanged -= OnSubscribedClientsChanged;
+                _notifyCharacteristic = null;
+            }
+            #endif
+
             if (_isConnected)
             {
                 lock (_lock)
