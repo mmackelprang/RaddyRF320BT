@@ -20,6 +20,12 @@ RadioProtocol.Console           🖥️ Demo Application
 └── Program.cs                  ┌─ Interactive console demo
                                 └─ Configuration and DI setup
 
+btmock                          🔧 Mock Radio Device (NEW!)
+├── 📁 Bluetooth/               ┌─ BLE peripheral implementation
+├── 📁 Config/                  ├─ Configuration classes
+├── 📁 Logging/                 ├─ CSV message logging
+└── Program.cs                  └─ Interactive mock radio console
+
 RadioProtocol.Tests             🧪 Test Suite
 ├── 📁 Mocks/                   ┌─ Mock implementations
 ├── 📁 Integration/             ├─ Integration tests
@@ -90,6 +96,41 @@ JSON-based configuration with dependency injection:
   }
 }
 ```
+
+### Mock Radio Device (`btmock`) - NEW!
+
+#### 🔧 **Bluetooth Mock Radio**
+A Windows console application that acts as a mock Bluetooth LE radio device for protocol reverse engineering and testing.
+
+**Key Features:**
+- **BLE Peripheral**: Advertises as a configurable Bluetooth LE device (default: "RF320-BLE")
+- **GATT Service**: Implements write and notify characteristics for bidirectional communication
+- **Message Logging**: Logs all received messages to CSV with timestamps, hex data, and user tags
+- **Interactive Console**: Real-time message tagging and response sending
+- **Canned Responses**: Pre-configured responses for common protocol messages
+- **Custom Responses**: Enter arbitrary hex strings to send to connected controllers
+
+**Usage:**
+```bash
+# Run the mock radio
+dotnet run --project src/btmock
+
+# Press keys for actions:
+# [t] - Set message tag
+# [c] - Clear tag
+# [r] - Send handshake response
+# [s] - Send status response
+# [h] - Send custom hex
+# [q] - Quit
+```
+
+**Configuration:**
+All parameters are easily configurable via `config.json`:
+- Device Name, Address, and UUIDs
+- CSV log file path
+- Canned response definitions
+
+👉 **See [src/btmock/README.md](src/btmock/README.md) for complete btmock documentation**
 
 ### Test Suite (`RadioProtocol.Tests`)
 

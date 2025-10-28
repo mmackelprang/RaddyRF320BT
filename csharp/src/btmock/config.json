@@ -1,0 +1,17 @@
+{
+  "BluetoothConfig": {
+    "DeviceName": "RF320-BLE",
+    "DeviceAddress": "D5:D6:2A:FF:42:41",
+    "ServiceUUID": "0000ff10-0000-1000-8000-00805f9b34fb",
+    "WriteCharacteristicUUID": "0000ff13-0000-1000-8000-00805f9b34fb",
+    "NotifyCharacteristicUUID": "0000ff14-0000-1000-8000-00805f9b34fb"
+  },
+  "Logging": {
+    "CsvLogPath": "logs/btmock_log.csv",
+    "EnableConsoleLogging": true
+  },
+  "CannedResponses": {
+    "HandshakeResponse": "AB0117AB",
+    "StatusResponse": "AB0417010203BC"
+  }
+}
