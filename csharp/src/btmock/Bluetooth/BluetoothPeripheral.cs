@@ -97,12 +97,8 @@ public class BluetoothPeripheral
         // 3. Set up characteristic write event handlers
         // 4. Start a BluetoothLEAdvertisementPublisher
         
-        await Task.Run(() =>
-        {
-            _logger.LogInformation("Windows Bluetooth initialization simulated");
-            // Simulated delay for initialization
-            Thread.Sleep(500);
-        });
+        await Task.Delay(500); // Simulated initialization delay
+        _logger.LogInformation("Windows Bluetooth initialization simulated");
         
         #else
         // Non-Windows platforms can use InTheHand.BluetoothLE or other libraries
@@ -111,11 +107,8 @@ public class BluetoothPeripheral
         // Note: InTheHand.BluetoothLE provides cross-platform Bluetooth LE support
         // However, peripheral/server mode support varies by platform
         
-        await Task.Run(() =>
-        {
-            _logger.LogInformation("Cross-platform Bluetooth initialization simulated");
-            Thread.Sleep(500);
-        });
+        await Task.Delay(500); // Simulated initialization delay
+        _logger.LogInformation("Cross-platform Bluetooth initialization simulated");
         #endif
         
         // Simulate a connection being established after a short delay
@@ -185,10 +178,7 @@ public class BluetoothPeripheral
             }
             
             // Simulate async send operation
-            await Task.Run(() =>
-            {
-                Thread.Sleep(50); // Simulate transmission delay
-            });
+            await Task.Delay(50); // Simulate transmission delay
             
             _logger.LogInformation("Notification sent successfully");
         }
@@ -224,10 +214,7 @@ public class BluetoothPeripheral
             }
             
             // Simulate async cleanup
-            await Task.Run(() =>
-            {
-                Thread.Sleep(100);
-            });
+            await Task.Delay(100);
             
             _logger.LogInformation("Bluetooth peripheral stopped");
         }

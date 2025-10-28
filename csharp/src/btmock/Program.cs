@@ -92,13 +92,15 @@ class Program
     /// </summary>
     private static void InitializeLogging()
     {
-        using var loggerFactory = LoggerFactory.Create(builder =>
+        var loggerFactory = LoggerFactory.Create(builder =>
         {
             builder.AddConsole();
             builder.SetMinimumLevel(LogLevel.Information);
         });
         
         _logger = loggerFactory.CreateLogger<Program>();
+        // Note: Logger factory is intentionally not disposed to keep logger functional
+        // In a production app, consider using dependency injection for proper lifecycle management
     }
 
     /// <summary>
