@@ -185,6 +185,15 @@ public record RadioState(
     };
     
     public string SignalQualityText => GetSignalQuality(SignalStrength);
+    
+    // Get decimal places for frequency display based on band
+    private static int GetDecimalPlaces(byte bandCode) => bandCode switch
+    {
+        0x00 => 2,  // FM: 2 decimal places (e.g., 102.30 MHz)
+        0x01 => 0,  // MW: 0 decimal places (e.g., 1270 KHz)
+        _ => 3      // All other bands: 3 decimal places (e.g., 119.345 MHz)
+    };
+    
     // Get verified band name from band code (Byte 3 in ab0901 messages)
     public static string GetBandName(byte bandCode) => bandCode switch
     {
@@ -212,12 +221,21 @@ public record RadioState(
             byte bandCode = byte.Parse(byte3, NumberStyles.HexNumber);
             string bandName = GetBandName(bandCode);
             
-            // Extract 24-bit frequency (Byte3 + Byte4 + Byte5)
-            // Note: Byte3 serves dual purpose - band code AND part of frequency value
-            string byte4 = hex.Substring(8, 2);   // Byte 4
-            string byte5 = hex.Substring(10, 2);  // Byte 5
-            string freqHex = byte3 + byte4 + byte5;
-            uint rawFreq = Convert.ToUInt32(freqHex, 16);
+            // Extract frequency bytes (Bytes 4-7) for nibble-based decoding
+            string byte4Str = hex.Substring(8, 2);   // Byte 4
+            string byte5Str = hex.Substring(10, 2);  // Byte 5
+            string byte6Str = hex.Substring(12, 2);  // Byte 6
+            string byte7Str = hex.Substring(14, 2);  // Byte 7
+            
+            byte byte4 = byte.Parse(byte4Str, NumberStyles.HexNumber);
+            byte byte5 = byte.Parse(byte5Str, NumberStyles.HexNumber);
+            byte byte6 = byte.Parse(byte6Str, NumberStyles.HexNumber);
+            byte byte7 = byte.Parse(byte7Str, NumberStyles.HexNumber);
+            
+            // Extract Byte 8 (unit indicator: 0=MHz, 1=KHz)
+            string byte8Str = hex.Substring(16, 2);
+            byte byte8 = byte.Parse(byte8Str, NumberStyles.HexNumber);
+            bool isKHz = byte8 == 0x01;
             
             // Extract Byte 9 (contains signal strength in nibbles)
             // Format: High nibble = signal strength (0-6), Low nibble = signal bars/mode
@@ -226,21 +244,36 @@ public record RadioState(
             byte signalStrength = (byte)((byte9 >> 4) & 0x0F);  // High nibble
             byte signalBars = (byte)(byte9 & 0x0F);             // Low nibble
             
-            // Note: The full byte9 value is still used as "scale factor" in frequency calc
-            byte scaleFactor = byte9;
+            // Decode frequency using nibble extraction method
+            // Formula: Extract nibbles from bytes 4-7, assemble as: B6L B5H B5L B4H B4L
+            byte b4High = (byte)((byte4 >> 4) & 0x0F);
+            byte b4Low = (byte)(byte4 & 0x0F);
+            byte b5High = (byte)((byte5 >> 4) & 0x0F);
+            byte b5Low = (byte)(byte5 & 0x0F);
+            byte b6Low = (byte)(byte6 & 0x0F);
             
-            // Calculate frequency with scale factor (approximate only)
-            double freq = ScaleFrequency(rawFreq, scaleFactor);
+            // Assemble frequency hex string from nibbles
+            string freqHex = $"{b6Low:X}{b5High:X}{b5Low:X}{b4High:X}{b4Low:X}";
+            uint freqRaw = Convert.ToUInt32(freqHex, 16);
             
-            byte first = byte.Parse(byte3, NumberStyles.HexNumber);
+            // Apply decimal places based on band
+            int decimalPlaces = GetDecimalPlaces(bandCode);
+            double freq = freqRaw / Math.Pow(10, decimalPlaces);
+            
+            // Convert KHz to MHz if necessary
+            if (isKHz)
+            {
+                freq = freq / 1000.0;  // Convert KHz to MHz for consistent display
+            }
+            
+            // Legacy fields for compatibility
+            byte scaleFactor = byte9;  // Kept for logging, not used in new formula
+            uint rawFreq = (uint)((bandCode << 16) | (byte4 << 8) | byte5);  // Old format for logging
+            byte first = bandCode;
             byte high = (byte)(first >> 4);
             byte low = (byte)(first & 0x0F);
             
-            // Byte 6 might indicate unit (00=MHz, 01=kHz, 02=?)
-            string unitByte = hex.Substring(12, 2);
-            bool isMHz = unitByte == "00" || unitByte == "01" || unitByte == "02";
-            
-            return new RadioState(hex, freqHex, freq, isMHz, high, low, rawFreq, scaleFactor, 
+            return new RadioState(hex, freqHex, freq, !isKHz, high, low, freqRaw, scaleFactor, 
                 bandCode, bandName, signalStrength, signalBars);
         }
         // Extended variant placeholder
@@ -252,50 +285,27 @@ public record RadioState(
         return null;
     }
 
-    private static double ScaleFrequency(uint raw, byte scaleFactor = 0)
-    {
-        // ⚠️ FREQUENCY ENCODING NOT FULLY DECODED ⚠️
-        //
-        // Verified data from RF320-BLE hardware testing (Nov 13, 2025):
-        // Band | Display Freq | Raw (B3+B4+B5) | Byte6 | Byte9(Scale) | Divisor
-        // -----|--------------|----------------|-------|--------------|----------
-        // MW   | 1.270 MHz    | 0x01F604       | 0x00  | 0x30 (48)    | ~101,194
-        // FM   | 102.30 MHz   | 0x00F627       | 0x00  | 0x24 (36)    | ~616
-        // AIR  | 119.345 MHz  | 0x0331D2       | 0x01  | 0x13 (19)    | ~1,754
-        // WB   | 162.40 MHz   | 0x06607A       | 0x02  | 0x13 (19)    | ~2,573
-        // VHF  | 145.095 MHz  | 0x07C736       | 0x02  | 0x13 (19)    | ~3,521
-        //
-        // Analysis from STATUS_MESSAGE_ANALYSIS.md (Android app reverse engineering):
-        // - Android extracts 4 frequency bytes, concatenates them, calls hexToDec()
-        // - However, obfuscated variable names hide exact byte positions
-        // - Android messages may be longer (14+ bytes) vs our 12-byte messages
-        // 
-        // CONCLUSION: The divisor varies even with same scale factor AND byte6 value.
-        // This suggests either:
-        // 1. Additional encoding in other bytes (B7, B8, or nibbles within B9)
-        // 2. Non-linear formula or lookup table
-        // 3. Different message format between firmware versions
-        //
-        // Current implementation provides APPROXIMATE values only.
-        // Display should show raw hex values for analysis until formula is decoded.
-        
-        if (scaleFactor == 0)
-        {
-            // Fallback: Adaptive heuristic for legacy messages
-            if (raw > 2_000_000) return raw / 100_000.0;
-            if (raw > 200_000) return raw / 1_000.0;
-            if (raw > 10_000) return raw / 100.0;
-            return raw / 10.0;
-        }
-        
-        // Approximate formula (not accurate, needs more reverse engineering):
-        // Returns values in ballpark but not exact
-        double approxFreq = raw / (scaleFactor * 100.0);
-        
-        // Note: This will be inaccurate. Frequency display should show raw value
-        // until proper decoding formula is determined.
-        return approxFreq;
-    }
+    // Note: ScaleFrequency method removed - replaced with correct nibble-based decoding
+    // Frequency decoding is now handled directly in Parse() method
+    // 
+    // ✅ FREQUENCY ENCODING FULLY DECODED (Nov 13, 2025)
+    //
+    // Breakthrough: Frequency is encoded in nibbles of bytes 4-7:
+    // 1. Extract nibbles: B4High, B4Low, B5High, B5Low, B6Low
+    // 2. Assemble hex string: B6Low + B5High + B5Low + B4High + B4Low
+    // 3. Convert to decimal
+    // 4. Apply decimal places: FM=2, MW/AM=0, Others=3
+    // 5. Check Byte 8: 0=MHz, 1=KHz (convert KHz to MHz for display)
+    //
+    // Verified against hardware data:
+    // Band | Display      | B4   B5   B6   B7   B8 | Nibbles    | Result
+    // -----|--------------|------------------------|------------|-------------
+    // MW   | 1.270 MHz    | F6   04   00   00   01 | 0 0 4 F 6  | 1270 KHz ✓
+    // FM   | 102.30 MHz   | F6   27   00   00   00 | 0 2 7 F 6  | 10230 ✓
+    // AIR  | 119.345 MHz  | 31   D2   01   00   00 | 1 D 2 3 1  | 119345 ✓
+    // WB   | 162.40 MHz   | 60   7A   02   00   00 | 2 7 A 6 0  | 162400 ✓
+    // VHF  | 145.095 MHz  | C7   36   02   00   00 | 2 3 6 C 7  | 145095 ✓
+
 }
 
 public static class FrameFactory

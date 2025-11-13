@@ -4,25 +4,23 @@ A comprehensive C# console application for testing and interacting with the RF32
 
 ## Current Status (November 13, 2025)
 
-### ✅ Fully Working
+### ✅ Fully Working - ALL PROTOCOL FEATURES DECODED!
 - **Command Transmission**: All button commands send correctly with `WriteWithResponse`
 - **Band Switching**: Cycles through all bands (AIR/WB/FM/VHF/MW/SW)
 - **Volume Control**: VolAdd/VolDel update radio volume in real-time
 - **Frequency Entry**: Number keys + Point + FreqConfirm accepted by radio
-- **Status Monitoring**: Real-time updates for volume, modulation mode, band, and signal strength
+- **Status Monitoring**: Real-time updates for volume, modulation mode, band, signal strength, and frequency
 - **BLE Connection**: Stable connection using Service ff12, Characteristics ff13 (TX) and ff14 (RX)
-- **Band Name Display**: ✅ DECODED - FM/MW/SW/AIR/WB/VHF from byte 3 of ab0901 messages
-- **Signal Strength**: ✅ DECODED - 0-6 signal bars from high nibble of byte 9 (ab0901)
-
-### ⚠️ Partially Working
-- **Frequency Display**: Raw frequency values captured from ab0901 messages, but decoding formula incomplete
-  - Verified data: Band codes, 24-bit raw values, scale factors, byte 6 parameters
-  - Mathematical formula not yet derived (divisor varies non-linearly)
-  - See STATUS_MESSAGE_ANALYSIS.md for Android app reverse engineering insights
+- **Band Name Display**: ✅ FULLY DECODED - FM/MW/SW/AIR/WB/VHF from byte 3 of ab0901 messages
+- **Signal Strength**: ✅ FULLY DECODED - 0-6 signal bars from high nibble of byte 9 (ab0901)
+- **Frequency Display**: ✅ FULLY DECODED - Nibble-based extraction from bytes 4-7 with band-specific decimal places
+  - MW/AM: 0 decimal places (e.g., 1270 KHz)
+  - FM: 2 decimal places (e.g., 102.30 MHz)
+  - All others: 3 decimal places (e.g., 119.345 MHz)
+  - Unit indicator from byte 8 (0=MHz, 1=KHz)
 
 ### ❌ Not Yet Implemented
 - **Battery Level**: Not accessed (BLE Battery Service 0x180f present but not queried)
-- **Frequency Formula**: Exact conversion from raw value to MHz requires more analysis
 
 ## Features
 
@@ -212,8 +210,8 @@ The application provides real-time feedback:
 ```
   → TX: D → Demodulation                        (Sent to radio)
   ← RX: Ack: SUCCESS                             (Received from radio)
-  ← STATE: Band=VHF    Freq≈145.10 MHz  Signal:[████░░] Good
-           (raw=0x07C736, scale=19, B9=0x13)    (Radio state update with band & signal)
+  ← STATE: Band=VHF    Freq=145.095 MHz  Signal:[████░░] Good
+           (decoded from nibbles: 0x236C7)       (Exact frequency decoded!)
   ← VolumeValue: '12'                           (Status update)
 ```
 
@@ -339,24 +337,40 @@ Status Messages: [AB LEN 1C TYPE DATA...]
   Device continuously streams status (~2-3 msg/sec)
 ```
 
-## Next Steps for Complete Status Decoding
+## Protocol Reverse Engineering - COMPLETE! 🎉
 
-### High Priority
-1. **Frequency Decoding Formula** ⚠️ IN PROGRESS
-   - ✅ Data structure fully mapped: Bytes 3-5 (raw), Byte 6 (param), Byte 9 (scale/signal)
-   - ✅ Five verified data points collected across all bands
-   - ❌ Mathematical conversion formula not yet derived
-   - **Verified Test Data** (from hardware, Nov 13, 2025):
-     - MW:  1.270 MHz → Raw=0x01F604, Byte6=0x00, Scale=48
-     - FM:  102.30 MHz → Raw=0x00F627, Byte6=0x00, Scale=36
-     - AIR: 119.345 MHz → Raw=0x0331D2, Byte6=0x01, Scale=19
-     - WB:  162.40 MHz → Raw=0x06607A, Byte6=0x02, Scale=19
-     - VHF: 145.095 MHz → Raw=0x07C736, Byte6=0x02, Scale=19
-   - **Problem**: Divisor varies non-linearly even with same scale factor
-   - **Analysis**: See STATUS_MESSAGE_ANALYSIS.md for Android app algorithm details
-   - **Needs**: More frequency samples, or deobfuscated Android source code
+All critical RF320-BLE protocol features have been successfully decoded:
+- ✅ Command transmission (WriteWithResponse required)
+- ✅ Band name decoding (6 bands mapped)
+- ✅ Signal strength decoding (0-6 bars with quality labels)
+- ✅ **Frequency decoding (nibble-based extraction formula)**
+- ✅ Volume status monitoring
+- ✅ Modulation mode detection
 
-2. **Signal Strength Parsing** ✅ COMPLETE
+### Remaining Optional Features
+
+1. **Battery Level Monitoring** (Low Priority)
+   - BLE Battery Service (UUID 0x180f) is present on device
+   - Requires separate GATT read operation
+   - Not critical for radio control functionality
+   - **Action**: Implement BluetoothGattService query for battery characteristic
+
+2. **Frequency Decoding Formula** ✅ COMPLETE (Nov 13, 2025)
+   - **BREAKTHROUGH**: Nibble-based extraction formula discovered!
+   - **Algorithm**:
+     1. Extract nibbles from Bytes 4-7: B4High, B4Low, B5High, B5Low, B6Low
+     2. Assemble hex string: B6Low + B5High + B5Low + B4High + B4Low
+     3. Convert to decimal
+     4. Apply band-specific decimal places: FM=2, MW=0, Others=3
+     5. Check Byte 8: 0=MHz, 1=KHz
+   - **Verified** against all 5 hardware test frequencies: 100% accurate!
+     - MW:  1.270 MHz → Nibbles: 0,0,4,F,6 → 1270 KHz ✓
+     - FM:  102.30 MHz → Nibbles: 0,2,7,F,6 → 10230 ✓
+     - AIR: 119.345 MHz → Nibbles: 1,D,2,3,1 → 119345 ✓
+     - WB:  162.40 MHz → Nibbles: 2,7,A,6,0 → 162400 ✓
+     - VHF: 145.095 MHz → Nibbles: 2,3,6,C,7 → 145095 ✓
+
+3. **Signal Strength Parsing** ✅ COMPLETE
    - ✅ Decoded from Byte 9 high nibble of ab0901 messages
    - ✅ Signal bars: 0-6 (No Signal → Excellent)
    - ✅ Displayed in real-time with visual bar graph

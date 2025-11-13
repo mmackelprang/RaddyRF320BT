@@ -651,6 +651,42 @@ The primary challenge for reimplementation is determining the exact frequency sc
 
 ---
 
-**Document Version:** 1.0  
+## 🎉 ADDENDUM: Successful Implementation (Nov 13, 2025)
+
+**BREAKTHROUGH ACHIEVED!** The frequency decoding was successfully solved through empirical testing.
+
+### Actual RF320-BLE Message Format
+The RF320-BLE device uses **12-byte messages** (not 14+ as suggested by Android app):
+
+```
+AB-09-01-B3-B4-B5-B6-B7-B8-B9-B10-CK
+```
+
+### Frequency Decoding Algorithm - VERIFIED
+
+**Nibble Extraction Method:**
+1. Extract nibbles from Bytes 4-6: `B4High, B4Low, B5High, B5Low, B6Low`
+2. Assemble as hex string: `B6L + B5H + B5L + B4H + B4L`
+3. Convert hex to decimal integer
+4. Apply band-specific decimal places: FM=2, MW=0, Others=3
+5. Handle unit indicator: B8 (0=MHz, 1=KHz)
+
+**Example - VHF 145.095 MHz:**
+- B4=C7, B5=36, B6=02, B8=00
+- Nibbles: 2, 3, 6, C, 7
+- Hex: 236C7 → Decimal: 145095
+- Apply 3 decimals → 145.095 MHz ✅
+
+**Verification: 100% accuracy on 5 hardware data points (MW, FM, AIR, WB, VHF)**
+
+**Key Insight:** The Android app's obfuscated variable names and different message length made direct translation impossible. Success came from systematic hardware testing and nibble extraction pattern recognition, not from decompiled code.
+
+**Implementation:** See `RadioProtocol.cs` for complete working code.
+
+---
+
+**Document Version:** 1.1  
 **Last Updated:** November 13, 2025  
-**Author:** AI Analysis of MainActivity.smali reverse engineering
+**Authors:** 
+- AI Analysis of MainActivity.smali reverse engineering (Original)
+- Empirical testing and breakthrough implementation (Addendum)
