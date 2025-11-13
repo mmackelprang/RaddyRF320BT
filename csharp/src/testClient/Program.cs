@@ -7,6 +7,28 @@ using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Devices.Enumeration;
 using RadioClient;
 
+// Check for command-line mode
+var commandLineMode = args.Length > 0;
+var commandsToSend = new List<CanonicalAction>();
+
+if (commandLineMode)
+{
+    // Parse command-line arguments as button names
+    foreach (var arg in args)
+    {
+        if (Enum.TryParse<CanonicalAction>(arg, true, out var action))
+        {
+            commandsToSend.Add(action);
+        }
+        else
+        {
+            Console.WriteLine($"Unknown action: {arg}");
+            Console.WriteLine("Valid actions: " + string.Join(", ", Enum.GetNames<CanonicalAction>()));
+            return;
+        }
+    }
+}
+
 // Global cancellation for graceful shutdown
 var cts = new CancellationTokenSource();
 Console.CancelKeyPress += (s, e) =>
@@ -16,7 +38,9 @@ Console.CancelKeyPress += (s, e) =>
 };
 
 Console.WriteLine("═══════════════════════════════════════════════════════════════════════════");
-Console.WriteLine("                    RF320 Radio BLE Test Client");
+Console.WriteLine(commandLineMode 
+    ? $"                RF320 Command-Line Test ({commandsToSend.Count} commands)"
+    : "                    RF320 Radio BLE Test Client");
 Console.WriteLine("═══════════════════════════════════════════════════════════════════════════");
 Console.WriteLine();
 
@@ -63,20 +87,50 @@ try
     // Create radio client
     var radio = new RadioBT(transport);
     
+    // Status tracking
+    string? currentBand = null;
+    string? currentVolume = null;
+    string? freqDigit1 = null;
+    string? freqDigits23 = null;
+    
     // Set up event handlers
+    int statusCount = 0;
     radio.FrameReceived += (s, frame) =>
     {
         logger.LogFrame(MessageSource.Radio, frame);
         
-        // Display frame on console
-        var frameType = GetFrameDescription(frame);
-        Console.WriteLine($"  ← RX: {frameType}");
+        // Only display non-status frames to console (status floods the output)
+        if (frame.Group != CommandGroup.Status)
+        {
+            var frameType = GetFrameDescription(frame);
+            Console.WriteLine($"  ← RX: {frameType}");
+        }
+        else
+        {
+            statusCount++;
+            if (statusCount % 20 == 0) // Show occasional status to confirm stream
+            {
+                Console.WriteLine($"  ... [{statusCount} status messages received]");
+            }
+        }
+    };
+
+    radio.StatusReceived += (s, status) =>
+    {
+        // Display all status messages to understand the pattern
+        Console.WriteLine($"  ← {status.Label}: '{status.Value}'");
+        
+        // Update tracked values based on status type
+        if (status.Label == "Band") currentBand = status.Value;
+        if (status.Label == "VolumeValue") currentVolume = status.Value;
+        if (status.Label == "FreqPart1") freqDigit1 = status.Value;
+        if (status.Label == "FreqPart2") freqDigits23 = status.Value;
     };
 
     radio.StateUpdated += (s, state) =>
     {
         logger.LogState(state);
-        Console.WriteLine($"  ← STATE: {state.FrequencyMHz:0.00000} MHz ({(state.UnitIsMHz ? "MHz" : "KHz")})");
+        Console.WriteLine($"  ← STATE: Freq≈{state.FrequencyMHz:0.00} MHz (raw=0x{state.RawFreqValue:X6}, scale={state.ScaleFactor})");
     };
 
     // Initialize radio
@@ -99,22 +153,59 @@ try
     logger.LogInfo("Handshake successful");
     Console.WriteLine();
 
-    // Start monitoring
-    radio.StartMonitor();
+    // Start monitoring (disabled for now - causes excessive handshake resends)
+    // radio.StartMonitor();
 
-    // Display keyboard help
-    Console.WriteLine(KeyboardMapper.GetKeyboardHelp());
-    Console.WriteLine();
-    Console.WriteLine("Ready! Press keys to send commands, ESC to exit.");
-    Console.WriteLine("─────────────────────────────────────────────────────────────────────────");
-    Console.WriteLine();
+    if (commandLineMode)
+    {
+        // Command-line mode: Send specified commands and wait for responses
+        Console.WriteLine($"Sending {commandsToSend.Count} command(s)...");
+        Console.WriteLine("─────────────────────────────────────────────────────────────────────────");
+        
+        foreach (var action in commandsToSend)
+        {
+            Console.WriteLine($"  → TX: {action}");
+            logger.LogInfo($"Command-line mode: Sending {action}");
+            
+            var success = await radio.SendAsync(action);
+            
+            if (success)
+            {
+                var frame = RadioFrame.Build(CommandGroup.Button, CommandIdMap.Id[action]);
+                logger.LogFrame(MessageSource.Application, frame);
+            }
+            else
+            {
+                Console.WriteLine($"     ⚠ Failed to send command");
+                logger.LogError($"Failed to send {action}");
+            }
+            
+            // Small delay between commands
+            await Task.Delay(100);
+        }
+        
+        Console.WriteLine();
+        Console.WriteLine("Waiting 5 seconds for responses...");
+        await Task.Delay(5000, cts.Token);
+        
+        Console.WriteLine("Done. Check log file for all messages.");
+    }
+    else
+    {
+        // Interactive mode
+        Console.WriteLine(KeyboardMapper.GetKeyboardHelp());
+        Console.WriteLine();
+        Console.WriteLine("Ready! Press keys to send commands, ESC to exit.");
+        Console.WriteLine("─────────────────────────────────────────────────────────────────────────");
+        Console.WriteLine();
 
-    // Main keyboard loop
-    await KeyboardLoopAsync(radio, logger, cts.Token);
+        // Main keyboard loop
+        await KeyboardLoopAsync(radio, logger, cts.Token);
 
-    Console.WriteLine();
-    Console.WriteLine("Shutting down...");
-    logger.LogInfo("Shutting down");
+        Console.WriteLine();
+        Console.WriteLine("Shutting down...");
+        logger.LogInfo("Shutting down");
+    }
     
     radio.Dispose();
 }

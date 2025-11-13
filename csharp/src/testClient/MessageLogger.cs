@@ -133,6 +133,12 @@ public sealed class MessageLogger : IDisposable
             var action = CommandIdMap.Id.FirstOrDefault(kvp => kvp.Value == frame.CommandId).Key;
             return action != default ? $"Button: {action}" : $"Button: Unknown (0x{frame.CommandId:X2})";
         }
+        
+        // Check for status messages
+        if (frame.Group == CommandGroup.Status)
+        {
+            return $"Status: 0x{frame.CommandId:X2}";
+        }
 
         return $"Group: {frame.Group} (0x{frame.CommandId:X2})";
     }
