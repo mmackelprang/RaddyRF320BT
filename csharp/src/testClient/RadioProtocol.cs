@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace RadioClient;
 
-public enum CommandGroup : byte { Button = 0x0C, Ack = 0x12 }
+public enum CommandGroup : byte { Button = 0x0C, Ack = 0x12, Status = 0x1C }
 
 public static class CommandBase
 {
@@ -14,6 +14,7 @@ public static class CommandBase
     {
         CommandGroup.Button => 0xB9,
         CommandGroup.Ack => 0xBF,
+        CommandGroup.Status => 0x00, // Status messages don't use standard checksum
         _ => throw new ArgumentOutOfRangeException(nameof(g))
     };
 }
@@ -80,23 +81,79 @@ public record RadioFrame(byte Header, byte Proto, CommandGroup Group, byte Comma
     public static bool TryParse(ReadOnlySpan<byte> data, out RadioFrame? frame)
     {
         frame = default;
-        if (data.Length == 5 && data[0] == CommandBase.Header && data[1] == CommandBase.Proto)
-        {
-            var group = (CommandGroup)data[2];
-            byte baseVal = CommandBase.BaseFor(group);
-            byte cmd = data[3];
-            byte check = data[4];
-            if (check != (byte)(baseVal + cmd)) return false;
-            frame = new RadioFrame(data[0], data[1], group, cmd, check);
-            return true;
-        }
+        
         // Handshake (length 4): AB 01 FF AB
         if (data.Length == 4 && data[0] == 0xAB && data[1] == 0x01 && data[3] == 0xAB)
         {
             frame = new RadioFrame(data[0], data[1], 0, data[2], data[3]);
             return true;
         }
+        
+        // Standard 5-byte frame (Button/Ack groups)
+        if (data.Length == 5 && data[0] == CommandBase.Header && data[1] == CommandBase.Proto)
+        {
+            var group = (CommandGroup)data[2];
+            if (group == CommandGroup.Button || group == CommandGroup.Ack)
+            {
+                byte baseVal = CommandBase.BaseFor(group);
+                byte cmd = data[3];
+                byte check = data[4];
+                if (check != (byte)(baseVal + cmd)) return false;
+                frame = new RadioFrame(data[0], data[1], group, cmd, check);
+                return true;
+            }
+        }
+        
+        // Status messages: Variable length (AB-0X-1C-...) where 0X is length indicator
+        if (data.Length >= 5 && data[0] == CommandBase.Header && data[2] == (byte)CommandGroup.Status)
+        {
+            byte lengthByte = data[1];
+            // Create a status frame (proto field repurposed as length for status messages)
+            frame = new RadioFrame(data[0], lengthByte, CommandGroup.Status, data[3], 
+                data.Length > 4 ? data[4] : (byte)0);
+            return true;
+        }
+        
         return false;
+    }
+}
+
+public record StatusMessage(byte Type, string Label, string Value, byte[] RawData)
+{
+    public static StatusMessage? Parse(byte[] data)
+    {
+        // Status format: AB-LEN-1C-TYPE-03-DATALEN-[ASCII DATA]-CHECKSUM
+        if (data.Length < 7 || data[0] != 0xAB || data[2] != 0x1C) return null;
+        
+        byte type = data[3];
+        // data[4] is usually 0x03 (separator/sub-field)
+        byte dataLength = data[5]; // Actual data length field
+        
+        // Extract ASCII data (starts at offset 6)
+        if (6 + dataLength > data.Length) return null;
+        
+        byte[] asciiBytes = data[6..(6 + dataLength)];
+        string value = System.Text.Encoding.ASCII.GetString(asciiBytes);
+        
+        string label = type switch
+        {
+            0x01 => "Demodulation",
+            0x02 => "ModulationMode", // AM/NFM/WFM (not band name like AIR/VHF)
+            0x03 => "BandWidth",
+            0x04 => "Unknown04",
+            0x05 => "SNR",
+            0x06 => "FreqFractional1", // Fractional frequency part (single digit)
+            0x07 => "RSSI",
+            0x08 => "FreqFractional23", // Fractional frequency part (two digits)
+            0x09 => "VolumeLabel",
+            0x0A => "VolumeValue",
+            0x0B => "Model",
+            0x0C => "Status",
+            0x10 => "Recording",
+            _ => $"Type{type:X2}"
+        };
+        
+        return new StatusMessage(type, label, value, data);
     }
 }
 
@@ -106,29 +163,44 @@ public record RadioState(
     double FrequencyMHz,
     bool UnitIsMHz,
     byte HighNibble,
-    byte LowNibble
+    byte LowNibble,
+    uint RawFreqValue = 0,
+    byte ScaleFactor = 0
 ){
     public static RadioState? Parse(byte[] value)
     {
         string hex = BitConverter.ToString(value).Replace("-", "").ToLowerInvariant();
-        if (hex.Length < 12) return null;
+        if (hex.Length < 22) return null; // Need at least 11 bytes for ab0901
         string sig = hex[..6];
         if (sig == "ab0901")
         {
-            // heuristic extraction
-            if (hex.Length < 20) return null;
-            string freqPart1 = hex.Substring(8, 2);
-            string freqPart2 = hex.Substring(10, 2);
-            string freqPart3 = hex.Substring(12, 2);
-            string freqPart4 = hex.Substring(14, 2);
-            string freqHex = freqPart1 + freqPart2 + freqPart3 + freqPart4;
-            byte first = byte.Parse(freqPart1, NumberStyles.HexNumber);
+            // Format: AB-09-01-B3-B4B5-B6-0000-B9-00-CK
+            // where B3-B4B5 = 24-bit frequency value, B9 = scale factor
+            if (hex.Length < 22) return null;
+            
+            // Extract 24-bit frequency (Byte3 + Byte4-5)
+            string byte3 = hex.Substring(6, 2);   // Byte 3
+            string byte4 = hex.Substring(8, 2);   // Byte 4
+            string byte5 = hex.Substring(10, 2);  // Byte 5
+            string freqHex = byte3 + byte4 + byte5;
+            uint rawFreq = Convert.ToUInt32(freqHex, 16);
+            
+            // Extract scale factor (Byte 9)
+            string scaleHex = hex.Substring(18, 2);
+            byte scaleFactor = byte.Parse(scaleHex, NumberStyles.HexNumber);
+            
+            // Calculate frequency with scale factor (approximate only)
+            double freq = ScaleFrequency(rawFreq, scaleFactor);
+            
+            byte first = byte.Parse(byte3, NumberStyles.HexNumber);
             byte high = (byte)(first >> 4);
             byte low = (byte)(first & 0x0F);
-            double freq = ScaleFrequency(Convert.ToUInt32(freqHex, 16));
-            string unitByte = hex.Substring(16, 2);
-            bool isMHz = unitByte == "00"; // 00 -> MHz, 01 -> KHz (per smali runnables)
-            return new RadioState(hex, freqHex, freq, isMHz, high, low);
+            
+            // Byte 6 might indicate unit (00=MHz, 01=kHz, 02=?)
+            string unitByte = hex.Substring(12, 2);
+            bool isMHz = unitByte == "00" || unitByte == "01" || unitByte == "02";
+            
+            return new RadioState(hex, freqHex, freq, isMHz, high, low, rawFreq, scaleFactor);
         }
         // Extended variant placeholder
         if (sig == "ab090f")
@@ -139,13 +211,38 @@ public record RadioState(
         return null;
     }
 
-    private static double ScaleFrequency(uint raw)
+    private static double ScaleFrequency(uint raw, byte scaleFactor = 0)
     {
-        // Adaptive heuristic described in PROTOCOL_INFO.md
-        if (raw > 2_000_000) return raw / 100_000.0;
-        if (raw > 200_000) return raw / 1_000.0;
-        if (raw > 10_000) return raw / 100.0;
-        return raw / 10.0;
+        // Complex frequency encoding - NOT YET FULLY DECODED
+        // Known data points from RF320 testing (see TESTING_RESULTS.md):
+        // Band | Display Freq | Raw Value | Scale | Actual Divisor
+        // -----|--------------|-----------|-------|---------------
+        // AIR  | 119.345 MHz  | 209362    | 19    | ~1754
+        // WB   | 162.40 MHz   | 417914    | 19    | ~2573
+        // FM   | 102.30 MHz   | 63015     | 36    | ~616
+        // VHF  | 145.095 MHz  | 510774    | 19    | ~3521
+        // MW   | 1.270 MHz    | 128516    | 48    | ~101194
+        //
+        // The divisor varies even for the same scale factor, suggesting additional
+        // encoding parameters (possibly in other bytes of the ab0901 message).
+        // Current implementation provides approximate values only.
+        
+        if (scaleFactor == 0)
+        {
+            // Fallback: Adaptive heuristic for legacy messages
+            if (raw > 2_000_000) return raw / 100_000.0;
+            if (raw > 200_000) return raw / 1_000.0;
+            if (raw > 10_000) return raw / 100.0;
+            return raw / 10.0;
+        }
+        
+        // Approximate formula (not accurate, needs more reverse engineering):
+        // Returns values in ballpark but not exact
+        double approxFreq = raw / (scaleFactor * 100.0);
+        
+        // Note: This will be inaccurate. Frequency display should show raw value
+        // until proper decoding formula is determined.
+        return approxFreq;
     }
 }
 

@@ -17,6 +17,7 @@ public sealed class RadioBT : IDisposable
 
     public event EventHandler<RadioFrame>? FrameReceived;
     public event EventHandler<RadioState>? StateUpdated;
+    public event EventHandler<StatusMessage>? StatusReceived;
     public bool IsHandshakeComplete { get; private set; }
 
     public RadioBT(IRadioTransport transport)
@@ -27,19 +28,22 @@ public sealed class RadioBT : IDisposable
 
     public async Task<bool> InitializeAsync(CancellationToken ct = default)
     {
-        // Enable notifications assumed done externally (descriptor write)
+        // Send handshake - device responds with status stream, not ACK
         if (!await SendHandshake(ct)) return false;
-        // Wait for ack success (poll inbound queue)
+        
+        // Wait briefly for any response (status messages indicate connection is active)
         var sw = DateTime.UtcNow;
-        while ((DateTime.UtcNow - sw) < TimeSpan.FromSeconds(3))
+        while ((DateTime.UtcNow - sw) < TimeSpan.FromSeconds(1))
         {
-            if (_inboundFrames.TryPeek(out var f) && f.Group == CommandGroup.Ack && f.CommandId == 0x01)
+            // Accept any frame or state update as evidence of successful connection
+            if (_inboundFrames.Count > 0 || _stateSnapshots.Count > 0)
             {
                 IsHandshakeComplete = true;
                 return true;
             }
             await Task.Delay(50, ct);
         }
+        Console.WriteLine("No response from device within timeout");
         return false;
     }
 
@@ -56,16 +60,27 @@ public sealed class RadioBT : IDisposable
 
     private void OnNotification(object? sender, byte[] data)
     {
-        if (RadioFrame.TryParse(data, out var frame))
+        if (RadioFrame.TryParse(data, out var frame) && frame != null)
         {
             _inboundFrames.Enqueue(frame);
-            if (frame.Group == CommandGroup.Button && frame.CommandId == 0x1C && data.Length >= 5) // heartbeat marker family
+            
+            // Check for status messages (Group 0x1C)
+            if (frame.Group == CommandGroup.Status)
             {
                 _lastHeartbeat = DateTime.UtcNow;
+                
+                // Try to parse as StatusMessage for detailed info
+                var status = StatusMessage.Parse(data);
+                if (status != null)
+                {
+                    StatusReceived?.Invoke(this, status);
+                }
             }
+            
             FrameReceived?.Invoke(this, frame);
             return;
         }
+        
         var state = RadioState.Parse(data);
         if (state != null)
         {
