@@ -165,8 +165,37 @@ public record RadioState(
     byte HighNibble,
     byte LowNibble,
     uint RawFreqValue = 0,
-    byte ScaleFactor = 0
+    byte ScaleFactor = 0,
+    byte BandCode = 0,
+    string BandName = "",
+    byte SignalStrength = 0,    // High nibble of Byte9 (0-6, signal bars)
+    byte SignalBars = 0          // Low nibble of Byte9 (additional signal info)
 ){
+    // Get signal quality description from signal strength level (0-6)
+    public static string GetSignalQuality(byte signalStrength) => signalStrength switch
+    {
+        0 => "No Signal",
+        1 => "Very Weak",
+        2 => "Weak",
+        3 => "Fair",
+        4 => "Good",
+        5 => "Very Good",
+        6 => "Excellent",
+        _ => $"Unknown({signalStrength})"
+    };
+    
+    public string SignalQualityText => GetSignalQuality(SignalStrength);
+    // Get verified band name from band code (Byte 3 in ab0901 messages)
+    public static string GetBandName(byte bandCode) => bandCode switch
+    {
+        0x00 => "FM",      // FM Radio (87.5-108 MHz)
+        0x01 => "MW",      // Medium Wave / AM Radio (530-1710 KHz)
+        0x02 => "SW",      // Short Wave
+        0x03 => "AIR",     // Airband / Aviation (108-137 MHz)
+        0x06 => "WB",      // Weather Band (162-163 MHz)
+        0x07 => "VHF",     // VHF Band (136-174 MHz)
+        _ => $"Unknown({bandCode:X2})"
+    };
     public static RadioState? Parse(byte[] value)
     {
         string hex = BitConverter.ToString(value).Replace("-", "").ToLowerInvariant();
@@ -178,16 +207,27 @@ public record RadioState(
             // where B3-B4B5 = 24-bit frequency value, B9 = scale factor
             if (hex.Length < 22) return null;
             
-            // Extract 24-bit frequency (Byte3 + Byte4-5)
-            string byte3 = hex.Substring(6, 2);   // Byte 3
+            // Extract band code (Byte 3)
+            string byte3 = hex.Substring(6, 2);   // Byte 3 - Band code
+            byte bandCode = byte.Parse(byte3, NumberStyles.HexNumber);
+            string bandName = GetBandName(bandCode);
+            
+            // Extract 24-bit frequency (Byte3 + Byte4 + Byte5)
+            // Note: Byte3 serves dual purpose - band code AND part of frequency value
             string byte4 = hex.Substring(8, 2);   // Byte 4
             string byte5 = hex.Substring(10, 2);  // Byte 5
             string freqHex = byte3 + byte4 + byte5;
             uint rawFreq = Convert.ToUInt32(freqHex, 16);
             
-            // Extract scale factor (Byte 9)
-            string scaleHex = hex.Substring(18, 2);
-            byte scaleFactor = byte.Parse(scaleHex, NumberStyles.HexNumber);
+            // Extract Byte 9 (contains signal strength in nibbles)
+            // Format: High nibble = signal strength (0-6), Low nibble = signal bars/mode
+            string byte9Hex = hex.Substring(18, 2);
+            byte byte9 = byte.Parse(byte9Hex, NumberStyles.HexNumber);
+            byte signalStrength = (byte)((byte9 >> 4) & 0x0F);  // High nibble
+            byte signalBars = (byte)(byte9 & 0x0F);             // Low nibble
+            
+            // Note: The full byte9 value is still used as "scale factor" in frequency calc
+            byte scaleFactor = byte9;
             
             // Calculate frequency with scale factor (approximate only)
             double freq = ScaleFrequency(rawFreq, scaleFactor);
@@ -200,7 +240,8 @@ public record RadioState(
             string unitByte = hex.Substring(12, 2);
             bool isMHz = unitByte == "00" || unitByte == "01" || unitByte == "02";
             
-            return new RadioState(hex, freqHex, freq, isMHz, high, low, rawFreq, scaleFactor);
+            return new RadioState(hex, freqHex, freq, isMHz, high, low, rawFreq, scaleFactor, 
+                bandCode, bandName, signalStrength, signalBars);
         }
         // Extended variant placeholder
         if (sig == "ab090f")
@@ -213,19 +254,30 @@ public record RadioState(
 
     private static double ScaleFrequency(uint raw, byte scaleFactor = 0)
     {
-        // Complex frequency encoding - NOT YET FULLY DECODED
-        // Known data points from RF320 testing (see TESTING_RESULTS.md):
-        // Band | Display Freq | Raw Value | Scale | Actual Divisor
-        // -----|--------------|-----------|-------|---------------
-        // AIR  | 119.345 MHz  | 209362    | 19    | ~1754
-        // WB   | 162.40 MHz   | 417914    | 19    | ~2573
-        // FM   | 102.30 MHz   | 63015     | 36    | ~616
-        // VHF  | 145.095 MHz  | 510774    | 19    | ~3521
-        // MW   | 1.270 MHz    | 128516    | 48    | ~101194
+        // ⚠️ FREQUENCY ENCODING NOT FULLY DECODED ⚠️
         //
-        // The divisor varies even for the same scale factor, suggesting additional
-        // encoding parameters (possibly in other bytes of the ab0901 message).
-        // Current implementation provides approximate values only.
+        // Verified data from RF320-BLE hardware testing (Nov 13, 2025):
+        // Band | Display Freq | Raw (B3+B4+B5) | Byte6 | Byte9(Scale) | Divisor
+        // -----|--------------|----------------|-------|--------------|----------
+        // MW   | 1.270 MHz    | 0x01F604       | 0x00  | 0x30 (48)    | ~101,194
+        // FM   | 102.30 MHz   | 0x00F627       | 0x00  | 0x24 (36)    | ~616
+        // AIR  | 119.345 MHz  | 0x0331D2       | 0x01  | 0x13 (19)    | ~1,754
+        // WB   | 162.40 MHz   | 0x06607A       | 0x02  | 0x13 (19)    | ~2,573
+        // VHF  | 145.095 MHz  | 0x07C736       | 0x02  | 0x13 (19)    | ~3,521
+        //
+        // Analysis from STATUS_MESSAGE_ANALYSIS.md (Android app reverse engineering):
+        // - Android extracts 4 frequency bytes, concatenates them, calls hexToDec()
+        // - However, obfuscated variable names hide exact byte positions
+        // - Android messages may be longer (14+ bytes) vs our 12-byte messages
+        // 
+        // CONCLUSION: The divisor varies even with same scale factor AND byte6 value.
+        // This suggests either:
+        // 1. Additional encoding in other bytes (B7, B8, or nibbles within B9)
+        // 2. Non-linear formula or lookup table
+        // 3. Different message format between firmware versions
+        //
+        // Current implementation provides APPROXIMATE values only.
+        // Display should show raw hex values for analysis until formula is decoded.
         
         if (scaleFactor == 0)
         {

@@ -81,8 +81,10 @@ public sealed class MessageLogger : IDisposable
         lock (_lock)
         {
             var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-            _writer.WriteLine($"[{timestamp}] {"Radio",-11} | Type: {"State Update",-20} | Freq: {state.FrequencyMHz:0.00000} MHz ({(state.UnitIsMHz ? "MHz" : "KHz")})");
-            _writer.WriteLine($"{"",25} | Raw Hex: {state.RawHex}");
+            _writer.WriteLine($"[{timestamp}] {"Radio",-11} | Type: {"State Update",-20} | Band: {state.BandName,-6} | Freq: {state.FrequencyMHz:0.00000} MHz");
+            _writer.WriteLine($"{""  ,25} | Raw: 0x{state.RawFreqValue:X6}, Scale/B9: 0x{state.ScaleFactor:X2}, Byte6: 0x{((state.RawFreqValue >> 16) & 0xFF):X2}");
+            _writer.WriteLine($"{""  ,25} | Signal: {state.SignalStrength}/6 ({state.SignalQualityText}), Bars: {state.SignalBars}");
+            _writer.WriteLine($"{""  ,25} | Full Hex: {state.RawHex}");
         }
     }
 

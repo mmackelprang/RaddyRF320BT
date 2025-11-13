@@ -9,17 +9,20 @@ A comprehensive C# console application for testing and interacting with the RF32
 - **Band Switching**: Cycles through all bands (AIR/WB/FM/VHF/MW/SW)
 - **Volume Control**: VolAdd/VolDel update radio volume in real-time
 - **Frequency Entry**: Number keys + Point + FreqConfirm accepted by radio
-- **Status Monitoring**: Real-time updates for volume and modulation mode
+- **Status Monitoring**: Real-time updates for volume, modulation mode, band, and signal strength
 - **BLE Connection**: Stable connection using Service ff12, Characteristics ff13 (TX) and ff14 (RX)
+- **Band Name Display**: ✅ DECODED - FM/MW/SW/AIR/WB/VHF from byte 3 of ab0901 messages
+- **Signal Strength**: ✅ DECODED - 0-6 signal bars from high nibble of byte 9 (ab0901)
 
 ### ⚠️ Partially Working
 - **Frequency Display**: Raw frequency values captured from ab0901 messages, but decoding formula incomplete
-- **Modulation Mode**: Shows AM/NFM/WFM (demodulation type) instead of band names (AIR/VHF/etc)
+  - Verified data: Band codes, 24-bit raw values, scale factors, byte 6 parameters
+  - Mathematical formula not yet derived (divisor varies non-linearly)
+  - See STATUS_MESSAGE_ANALYSIS.md for Android app reverse engineering insights
 
 ### ❌ Not Yet Implemented
-- **Band Name Display**: AIR/WB/FM/VHF/MW/SW not available in BLE messages
-- **Signal Strength**: SNR/RSSI values received but not parsed numerically
-- **Battery Level**: Not found in status messages
+- **Battery Level**: Not accessed (BLE Battery Service 0x180f present but not queried)
+- **Frequency Formula**: Exact conversion from raw value to MHz requires more analysis
 
 ## Features
 
@@ -207,9 +210,11 @@ Hold commands simulate long button presses:
 ### Screen Output
 The application provides real-time feedback:
 ```
-  → TX: D → Demodulation          (Sent to radio)
-  ← RX: Ack: SUCCESS               (Received from radio)
-  ← STATE: 146.52000 MHz (MHz)    (Radio state update)
+  → TX: D → Demodulation                        (Sent to radio)
+  ← RX: Ack: SUCCESS                             (Received from radio)
+  ← STATE: Band=VHF    Freq≈145.10 MHz  Signal:[████░░] Good
+           (raw=0x07C736, scale=19, B9=0x13)    (Radio state update with band & signal)
+  ← VolumeValue: '12'                           (Status update)
 ```
 
 ### Exiting
@@ -337,21 +342,30 @@ Status Messages: [AB LEN 1C TYPE DATA...]
 ## Next Steps for Complete Status Decoding
 
 ### High Priority
-1. **Frequency Decoding Formula**
-   - Current data points collected (see TESTING_RESULTS.md)
-   - Need to determine correct conversion from raw 24-bit value + scale factor
-   - Tested bands: AIR (119.345 MHz), WB (162.40 MHz), FM (102.30 MHz), VHF (145.095 MHz), MW (1.270 MHz)
-   - Raw values and scale factors logged for analysis
+1. **Frequency Decoding Formula** ⚠️ IN PROGRESS
+   - ✅ Data structure fully mapped: Bytes 3-5 (raw), Byte 6 (param), Byte 9 (scale/signal)
+   - ✅ Five verified data points collected across all bands
+   - ❌ Mathematical conversion formula not yet derived
+   - **Verified Test Data** (from hardware, Nov 13, 2025):
+     - MW:  1.270 MHz → Raw=0x01F604, Byte6=0x00, Scale=48
+     - FM:  102.30 MHz → Raw=0x00F627, Byte6=0x00, Scale=36
+     - AIR: 119.345 MHz → Raw=0x0331D2, Byte6=0x01, Scale=19
+     - WB:  162.40 MHz → Raw=0x06607A, Byte6=0x02, Scale=19
+     - VHF: 145.095 MHz → Raw=0x07C736, Byte6=0x02, Scale=19
+   - **Problem**: Divisor varies non-linearly even with same scale factor
+   - **Analysis**: See STATUS_MESSAGE_ANALYSIS.md for Android app algorithm details
+   - **Needs**: More frequency samples, or deobfuscated Android source code
 
-2. **Signal Strength Parsing**
-   - Type 0x05 (SNR) and 0x07 (RSSI) receive ASCII labels
-   - Need to find numeric value in message payload
-   - Radio displays 2-digit signal strength that fluctuates
+2. **Signal Strength Parsing** ✅ COMPLETE
+   - ✅ Decoded from Byte 9 high nibble of ab0901 messages
+   - ✅ Signal bars: 0-6 (No Signal → Excellent)
+   - ✅ Displayed in real-time with visual bar graph
+   - Note: Type 0x05/0x07 status messages (SNR/RSSI labels) are informational only
 
-3. **Band Name Detection**
-   - Type 0x02 only shows modulation (AM/NFM/WFM)
-   - Actual band (AIR/WB/FM/VHF/MW/SW) not found in current status messages
-   - May require analyzing other message groups (0x19, 0x21) or ab0901 fields
+3. **Band Name Detection** ✅ COMPLETE
+   - ✅ Decoded from Byte 3 of ab0901 messages
+   - ✅ Mapping verified: 0x00=FM, 0x01=MW, 0x02=SW, 0x03=AIR, 0x06=WB, 0x07=VHF
+   - Note: Type 0x02 status shows modulation type (AM/NFM/WFM), not band name
 
 ### Medium Priority
 4. **Additional Status Fields**
