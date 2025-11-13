@@ -208,7 +208,8 @@ public class WindowsBluetoothConnection : BluetoothConnectionBase
 
         try
         {
-            var status = await _writeCharacteristic.WriteValueAsync(data.AsBuffer(), GattWriteOption.WriteWithoutResponse);
+            // CRITICAL: Radio requires WriteWithResponse (BLE-level ACK) for commands to work
+            var status = await _writeCharacteristic.WriteValueAsync(data.AsBuffer(), GattWriteOption.WriteWithResponse);
             if (status == GattCommunicationStatus.Success)
             {
                 _logger.LogRawDataSent(data);

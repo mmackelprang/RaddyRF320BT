@@ -1,485 +1,411 @@
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using RadioProtocol.Core;
-using RadioProtocol.Core.Constants;
+using RadioProtocol.Core.Bluetooth;
 using RadioProtocol.Core.Logging;
-using RadioProtocol.Core.Models;
-using Serilog;
+using RadioProtocol.Core.Protocol;
 
 namespace RadioProtocol.Console;
 
 /// <summary>
-/// Console application demonstrating the Radio Protocol library
+/// RF320 Radio Protocol Console Application
+/// Interactive keyboard control and command-line automation
 /// </summary>
 class Program
 {
-    private static IRadioManager? _radioManager;
-    private static ILogger<Program>? _logger;
+    private static IRadioLogger? _logger;
+    private static RadioConnection? _radio;
+    private static IRadioTransport? _transport;
     private static readonly CancellationTokenSource _cancellationTokenSource = new();
-    private static String _address = String.Empty;
+    
+    // Status tracking for display
+    private static string _currentBand = "---";
+    private static string _currentFrequency = "---";
+    private static string _currentVolume = "---";
+    private static int _currentSignal = 0;
+    private static DateTime _lastStatusUpdate = DateTime.MinValue;
 
-    static async Task Main(string[] args)
+    static async Task<int> Main(string[] args)
     {
-        System.Console.WriteLine("Radio Protocol Library - Console Demo");
-        System.Console.WriteLine("=====================================");
+        // Check for command-line mode
+        var commandLineMode = args.Length > 0;
+        var commandsToSend = new List<CanonicalAction>();
+
+        if (commandLineMode)
+        {
+            // Parse command-line arguments as action names
+            foreach (var arg in args)
+            {
+                if (Enum.TryParse<CanonicalAction>(arg, true, out var action))
+                {
+                    commandsToSend.Add(action);
+                }
+                else
+                {
+                    System.Console.WriteLine($"Unknown action: {arg}");
+                    System.Console.WriteLine("Valid actions: " + string.Join(", ", Enum.GetNames<CanonicalAction>()));
+                    return 1;
+                }
+            }
+        }
+
+        // Setup logger
+        var logDir = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RadioProtocol", "Logs");
+        System.IO.Directory.CreateDirectory(logDir);
+        var logFile = System.IO.Path.Combine(logDir, $"RadioProtocol_{DateTime.Now:yyyyMMdd_HHmmss}.log");
+        
+        var simpleLogger = new SimpleFileLogger(logFile);
+        _logger = new RadioLogger(simpleLogger);
+
+        // Handle Ctrl+C gracefully
+        System.Console.CancelKeyPress += (s, e) =>
+        {
+            e.Cancel = true;
+            _cancellationTokenSource.Cancel();
+        };
+
+        // Display header
+        System.Console.Clear();
+        System.Console.WriteLine("═══════════════════════════════════════════════════════════════════════════");
+        System.Console.WriteLine(commandLineMode 
+            ? $"                RF320 Command-Line Mode ({commandsToSend.Count} commands)"
+            : "                    RF320 Radio Protocol Console");
+        System.Console.WriteLine("═══════════════════════════════════════════════════════════════════════════");
         System.Console.WriteLine();
+        
+        _logger.LogInfo("Application started");
+        _logger.LogInfo($"Log file: {logFile}");
 
         try
         {
-            // Build host with dependency injection
-            var host = CreateHostBuilder(args).Build();
+            // Scan for RF320 devices
+            _logger.LogInfo("Scanning for RF320 devices...");
             
-            // Get services
-            _logger = host.Services.GetRequiredService<ILogger<Program>>();
-            var configuration = host.Services.GetRequiredService<IConfiguration>();
+            var bluetoothConnection = BluetoothConnectionFactory.Create(_logger);
+            var devices = await bluetoothConnection.ScanForDevicesAsync(_cancellationTokenSource.Token);
             
-            // Initialize radio manager
-            _radioManager = new RadioManagerBuilder()
-                .WithLogger(host.Services.GetRequiredService<IRadioLogger>())
-                .Build();
+            var rf320Device = devices.FirstOrDefault(d => d.Name.Contains("RF320", StringComparison.OrdinalIgnoreCase));
+            
+            if (rf320Device == null)
+            {
+                System.Console.WriteLine("No RF320 device found. Exiting.");
+                _logger.LogError(null, "No RF320 device found");
+                return 1;
+            }
 
-            // Setup event handlers
+            System.Console.WriteLine($"Found device: {rf320Device.Name} ({rf320Device.Address})");
+            _logger.LogInfo($"Found device: {rf320Device.Name} (Address: {rf320Device.Address})");
+            System.Console.WriteLine();
+
+            // Connect to device
+            System.Console.WriteLine("Connecting to device...");
+            if (!await bluetoothConnection.ConnectAsync(rf320Device.Address, _cancellationTokenSource.Token))
+            {
+                System.Console.WriteLine("Failed to connect to device.");
+                _logger.LogError(null, "Failed to connect to device");
+                return 1;
+            }
+
+            System.Console.WriteLine("Connected successfully!");
+            _logger.LogInfo("Connected to device successfully");
+            System.Console.WriteLine();
+
+            // Create transport adapter
+            _transport = new TransportAdapter(bluetoothConnection);
+            
+            // Create radio connection
+            _radio = new RadioConnection(_transport, _logger);
+            
+            // Set up event handlers
             SetupEventHandlers();
 
-            // Handle Ctrl+C gracefully
-            System.Console.CancelKeyPress += (_, e) =>
-            {
-                e.Cancel = true;
-                _cancellationTokenSource.Cancel();
-            };
-
-            _logger.LogInformation("Console application started");
-
-            // Run the main demo
-            await RunDemoAsync(configuration);
-        }
-        catch (Exception ex)
-        {
-            System.Console.WriteLine($"Fatal error: {ex.Message}");
-            _logger?.LogError(ex, "Fatal error in console application");
-        }
-        finally
-        {
-            _radioManager?.Dispose();
-            _cancellationTokenSource.Dispose();
-        }
-
-        System.Console.WriteLine("\nPress any key to exit...");
-        System.Console.ReadKey();
-    }
-
-    private static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .UseSerilog((context, services, loggerConfiguration) => loggerConfiguration
-                .ReadFrom.Configuration(context.Configuration)
-                .ReadFrom.Services(services)
-                .Enrich.FromLogContext()
-                .WriteTo.File(
-                    path: "logs/radio-protocol-.log",
-                    rollingInterval: RollingInterval.Day,
-                    retainedFileCountLimit: 2,
-                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
-                ))
-            .ConfigureServices((context, services) =>
-            {
-                services.AddSingleton<IRadioLogger, RadioLogger>();
-            })
-            .ConfigureAppConfiguration((context, config) =>
-            {
-                config.AddJsonFile("appsettings.json", optional: false);
-            })
-            .ConfigureLogging((context, logging) =>
-            {
-                logging.ClearProviders();
-            });
-
-    private static void SetupEventHandlers()
-    {
-        if (_radioManager == null) return;
-
-        _radioManager.ConnectionStateChanged += (sender, connectionInfo) =>
-        {
-            var color = connectionInfo.State switch
-            {
-                ConnectionState.Connected => ConsoleColor.Green,
-                ConnectionState.Connecting => ConsoleColor.Yellow,
-                ConnectionState.Error => ConsoleColor.Red,
-                _ => ConsoleColor.Gray
-            };
-
-            WriteColorLine($"Connection: {connectionInfo.State}", color);
-            if (!string.IsNullOrEmpty(connectionInfo.ErrorMessage))
-            {
-                WriteColorLine($"  Error: {connectionInfo.ErrorMessage}", ConsoleColor.Red);
-            }
-        };
-
-        _radioManager.MessageReceived += (sender, packet) =>
-        {
-//            WriteColorLine($"Received: {packet.PacketType} - {packet.HexData}", ConsoleColor.Cyan);
-//            if (packet.ParsedData != null)
-//            {
-//                WriteColorLine($"  Parsed: {packet.ParsedData}", ConsoleColor.Blue);
-//            }
-        };
-
-        _radioManager.StatusUpdated += (sender, status) =>
-        {
-            WriteColorLine($"Status Update: Freq={status.Frequency}, Vol={status.VolumeLevel}, Squelch={status.SquelchLevel}", ConsoleColor.Magenta);
-        };
-
-        _radioManager.DeviceInfoReceived += (sender, deviceInfo) =>
-        {
-            WriteColorLine($"Device Info: {deviceInfo.RadioVersion} - {deviceInfo.ModelName}", ConsoleColor.Green);
-        };
-    }
-
-    private static void PrintCommands()
-    {
-        System.Console.WriteLine("Available Commands:");
-        System.Console.WriteLine("  connect [address] - Connect to radio device");
-        System.Console.WriteLine("  scan              - Show devices visible");
-        System.Console.WriteLine("  disconnect        - Disconnect from device");
-        System.Console.WriteLine("  handshake         - Send handshake command");
-        System.Console.WriteLine("  number <0-9>      - Press number button");
-        System.Console.WriteLine("  number <0-9> long - Press number button (long)");
-        System.Console.WriteLine("  volume up/down    - Adjust volume");
-        System.Console.WriteLine("  nav up/down       - Navigate up/down");
-        System.Console.WriteLine("  nav up/down long  - Navigate up/down (long press)");
-        System.Console.WriteLine("  button <type>     - Press specific button");
-        System.Console.WriteLine("  demo              - Run automated demo");
-        System.Console.WriteLine("  test              - Run test sequence");
-        System.Console.WriteLine("  status            - Show current status");
-        System.Console.WriteLine("  help              - Show this help");
-        System.Console.WriteLine("  quit              - Exit application");
-        System.Console.WriteLine();
-    }
-
-    private static async Task RunDemoAsync(IConfiguration configuration)
-    {
-        var deviceAddress = configuration["RadioSettings:DeviceAddress"] ?? "00:11:22:33:44:55";
-        var autoConnect = configuration.GetValue<bool>("RadioSettings:AutoConnect");
-
-        PrintCommands();
-
-        if (autoConnect)
-        {
-            await ConnectToDevice(deviceAddress);
-        }
-
-        // Command loop
-        while (!_cancellationTokenSource.Token.IsCancellationRequested)
-        {
-            System.Console.Write("> ");
-            var input = System.Console.ReadLine();
+            // Initialize radio
+            System.Console.WriteLine("Initializing radio (handshake)...");
+            _logger.LogInfo("Sending handshake");
             
-            if (string.IsNullOrWhiteSpace(input))
-                continue;
-
-            var parts = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            var command = parts[0].ToLowerInvariant();
-
-            try
+            if (!await _radio.InitializeAsync(_cancellationTokenSource.Token))
             {
-                await ProcessCommandAsync(command, parts.Skip(1).ToArray());
+                _logger.LogInfo("No handshake response (expected - device streams status instead)");
             }
-            catch (Exception ex)
+
+            System.Console.WriteLine("Radio initialized successfully!");
+            _logger.LogInfo("Handshake complete - status stream active");
+            System.Console.WriteLine();
+
+            if (commandLineMode)
             {
-                WriteColorLine($"Error: {ex.Message}", ConsoleColor.Red);
-                _logger?.LogError(ex, "Command execution error");
-            }
-        }
-    }
-
-    private static async Task ProcessCommandAsync(string command, string[] args)
-    {
-        if (_radioManager == null) return;
-
-        switch (command)
-        {
-            case "connect":
-                var address = args.Length > 0 ? args[0] : "00:11:22:33:44:55";
-                if(_address != String.Empty)
-                {
-                    address = _address;
-                }
-                await ConnectToDevice(address);
-                break;
-
-            case "scan":
-                await ScanForDevices();
-                break;
-
-            case "disconnect":
-                await _radioManager.DisconnectAsync();
-                break;
-
-            case "handshake":
-                var handshakeResult = await _radioManager.SendHandshakeAsync(_cancellationTokenSource.Token);
-                WriteCommandResult(handshakeResult);
-                break;
-
-            case "number":
-                await ProcessNumberCommand(args);
-                break;
-
-            case "volume":
-                await ProcessVolumeCommand(args);
-                break;
-
-            case "nav":
-                await ProcessNavigationCommand(args);
-                break;
-
-            case "button":
-                await ProcessButtonCommand(args);
-                break;
-
-            case "demo":
-                await RunAutomatedDemo();
-                break;
-
-            case "test":
-                await RunTestSequence();
-                break;
-
-            case "status":
-                ShowCurrentStatus();
-                break;
-
-            case "help":
-                PrintCommands();
-                break;
-
-            case "quit":
-            case "exit":
-                _cancellationTokenSource.Cancel();
-                break;
-
-            default:
-                WriteColorLine($"Unknown command: {command}. Type 'help' for available commands.", ConsoleColor.Yellow);
-                break;
-        }
-    }
-
-    private static async Task ScanForDevices()
-    {
-        if (_radioManager == null) return;
-
-        WriteColorLine($"Scanning for devices:", ConsoleColor.Yellow);
-        var devices = await _radioManager.ScanForDevicesAsync(_cancellationTokenSource.Token);
-
-        foreach (var d in devices)
-        {
-            if (d.Name.Contains("RF320"))
-            {
-                _address = d.Address;
-                WriteColorLine($"  {d.Name} - {d.Address}", ConsoleColor.Green);
-
+                // Command-line mode: Send specified commands and exit
+                await RunCommandLineMode(commandsToSend);
             }
             else
             {
-                WriteColorLine($"  {d.Name} - {d.Address}", ConsoleColor.Gray);
+                // Interactive mode
+                await RunInteractiveMode();
+            }
+            
+            return 0;
+        }
+        catch (OperationCanceledException)
+        {
+            System.Console.WriteLine("\nOperation cancelled.");
+            _logger?.LogInfo("Operation cancelled by user");
+            return 0;
+        }
+        catch (Exception ex)
+        {
+            System.Console.WriteLine($"\nError: {ex.Message}");
+            _logger?.LogError(ex, $"Unhandled exception: {ex.Message}");
+            return 1;
+        }
+        finally
+        {
+            _radio?.Dispose();
+            _transport?.Dispose();
+            _logger?.LogInfo("Application exiting");
+            
+            System.Console.WriteLine();
+            System.Console.WriteLine("═══════════════════════════════════════════════════════════════════════════");
+            System.Console.WriteLine($"Log file saved to: {logFile}");
+            System.Console.WriteLine("═══════════════════════════════════════════════════════════════════════════");
+        }
+    }
+
+    private static void SetupEventHandlers()
+    {
+        if (_radio == null) return;
+
+        _radio.StatusReceived += (s, status) =>
+        {
+            _lastStatusUpdate = DateTime.Now;
+            _logger?.LogInfo($"Status: {status.Label} = '{status.Value}'");
+            
+            // Track status for display
+            if (status.Label == "VolumeValue") _currentVolume = status.Value;
+        };
+
+        _radio.StateUpdated += (s, state) =>
+        {
+            _lastStatusUpdate = DateTime.Now;
+            _currentBand = state.BandName;
+            _currentFrequency = $"{state.FrequencyMHz:0.000} {(state.UnitIsMHz ? "MHz" : "KHz")}";
+            _currentSignal = state.SignalStrength;
+            
+            _logger?.LogInfo($"State: Band={state.BandName} Freq={state.FrequencyMHz:0.000} Signal={state.SignalStrength}/6");
+        };
+
+        _radio.FrameReceived += (s, frame) =>
+        {
+            // Only log non-status frames (status floods the log)
+            if (frame.Group != CommandGroup.Status)
+            {
+                _logger?.LogInfo($"Frame: Group={frame.Group} CommandId=0x{frame.CommandId:X2}");
+            }
+        };
+    }
+
+    private static async Task RunCommandLineMode(List<CanonicalAction> commands)
+    {
+        if (_radio == null) return;
+
+        System.Console.WriteLine($"Sending {commands.Count} command(s)...");
+        System.Console.WriteLine("─────────────────────────────────────────────────────────────────────────");
+        
+        foreach (var action in commands)
+        {
+            _logger?.LogInfo($"Command-line mode: Sending {action}");
+            
+            var success = await _radio.SendAsync(action);
+            
+            if (!success)
+            {
+                _logger?.LogError(null, $"Failed to send {action}");
+            }
+            
+            // Small delay between commands
+            await Task.Delay(100);
+        }
+        
+        System.Console.WriteLine();
+        System.Console.WriteLine("Waiting 5 seconds for responses...");
+        await Task.Delay(5000, _cancellationTokenSource.Token);
+        
+        System.Console.WriteLine("Done. Check log file for all messages.");
+    }
+
+    private static async Task RunInteractiveMode()
+    {
+        if (_radio == null) return;
+
+        // Clear screen and show interface
+        System.Console.Clear();
+        PrintStatusHeader();
+        System.Console.WriteLine(KeyboardMapper.GetKeyboardHelp());
+        System.Console.WriteLine();
+        System.Console.WriteLine("Ready! Press keys to send commands, ESC to exit.");
+        System.Console.WriteLine("─────────────────────────────────────────────────────────────────────────");
+        
+        // Start background status updater
+        _ = Task.Run(async () => await StatusUpdateLoop());
+
+        // Main keyboard loop
+        await KeyboardLoopAsync();
+
+        System.Console.WriteLine();
+        System.Console.WriteLine("Shutting down...");
+        _logger?.LogInfo("Shutting down");
+    }
+
+    private static void PrintStatusHeader()
+    {
+        var cursorTop = System.Console.CursorTop;
+        System.Console.SetCursorPosition(0, 0);
+        
+        var signalBars = new string('█', _currentSignal) + new string('░', 6 - _currentSignal);
+        var statusLine = $"│ Band: {_currentBand,-6} │ Freq: {_currentFrequency,-14} │ Vol: {_currentVolume,-3} │ Signal: [{signalBars}] │";
+        
+        System.Console.WriteLine("┌─────────────────────────────────────────────────────────────────────────┐");
+        System.Console.WriteLine(statusLine);
+        System.Console.WriteLine("└─────────────────────────────────────────────────────────────────────────┘");
+        
+        // Restore cursor position if we were below the header
+        if (cursorTop > 2)
+        {
+            System.Console.SetCursorPosition(0, cursorTop);
+        }
+    }
+
+    private static async Task StatusUpdateLoop()
+    {
+        var lastPrintedStatus = string.Empty;
+        
+        while (!_cancellationTokenSource.Token.IsCancellationRequested)
+        {
+            var currentStatus = $"{_currentBand}|{_currentFrequency}|{_currentVolume}|{_currentSignal}";
+            
+            // Only update if status has changed
+            if (currentStatus != lastPrintedStatus)
+            {
+                PrintStatusHeader();
+                lastPrintedStatus = currentStatus;
+            }
+            
+            await Task.Delay(500);
+        }
+    }
+
+    private static async Task KeyboardLoopAsync()
+    {
+        if (_radio == null) return;
+
+        while (!_cancellationTokenSource.Token.IsCancellationRequested)
+        {
+            if (!System.Console.KeyAvailable)
+            {
+                await Task.Delay(50, _cancellationTokenSource.Token);
+                continue;
+            }
+
+            var keyInfo = System.Console.ReadKey(intercept: true);
+
+            // Exit on Escape
+            if (keyInfo.Key == ConsoleKey.Escape)
+            {
+                _logger?.LogInfo("User pressed ESC to exit");
+                break;
+            }
+
+            // Try to map key to action
+            if (KeyboardMapper.TryGetAction(keyInfo, out var action))
+            {
+                try
+                {
+                    _logger?.LogInfo($"Keyboard: {keyInfo.Key} → {action}");
+                    
+                    var success = await _radio.SendAsync(action);
+                    
+                    if (!success)
+                    {
+                        _logger?.LogError(null, $"Failed to send {action}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogError(ex, $"Error sending {action}");
+                }
             }
         }
     }
+}
 
-    private static async Task ConnectToDevice(string deviceAddress)
+/// <summary>
+/// Adapter to wrap IBluetoothConnection as IRadioTransport
+/// </summary>
+internal class TransportAdapter : IRadioTransport
+{
+    private readonly IBluetoothConnection _connection;
+
+    public event EventHandler<byte[]>? NotificationReceived;
+
+    public TransportAdapter(IBluetoothConnection connection)
     {
-        if (_radioManager == null) return;
+        _connection = connection;
+        _connection.DataReceived += (s, data) => NotificationReceived?.Invoke(this, data);
+    }
 
-        WriteColorLine($"Connecting to device: {deviceAddress}", ConsoleColor.Yellow);
-        var success = await _radioManager.ConnectAsync(deviceAddress, _cancellationTokenSource.Token);
+    public Task<bool> WriteAsync(byte[] data)
+    {
+        return _connection.SendDataAsync(data);
+    }
 
-        if (success)
+    public void Dispose()
+    {
+        _connection?.Dispose();
+    }
+}
+
+/// <summary>
+/// Simple file logger that implements ILogger
+/// </summary>
+internal class SimpleFileLogger : ILogger<RadioLogger>
+{
+    private readonly string _logFilePath;
+    private readonly object _lock = new();
+
+    public SimpleFileLogger(string logFilePath)
+    {
+        _logFilePath = logFilePath;
+        WriteHeader();
+    }
+
+    private void WriteHeader()
+    {
+        lock (_lock)
         {
-            WriteColorLine("Connected successfully!", ConsoleColor.Green);
-        }
-        else
-        {
-            WriteColorLine("Connection failed!", ConsoleColor.Red);
+            System.IO.File.AppendAllText(_logFilePath, 
+                $"=== Radio Protocol Session Started: {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} ===\n\n");
         }
     }
 
-    private static async Task ProcessNumberCommand(string[] args)
+    public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+
+    public bool IsEnabled(LogLevel logLevel) => true;
+
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
-        if (_radioManager == null || args.Length == 0) return;
-
-        if (!int.TryParse(args[0], out var number) || number < 0 || number > 9)
+        lock (_lock)
         {
-            WriteColorLine("Invalid number. Use 0-9.", ConsoleColor.Red);
-            return;
+            var message = formatter(state, exception);
+            var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+            System.IO.File.AppendAllText(_logFilePath, $"[{timestamp}] [{logLevel}] {message}\n");
+            
+            if (exception != null)
+            {
+                System.IO.File.AppendAllText(_logFilePath, $"  Exception: {exception}\n");
+            }
         }
-
-        var longPress = args.Length > 1 && args[1].ToLowerInvariant() == "long";
-        var result = await _radioManager.PressNumberAsync(number, longPress, _cancellationTokenSource.Token);
-        WriteCommandResult(result);
-    }
-
-    private static async Task ProcessVolumeCommand(string[] args)
-    {
-        if (_radioManager == null || args.Length == 0) return;
-
-        var direction = args[0].ToLowerInvariant();
-        if (direction != "up" && direction != "down")
-        {
-            WriteColorLine("Invalid volume direction. Use 'up' or 'down'.", ConsoleColor.Red);
-            return;
-        }
-
-        var result = await _radioManager.AdjustVolumeAsync(direction == "up", _cancellationTokenSource.Token);
-        WriteCommandResult(result);
-    }
-
-    private static async Task ProcessNavigationCommand(string[] args)
-    {
-        if (_radioManager == null || args.Length == 0) return;
-
-        var direction = args[0].ToLowerInvariant();
-        if (direction != "up" && direction != "down")
-        {
-            WriteColorLine("Invalid navigation direction. Use 'up' or 'down'.", ConsoleColor.Red);
-            return;
-        }
-
-        var longPress = args.Length > 1 && args[1].ToLowerInvariant() == "long";
-        var result = await _radioManager.NavigateAsync(direction == "up", longPress, _cancellationTokenSource.Token);
-        WriteCommandResult(result);
-    }
-
-    private static async Task ProcessButtonCommand(string[] args)
-    {
-        if (_radioManager == null || args.Length == 0) return;
-
-        var buttonName = args[0].ToLowerInvariant();
-        if (!Enum.TryParse<ButtonType>(buttonName, true, out var buttonType))
-        {
-            WriteColorLine($"Invalid button type: {buttonName}", ConsoleColor.Red);
-            WriteColorLine("Available buttons: " + string.Join(", ", Enum.GetNames<ButtonType>()), ConsoleColor.Gray);
-            return;
-        }
-
-        var result = await _radioManager.PressButtonAsync(buttonType, _cancellationTokenSource.Token);
-        WriteCommandResult(result);
-    }
-
-    private static async Task RunAutomatedDemo()
-    {
-        if (_radioManager == null) return;
-
-        WriteColorLine("Running automated demo...", ConsoleColor.Green);
-
-        var commands = new (string name, Func<Task<RadioProtocol.Core.Models.CommandResult>> commandFunc)[]
-        {
-            ("Handshake", () => _radioManager.SendHandshakeAsync(_cancellationTokenSource.Token)),
-            ("Number 1", () => _radioManager.PressNumberAsync(1, false, _cancellationTokenSource.Token)),
-            ("Number 2", () => _radioManager.PressNumberAsync(2, false, _cancellationTokenSource.Token)),
-            ("Volume Up", () => _radioManager.AdjustVolumeAsync(true, _cancellationTokenSource.Token)),
-            ("Volume Down", () => _radioManager.AdjustVolumeAsync(false, _cancellationTokenSource.Token)),
-            ("Navigate Up", () => _radioManager.NavigateAsync(true, false, _cancellationTokenSource.Token)),
-            ("Navigate Down", () => _radioManager.NavigateAsync(false, false, _cancellationTokenSource.Token)),
-            ("Band Button", () => _radioManager.PressButtonAsync(ButtonType.Band, _cancellationTokenSource.Token)),
-            ("Power Button", () => _radioManager.PressButtonAsync(ButtonType.Power, _cancellationTokenSource.Token))
-        };
-
-        foreach (var (name, commandFunc) in commands)
-        {
-            WriteColorLine($"Executing: {name}", ConsoleColor.Yellow);
-            var result = await commandFunc();
-            WriteCommandResult(result);
-            await Task.Delay(1000, _cancellationTokenSource.Token); // Delay between commands
-        }
-
-        WriteColorLine("Demo completed!", ConsoleColor.Green);
-    }
-
-    private static async Task RunTestSequence()
-    {
-        if (_radioManager == null) return;
-
-        WriteColorLine("Running test sequence based on documented messages...", ConsoleColor.Green);
-
-        // Test sequence based on COMMAND_RESPONSE_SEQUENCES.md
-        var testCommands = new[]
-        {
-            ButtonType.Band,
-            ButtonType.Number1,
-            ButtonType.Number2,
-            ButtonType.Number3,
-            ButtonType.VolumeUp,
-            ButtonType.VolumeDown,
-            ButtonType.UpShort,
-            ButtonType.DownShort,
-            ButtonType.Frequency,
-            ButtonType.Memo,
-            ButtonType.Record
-        };
-
-        foreach (var button in testCommands)
-        {
-            WriteColorLine($"Testing button: {button}", ConsoleColor.Yellow);
-            var result = await _radioManager.PressButtonAsync(button, _cancellationTokenSource.Token);
-            WriteCommandResult(result);
-            await Task.Delay(500, _cancellationTokenSource.Token);
-        }
-
-        WriteColorLine("Test sequence completed!", ConsoleColor.Green);
-    }
-
-    private static void ShowCurrentStatus()
-    {
-        if (_radioManager == null) return;
-
-        WriteColorLine("Current Status:", ConsoleColor.White);
-        WriteColorLine($"  Connected: {_radioManager.IsConnected}", ConsoleColor.Gray);
-        WriteColorLine($"  Connection: {_radioManager.ConnectionStatus.State}", ConsoleColor.Gray);
-        
-        if (_radioManager.CurrentStatus != null)
-        {
-            var status = _radioManager.CurrentStatus;
-            WriteColorLine($"  Frequency: {status.Frequency}", ConsoleColor.Gray);
-            WriteColorLine($"  Band: {status.Band}", ConsoleColor.Gray);
-            WriteColorLine($"  Volume: {status.VolumeLevel}", ConsoleColor.Gray);
-            WriteColorLine($"  Squelch: {status.SquelchLevel}", ConsoleColor.Gray);
-            WriteColorLine($"  Stereo: {status.IsStereo}", ConsoleColor.Gray);
-            WriteColorLine($"  Power: {status.IsPowerOn}", ConsoleColor.Gray);
-        }
-
-        if (_radioManager.DeviceInformation != null)
-        {
-            var device = _radioManager.DeviceInformation;
-            WriteColorLine($"  Device: {device.RadioVersion} - {device.ModelName}", ConsoleColor.Gray);
-        }
-    }
-
-    private static void WriteCommandResult(CommandResult result)
-    {
-        var color = result.Success ? ConsoleColor.Green : ConsoleColor.Red;
-        WriteColorLine($"Command {(result.Success ? "succeeded" : "failed")} in {result.ExecutionTime.TotalMilliseconds:F1}ms", color);
-        
-        if (!result.Success && !string.IsNullOrEmpty(result.ErrorMessage))
-        {
-            WriteColorLine($"  Error: {result.ErrorMessage}", ConsoleColor.Red);
-        }
-
-        if (result.SentData != null)
-        {
-            WriteColorLine($"  Sent: {Convert.ToHexString(result.SentData)}", ConsoleColor.Gray);
-        }
-
-        if (result.Response != null)
-        {
-            WriteColorLine($"  Response: {result.Response.PacketType} - {result.Response.HexData}", ConsoleColor.Blue);
-        }
-    }
-
-    private static void WriteColorLine(string text, ConsoleColor color)
-    {
-        var originalColor = System.Console.ForegroundColor;
-        System.Console.ForegroundColor = color;
-        System.Console.WriteLine(text);
-        System.Console.ForegroundColor = originalColor;
     }
 }
