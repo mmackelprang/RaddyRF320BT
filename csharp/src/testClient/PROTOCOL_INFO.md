@@ -96,30 +96,33 @@ Example: AB 06 1C 08 03 02 32 31 3D
 - ⚠️ **Type 0x06/0x08 (Frequency)**: Shows fractional part only (.345 from 119.345)
 - ⚠️ **Full Frequency (ab0901)**: Raw values captured, formula incomplete
 
-**ab0901 State Messages - PARTIALLY DECODED:**
-Format: `AB-09-01-B3-B4B5-B6-0000-B9-00-CK`
-- **Byte 3**: ✅ Band code (0x00=FM, 0x01=MW, 0x02=SW, 0x03=AIR, 0x06=WB, 0x07=VHF)
-- **Bytes 3-5**: 24-bit raw frequency value (Byte 3 dual-purpose: band + freq MSB)
-- **Byte 6**: Unknown parameter (0x00, 0x01, 0x02 observed)
-- **Byte 9 (high nibble)**: ✅ Signal strength 0-6 (0=No Signal, 6=Excellent)
-- **Byte 9 (low nibble)**: ✅ Signal bars (additional signal info 0-15)
-- **Byte 9 (full byte)**: Also used as "scale factor" in frequency calculation
+**ab0901 State Messages - ✅ FULLY DECODED (Nov 13, 2025):**
+Format: `AB-09-01-B3-B4-B5-B6-B7-B8-B9-B10-CK`
+- **Byte 3 (B3)**: ✅ Band code (0x00=FM, 0x01=MW, 0x02=SW, 0x03=AIR, 0x06=WB, 0x07=VHF)
+- **Bytes 4-7 (B4-B7)**: ✅ Frequency encoded in nibbles
+  - Algorithm: Extract B6Low, B5High, B5Low, B4High, B4Low → assemble as hex → convert to decimal
+  - Apply decimal places: FM=2, MW=0, Others=3
+- **Byte 8 (B8)**: ✅ Unit indicator (0=MHz, 1=KHz)
+- **Byte 9 (B9) high nibble**: ✅ Signal strength 0-6 (0=No Signal, 6=Excellent)
+- **Byte 9 (B9) low nibble**: ✅ Signal bars (additional signal info 0-15)
+- **Byte 10 (B10)**: Checksum/padding
+- **Byte 11 (CK)**: Checksum
 
-Verified frequency data points (Hardware, Nov 13, 2025):
-| Band | Code | Display | Raw (Hex) | Raw (Dec) | Byte6 | Byte9 (Scale) | Signal | Divisor |
-|------|------|---------|-----------|-----------|-------|---------------|--------|----------|
-| MW   | 0x01 | 1.270 MHz   | 0x01F604 | 128,516 | 0x00 | 0x30 (48) | 3 | ~101,194 |
-| FM   | 0x00 | 102.30 MHz  | 0x00F627 | 63,015  | 0x00 | 0x24 (36) | 2 | ~616 |
-| AIR  | 0x03 | 119.345 MHz | 0x0331D2 | 209,362 | 0x01 | 0x13 (19) | 1 | ~1,754 |
-| WB   | 0x06 | 162.40 MHz  | 0x06607A | 417,914 | 0x02 | 0x13 (19) | 1 | ~2,573 |
-| VHF  | 0x07 | 145.095 MHz | 0x07C736 | 510,774 | 0x02 | 0x13 (19) | 1 | ~3,521 |
+**Frequency Decoding - 100% VERIFIED (Hardware, Nov 13, 2025):**
+| Band | Code | Display | B4 | B5 | B6 | B7 | B8 | Nibbles (B6L,B5H,B5L,B4H,B4L) | Hex | Decimal | ✓ |
+|------|------|---------|----|----|----|----|----|---------------------------------|-----------|---------|---|
+| MW   | 0x01 | 1270 KHz | F6 | 04 | 00 | 00 | 01 | 0,0,4,F,6 | 004F6 | 1270 | ✅ |
+| FM   | 0x00 | 102.30 MHz | F6 | 27 | 00 | 00 | 00 | 0,2,7,F,6 | 027F6 | 10230 | ✅ |
+| AIR  | 0x03 | 119.345 MHz | 31 | D2 | 01 | 00 | 00 | 1,D,2,3,1 | 1D231 | 119345 | ✅ |
+| WB   | 0x06 | 162.40 MHz | 60 | 7A | 02 | 00 | 00 | 2,7,A,6,0 | 27A60 | 162400 | ✅ |
+| VHF  | 0x07 | 145.095 MHz | C7 | 36 | 02 | 00 | 00 | 2,3,6,C,7 | 236C7 | 145095 | ✅ |
 
 **Decoding Status:**
 - ✅ **Band names**: Fully decoded from Byte 3
 - ✅ **Signal strength**: Fully decoded from Byte 9 nibbles  
-- ⚠️ **Frequency**: Formula incomplete - divisor varies non-linearly
-- ❌ **Byte 6 purpose**: Correlation with frequency unclear
-- ❌ **Mathematical formula**: Requires more analysis or deobfuscated Android source
+- ✅ **Frequency**: FULLY DECODED - Nibble extraction method with 100% accuracy!
+- ✅ **Unit indicator**: Byte 8 (0=MHz, 1=KHz)
+- ✅ **Decimal places**: Band-specific (FM=2, MW=0, Others=3)
 
 **Key Findings:**
 1. **Device requires BLE-level ACK** (`WriteWithResponse`) for commands to be processed
@@ -130,26 +133,29 @@ Verified frequency data points (Hardware, Nov 13, 2025):
 6. Characteristic ff14 (0000ff14) is correct RX channel for status messages
 7. Status messages stream continuously (~2-3/sec) providing device state
 8. Volume updates are real-time and accurate
-9. Frequency decoding needs more reverse engineering
+9. Frequency decoding COMPLETED using nibble extraction method!
 
-### ⚠️ AREAS NEEDING MORE WORK
-- **Frequency formula**: ⚠️ IN PROGRESS - Raw values captured, conversion formula incomplete
-  - Divisor varies non-linearly even with same scale factor and Byte6
-  - May require additional parameters, lookup table, or non-linear formula
-  - See STATUS_MESSAGE_ANALYSIS.md for Android app algorithm details
-- **Battery level**: BLE Battery Service (0x180f) present but not queried
-- **ab090f frames**: Alternate state format mentioned in docs, not observed in testing
-- **Long-press commands**: Hold variants implemented but not verified with physical radio
-- **Timing limits**: Minimum command spacing not determined (100ms confirmed safe)
+### 🎉 PROTOCOL REVERSE ENGINEERING - COMPLETE!
 
-### ✅ COMPLETED REVERSE ENGINEERING
+All essential RF320-BLE protocol features successfully decoded (Nov 13, 2025):
+
+### ✅ FULLY DECODED FEATURES
 - ✅ **Band names**: Decoded from ab0901 Byte 3 (FM/MW/SW/AIR/WB/VHF)
 - ✅ **Signal strength**: Decoded from ab0901 Byte 9 nibbles (0-6 bars)
+- ✅ **Frequency**: **FULLY DECODED** - Nibble extraction with 100% accuracy!
+  - Algorithm: Extract nibbles from Bytes 4-7, assemble as hex, apply decimal places
+  - Verified on 5 hardware data points (MW, FM, AIR, WB, VHF)
 - ✅ **Volume status**: Real-time from Type 0x0A messages (0-15)
 - ✅ **Modulation mode**: From Type 0x02 messages (AM/NFM/WFM)
 - ✅ **WriteWithResponse**: Critical requirement discovered and implemented
 - ✅ **Command transmission**: All button commands verified working
 - ✅ **Status stream**: Continuous updates (~2-3/sec) fully parsed
+
+### ⚠️ Optional Enhancements (Not Critical)
+- **Battery level**: BLE Battery Service (0x180f) present but not queried
+- **ab090f frames**: Alternate state format mentioned in docs, not observed in testing
+- **Long-press commands**: Hold variants implemented but not verified with physical radio
+- **Timing limits**: Minimum command spacing not determined (100ms confirmed safe)
 
 ## 1. Device Discovery & Selection
 

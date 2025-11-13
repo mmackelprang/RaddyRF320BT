@@ -131,8 +131,9 @@ try
     {
         logger.LogState(state);
         var signalBars = new string('█', state.SignalStrength) + new string('░', 6 - state.SignalStrength);
-        Console.WriteLine($"  ← STATE: Band={state.BandName,-6} Freq≈{state.FrequencyMHz:0.00} MHz  Signal:[{signalBars}] {state.SignalQualityText}");
-        Console.WriteLine($"           (raw=0x{state.RawFreqValue:X6}, scale={state.ScaleFactor}, B9=0x{state.ScaleFactor:X2})");
+        var unit = state.UnitIsMHz ? "MHz" : "KHz";
+        Console.WriteLine($"  ← STATE: Band={state.BandName,-6} Freq={state.FrequencyMHz:0.000} {unit}  Signal:[{signalBars}] {state.SignalQualityText}");
+        Console.WriteLine($"           (decoded from nibbles: 0x{state.FrequencyHex})");
     };
 
     // Initialize radio
