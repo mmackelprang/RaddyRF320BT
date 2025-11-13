@@ -77,7 +77,7 @@ public record RadioFrame(byte Header, byte Proto, CommandGroup Group, byte Comma
 
     public byte[] ToBytes() => new[] { Header, Proto, (byte)Group, CommandId, Check };
 
-    public static bool TryParse(ReadOnlySpan<byte> data, out RadioFrame frame)
+    public static bool TryParse(ReadOnlySpan<byte> data, out RadioFrame? frame)
     {
         frame = default;
         if (data.Length == 5 && data[0] == CommandBase.Header && data[1] == CommandBase.Proto)
