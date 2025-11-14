@@ -574,10 +574,7 @@ public void BuildPowerFrame_ChecksumMatches() {
 | 中中中 / 的命令 | Emphatic / command marker | Service discovery logs |
 
 ## 15. Open Questions (For Live Validation)
-- Exact meaning of each state byte (at, ax, ay, az, aA, cj). Hypothesis: band, step size, modulation, stereo, squelch code.
-- Correct frequency scaling factor (hex to MHz). Requires observing real device values.
 - Accept frame timing (immediately after handshake or after certain command?).
- - Meaning of rapid repeating signatures (e.g., `ab061c`) seen in capture – likely periodic lightweight status/beacon; needs full frame collection beyond first 3 bytes.
 
 ## 15a. Long-Click / Special Function Mapping Dictionary
 The app defines extended long-press frames with CommandIds 0x35–0x49 (Group 0x0C). All share the same checksum rule (0xB9 + ID). Names are partially transliterated from Chinese pinyin / shorthand:
@@ -651,35 +648,6 @@ double ScaleFrequency(uint raw){
 ```
 Log both raw and scaled; allow manual override.
 
-## 15d. Capture Signature Interpretation (From PROTOCOL_SEQUENCE_SAMPLE.txt)
-| Signature | Observed Count | Hypothesis |
-|-----------|----------------|------------|
-| AB061C | Frequent repeating | Heartbeat / minor status (state byte 0x1C) |
-| AB01FF | Handshake echo? | Possibly device response mirroring `sendWoshou` minus trailer |
-| AB0220 | Squelch state update (0x20) |
-| AB0417 | Frequency component seed (matches parser branch) |
-| AB0E21 / AB0821 | Stereo / Music sub-state toggles |
-| AB0B1C | Back/Delete action acknowledgement |
-| AB0205 | Numeric 0x05 press acknowledgement |
-| AB0506 | Volume +/- or number interplay (needs full frame) |
-| AB0308 | Numeric 0x08 press |
-| AB0315 / AB0318 | Mode/state small frames (parser recognizes ab031e/f/03) |
-| AB1119 (x4) | Repeated state transitions (ID 0x19 step/long play region) |
-| AB1019 | Related to previous (short vs long variant) |
-| AB0207 | Numeric 0x07 acknowledgement |
-| AB0901 | Full state/frequency snapshot |
-| AB0410 | Decimal point / point press ack (0x10 in position) |
-| AB101C / AB0D1C / AB071C / AB081C / AB111C / AB091C / AB051C / AB0E1C | Series of quick state changes referencing 0x1C (Bluetooth / display / band-with) |
-| AB020C | Freq confirm (CommandId 0x0D) truncated signature (prefix) |
-
-NOTE: Capture truncates to first 3 bytes; real frames are 5 bytes (or more for snapshots). Interpretations thus provisional.
-
-## 15e. Collision Resolution Strategy (Implementation)
-- Maintain canonical enum for actions; alias names map to same CommandId.
-- On build: if requested alias differs, log alias → canonical mapping.
-- On parse: if CommandId matches known canonical, surface only canonical; maintain alias list for debugging.
-
-
 ## 16. Summary
 The Radio-C app uses a compact custom BLE protocol: framed by header `0xAB`, fixed proto `0x02`, grouped by command class (0x0C buttons, 0x12 acknowledgements). Check bytes are linear (`base + commandId`). Two characteristics (FF13 write, FF14 notify) facilitate half-duplex control & state updates. Notifications carry hex-encoded frequency/state structures keyed by 6-char signatures (e.g., `ab0901`). Reimplementation in C# centers on constructing frames, enabling notifications, decoding signatures, and mapping UI actions to command IDs.
 
@@ -701,3 +669,869 @@ Timing Heuristics for Reimplementation:
 4. If handshake echo not observed within startup window (<1 s after sending handshake), resend handshake once.
 
 Next Validation Step: Collect full-length frames (5+ bytes) corresponding to the truncated signatures to confirm check bytes & any payload extensions.
+
+## 18. Detailed Analysis of Status/Notification Message Types
+
+This section provides in-depth analysis of inbound notification message signatures with Group IDs AB02, AB04, AB05, and AB06, as determined from smali code analysis.
+
+### 18.1 AB02 Messages - Device State & Configuration Updates
+
+AB02 messages represent **device status and configuration responses** sent from the radio to the app. All AB02 messages follow the pattern `AB 02 XX YY` where XX is the sub-command identifier.
+
+#### AB02 Message Types
+
+| Signature | Byte Layout | Purpose | Data Extracted | UI Action |
+|-----------|-------------|---------|----------------|-----------|
+| `ab0205` | AB 02 05 XX | **Preset/Memory status** | Byte 6-7: Memory number (hex to dec) | Updates memory display; if "0" clears background, else shows preset number with colored background |
+| `ab0207` | AB 02 07 XX | **Battery level** | Byte 6-7: Battery level hex | Log: "蓝牙传输回电池信息" (Bluetooth returns battery info). Updates battery UI with percentage bars/icons |
+| `ab0209` | AB 02 09 XX | **Volume level** | Byte 6-7: Volume hex | Displays as "VOL:XX" where XX is decimal conversion of hex volume |
+| `ab020a` | AB 02 0A XX | **EQ (Equalizer) setting** | Byte 6-7: EQ mode | Log: "蓝牙传输回EQ信息" (Bluetooth returns EQ info). Updates EQ icon based on mode (00-05 map to different EQ presets) |
+| `ab020e` | AB 02 0E XX | **Play/Pause state** | Byte 6-7: Play status | Log: "蓝牙传输回当前播放状态" (Bluetooth returns current playback state). Updates play/pause button state |
+| `ab0211` | AB 02 11 XX | **Step size** | Byte 6-7: Step value hex | Updates tuning step display (e.g., 5kHz, 10kHz, 25kHz, etc.) |
+| `ab0216` | AB 02 16 XX | **Stereo/Mono indicator** | Byte 6-7: Audio mode | Updates stereo/mono icon on display |
+| `ab021b` | AB 02 1B XX | **De-emphasis setting** | Byte 6-7: De-emphasis value | Updates de-emphasis mode indicator (typically 50µs or 75µs for FM) |
+| `ab0220` | AB 02 20 XX | **Language setting** | Byte 6-7: Language code | 00=Chinese (Simplified), 01=English. Updates app locale configuration |
+| `ab0224` | AB 02 24 | **Power on confirmation** | No payload | Triggers UI update to show device is powered on |
+
+**Key Implementation Notes:**
+- All AB02 messages extract data from position 6-7 (bytes after signature)
+- Most values are 2-hex-digit codes that need `hexToDec()` conversion
+- Battery display uses `ConstraintLayout` visibility to show different battery level icons
+- Log messages often include Chinese text indicating the type of data received
+
+**C# Parsing Example:**
+```csharp
+public class AB02Message
+{
+    public string SubCommand { get; set; }  // Byte at position 4-5
+    public string DataByte { get; set; }     // Byte at position 6-7
+    
+    public static AB02Message Parse(string hexString)
+    {
+        if (!hexString.StartsWith("ab02") || hexString.Length < 8)
+            return null;
+            
+        return new AB02Message
+        {
+            SubCommand = hexString.Substring(4, 2),
+            DataByte = hexString.Substring(6, 2)
+        };
+    }
+    
+    public int GetDecimalValue()
+    {
+        return Convert.ToInt32(DataByte, 16);
+    }
+}
+```
+
+### 18.2 AB04 Messages - Preset/Memory & Music Operations
+
+AB04 messages handle **preset memory management and music playback information**.
+
+#### AB04 Message Types
+
+| Signature | Byte Layout | Purpose | Data Extracted | UI Action |
+|-----------|-------------|---------|----------------|-----------|
+| `ab0402` | AB 04 02 XX YY YY | **Music track selection** | Byte 6-7: Mode indicator<br>Byte 8-11: Track number (4 hex digits) | Log: "选曲功能" (Track selection function). Displays current track number or "Please Enter" if track is 0 |
+| `ab0410` | AB 04 10 XX YY YY | **Preset recall mode** | Byte 6-7: Mode (00/01/02)<br>Byte 8-9: Preset number | Log: "存台模式" (Save station mode). Mode 00=hide animation, 01=show preset number, 02=flicker animation |
+| `ab0414` | AB 04 14 XX YY YY | **Preset write/memory store** | Byte 6-7: Operation status<br>Byte 8-9, 10-11: Memory slot data | Stores preset frequency to memory slot. Status byte indicates success/failure |
+| `ab0417` | AB 04 17 XX YY ZZ | **Button state/color control** | Byte 6-7: Button state<br>Byte 8-9: State param 1<br>Byte 10-11: State param 2 | Log: "ab0417的命令" (ab0417 command). Controls button colors and touch handlers based on state (00=enabled/green, 01=disabled/gray) |
+
+**Special Notes on ab0410 (Preset Mode):**
+```java
+// Mode byte interpretation:
+if (mode == "00") {
+    // Hide preset indicator (no preset active)
+    clearAnimation();
+    setVisibility(INVISIBLE);
+}
+if (mode == "01") {
+    // Show preset number (preset recalled)
+    clearAnimation();
+    setVisibility(VISIBLE);
+    displayPresetNumber();
+}
+if (mode == "02") {
+    // Flicker animation (scanning/searching presets)
+    setVisibility(VISIBLE);
+    startFlickerAnimation();
+}
+```
+
+**Special Notes on ab0402 (Music Track):**
+```java
+// Track display logic:
+String trackHex = byte8-9 + byte10-11;  // Concatenate 4 hex digits
+String trackNum = hexToDec(trackHex);
+
+if (mode == "00") {
+    // Display current track / total tracks
+    display(currentTrack + "/" + totalTracks);
+} else if (trackNum.equals("0")) {
+    display("Please Enter");
+} else {
+    display(trackNum);
+}
+```
+
+### 18.3 AB05 Messages - Alarm Clock Settings
+
+AB05 messages handle **alarm clock configuration** (outbound and inbound).
+
+#### AB05 Message Structure
+
+| Signature | Byte Layout | Purpose | Data Format | Notes |
+|-----------|-------------|---------|-------------|-------|
+| `ab050e` | AB 05 0E XX HH MM 0S CC | **Alarm setting** | XX: On/Off (00=off, 01=on)<br>HH: Hour (2 hex digits)<br>MM: Minute (2 hex digits)<br>S: Snooze/repeat bits<br>CC: Checksum | Built by app to send alarm time to device. Checksum = sum of bytes 0-6 |
+
+**Detailed Structure of ab050e:**
+```
+Position:  0  1  2  3  4  5  6  7
+Bytes:     AB 05 0E XX HH MM 0S CC
+
+Where:
+- AB: Header
+- 05: Group (alarm/timer functions)
+- 0E: Sub-command (set alarm)
+- XX: Alarm on/off (from field 'A' in app: "00" or "01")
+- HH: Hour in hex (e.g., 0x07 for 7 AM)
+- MM: Minute in hex (e.g., 0x1E for 30 minutes)
+- 0S: Snooze/repeat setting (typically "00" or "01")
+- CC: Checksum = (byte0 + byte1 + byte2 + ... + byte6) & 0xFF
+```
+
+**Implementation Notes:**
+- Field `I` stores hour (as 2 hex chars)
+- Field `J` stores minute (as 2 hex chars)
+- Field `A` stores on/off state
+- Field `H` stores snooze/repeat value
+- Leading zeros are added if hour/minute convert to single digit hex
+
+**C# Alarm Message Builder:**
+```csharp
+public byte[] BuildAlarmMessage(bool alarmOn, int hour, int minute, int snooze)
+{
+    string onOff = alarmOn ? "01" : "00";
+    string hourHex = hour.ToString("X2");
+    string minHex = minute.ToString("X2");
+    string snoozeHex = "0" + snooze.ToString("X1");
+    
+    string message = $"ab050e{onOff}{hourHex}{minHex}{snoozeHex}";
+    byte[] bytes = HexStringToBytes(message);
+    
+    // Calculate checksum
+    int checksum = 0;
+    for (int i = 0; i < bytes.Length; i++)
+        checksum += bytes[i];
+    
+    // Append checksum byte
+    byte[] result = new byte[bytes.Length + 1];
+    Array.Copy(bytes, result, bytes.Length);
+    result[result.Length - 1] = (byte)(checksum & 0xFF);
+    
+    return result;
+}
+```
+
+### 18.4 AB06 Messages - Memory/Preset Data Transfer
+
+AB06 messages handle **memory preset storage and recall** with frequency data.
+
+#### AB06 Message Types
+
+| Signature | Byte Layout | Purpose | Data Extracted | UI Action |
+|-----------|-------------|---------|----------------|-----------|
+| `ab060c` | AB 06 0C XX YY YY ZZ ZZ... | **Music file count** | Byte 6-7: Count hi byte<br>Byte 8-9: Count lo byte<br>Concatenated: total file count | Log: "蓝牙传输回当前设备音乐总数" (Bluetooth returns total music count). Stores in field `N` |
+| `ab0610` | AB 06 10 BB FF FF FF FF | **Preset memory write** | BB: Band byte (from `at` field)<br>FF FF FF FF: 4 frequency bytes | Sends preset to store. Includes band and frequency from RemarkInfo object |
+
+**Detailed Structure of ab0610 (Preset Write):**
+```
+Position:  0  1  2  3  4  5  6  7  8  9
+Bytes:     AB 06 10 BB F1 F2 F3 F4 CC
+
+Where:
+- AB: Header
+- 06: Group (memory/preset operations)
+- 10: Sub-command (write preset)
+- BB: Band byte (current band from `at` field)
+- F1 F2 F3 F4: Frequency bytes (4 bytes from RemarkInfo)
+- CC: Checksum = sum of all previous bytes & 0xFF
+```
+
+**Implementation from onSend() method:**
+```java
+String command = "ab0610" + 
+                 this.at +                    // Current band
+                 remarkInfo.getByte4() +       // Freq byte 1
+                 remarkInfo.getByte5() +       // Freq byte 2
+                 remarkInfo.getByte6() +       // Freq byte 3
+                 remarkInfo.getByte7();        // Freq byte 4
+
+byte[] bytes = hexStringToBytes(command);
+int checksum = bytes[0] + bytes[1] + bytes[2] + ... + bytes[N-1];
+// Append checksum and send
+```
+
+**ab060c Music Count Parsing:**
+```java
+// Extract two 2-byte segments
+String hiByte = substring(6, 8);   // High order count
+String loByte = substring(8, 10);  // Low order count
+
+// Concatenate and convert
+String totalHex = loByte + hiByte;  // Note: reversed order
+String totalCount = hexToDec(totalHex);
+
+// Store total music file count
+field.N = totalCount;
+```
+
+### 18.5 Message Length Patterns
+
+| Message Group | Typical Length | Variable Length? | Notes |
+|---------------|----------------|------------------|-------|
+| AB02 | 8 chars (4 bytes) | No | Fixed: signature + 1 data byte |
+| AB04 | 10-12 chars (5-6 bytes) | Yes | Signature + mode + 1-2 data bytes |
+| AB05 | 16 chars (8 bytes) | No | Fixed: alarm data + checksum |
+| AB06 | 10-20 chars (5-10 bytes) | Yes | Variable based on preset/music data |
+
+### 18.6 Checksum Validation for AB05/AB06
+
+Messages in groups AB05 and AB06 include checksums for validation:
+
+```csharp
+public static bool ValidateChecksum(byte[] message)
+{
+    if (message.Length < 2) return false;
+    
+    int calculatedSum = 0;
+    for (int i = 0; i < message.Length - 1; i++)
+    {
+        calculatedSum += message[i];
+    }
+    
+    byte expectedChecksum = (byte)(calculatedSum & 0xFF);
+    byte actualChecksum = message[message.Length - 1];
+    
+    return expectedChecksum == actualChecksum;
+}
+```
+
+### 18.7 Chinese Log Message Translation Reference
+
+For debugging and understanding message flow:
+
+| Chinese Text | Translation | Context |
+|--------------|-------------|---------|
+| 蓝牙传输回电池信息 | Bluetooth returns battery info | AB0207 handler |
+| 蓝牙传输回EQ信息 | Bluetooth returns EQ info | AB020A handler |
+| 蓝牙传输回当前播放状态 | Bluetooth returns current playback state | AB020E handler |
+| 存台模式 | Save station mode / Preset mode | AB0410 handler |
+| 选曲功能 | Track selection function | AB0402 handler |
+| 蓝牙传输回当前设备音乐总数 | Bluetooth returns total music count | AB060C handler |
+| ab0417的命令 | ab0417 command | AB0417 handler |
+
+### 18.8 Implementation Priority
+
+Based on reverse engineering analysis, implement message handlers in this order:
+
+1. **AB02 messages** - Essential for device state monitoring (battery, volume, mode indicators)
+2. **AB04 messages** - Important for preset management and UI feedback
+3. **AB06 messages** - Required for memory/preset storage features
+4. **AB05 messages** - Optional alarm functionality (if needed)
+
+### 18.9 Testing Recommendations
+
+1. **AB02 Testing**: Monitor battery levels, volume changes, and mode switches
+2. **AB04 Testing**: Test preset recall (ab0410) in all three modes (hide/show/flicker)
+3. **AB05 Testing**: Set alarms and verify checksum calculation
+4. **AB06 Testing**: Store and recall frequency presets across different bands
+5. **Integration Testing**: Verify message sequencing during typical user workflows
+
+---
+
+## 19. Variable-Length Data Transfer Protocols (0x19, 0x1C, 0x21)
+
+### 19.1 Overview
+
+The Radio-C protocol uses three distinct **data transfer patterns** identified by the third byte of the message (byte position 4-5 in hex string). These patterns support **multi-packet variable-length data transmission** where data is accumulated across multiple messages.
+
+**Transfer Type Indicators:**
+- **0x19**: Version string transfer (firmware/software version information)
+- **0x1C**: General variable-length data transfer (most message types use this)
+- **0x21**: Button/numeric display data transfer (used for special displays)
+
+These patterns are used by message types **AB07, AB08, AB0B, AB0D, AB0E, AB0F, AB10, AB11** which were not explicitly signature-matched in the earlier sections.
+
+---
+
+### 19.2 Common Message Structure
+
+All three transfer types share a similar structure:
+
+```
+Position:  0  1  2  3  4  5  6  7  8  9  10 11 12+
+Hex:       AB XX TT YY SS LL [variable-length data...]
+
+Where:
+  AB    = Header byte (always 0xAB)
+  XX    = Message type (07, 08, 0B, 0D, 0E, 0F, 10, 11)
+  TT    = Transfer type (19, 1C, or 21)
+  YY    = Sub-type / packet sequence (01, 02, 03, 04...)
+  SS    = Data mode/type indicator (varies by message type)
+  LL    = Length byte (number of data bytes to follow)
+  [data]= Variable-length payload (LL bytes)
+```
+
+**Code Location:** MainActivity.smali lines 5643-5950 (0x19), 5910-9755 (0x1C), 10038-11363 (0x21)
+
+---
+
+### 19.3 Transfer Type 0x19 - Version String Transfer
+
+**Pattern:** `AB XX 19 YY SS LL [data]`
+
+**Purpose:** Transfers version strings or firmware information in chunks.
+
+**Parsing Logic (MainActivity.smali lines 5643-5850):**
+
+```smali
+# Check pattern: AB XX 19
+if (byte[0-1] == "ab" && byte[4-5] == "19") {
+    int length = Integer.parseInt(substring(8, 10), 16);  # Byte 8-9
+    String dataType = substring(6, 8);                     # Byte 6-7 (sub-type)
+    
+    if (dataType.equals("01")) {
+        # First packet - initialize buffer
+        int dataLen = length * 2 + 10;  # Calculate string length
+        String data = substring(10, dataLen);
+        field.bL = data;  # Store in version string buffer
+    }
+    else if (dataType.equals("02")) {
+        # Continuation packet - append data
+        field.bL = field.bL + substring(12, length * 2 + 12);
+    }
+    else if (dataType.equals("03")) {
+        # Finalization packet
+        field.bL = field.bL + substring(12, length * 2 + 12);
+        field.aQ = hexStringToBytes(field.bL).toDecimalString();
+        # Update UI with version string (MainActivity$33)
+    }
+    else if (dataType.equals("04")) {
+        # Complete packet - all data in one message
+        field.bL = field.bL + substring(10, length * 2 + 10);
+        field.aQ = hexStringToBytes(field.bL).toDecimalString();
+        # Update UI (MainActivity$33)
+    }
+}
+```
+
+**Observed Messages:** `AB1119`, `AB1019`
+
+**C# Parsing Example:**
+
+```csharp
+public class VersionStringTransfer
+{
+    private StringBuilder versionBuffer = new StringBuilder();
+    
+    public void ProcessMessage(byte[] rawBytes)
+    {
+        string hex = BitConverter.ToString(rawBytes).Replace("-", "").ToLower();
+        
+        if (hex.Substring(0, 2) != "ab" || hex.Substring(4, 2) != "19")
+            return;
+            
+        string messageType = hex.Substring(2, 2);  // 10, 11, etc.
+        string subType = hex.Substring(6, 2);       // 01, 02, 03, 04
+        int length = Convert.ToInt32(hex.Substring(8, 2), 16);
+        
+        switch (subType)
+        {
+            case "01":  // First packet
+                versionBuffer.Clear();
+                versionBuffer.Append(hex.Substring(10, length * 2));
+                break;
+                
+            case "02":  // Continuation
+                versionBuffer.Append(hex.Substring(12, length * 2));
+                break;
+                
+            case "03":  // Final packet
+            case "04":  // Complete in one packet
+                if (subType == "03")
+                    versionBuffer.Append(hex.Substring(12, length * 2));
+                else
+                    versionBuffer.Append(hex.Substring(10, length * 2));
+                    
+                string versionString = ConvertHexToDecimalString(versionBuffer.ToString());
+                OnVersionReceived?.Invoke(versionString);
+                break;
+        }
+    }
+    
+    private string ConvertHexToDecimalString(string hex)
+    {
+        byte[] bytes = new byte[hex.Length / 2];
+        for (int i = 0; i < bytes.Length; i++)
+            bytes[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
+        return Encoding.ASCII.GetString(bytes);
+    }
+}
+```
+
+---
+
+### 19.4 Transfer Type 0x1C - General Data Transfer
+
+**Pattern:** `AB XX 1C YY SS LL [data]`
+
+**Purpose:** Most common transfer type. Used for general variable-length data including presets, settings, and state information.
+
+**Parsing Logic (MainActivity.smali lines 5910-6850):**
+
+```smali
+# Check pattern: AB XX 1C
+if (byte[0-1] == "ab" && byte[4-5] == "1c" && byte[6-7] == "01") {
+    int length = Integer.parseInt(substring(10, 12), 16);  # Byte 10-11
+    String dataType = substring(8, 10);                     # Byte 8-9
+    
+    if (dataType.equals("01")) {
+        # First packet
+        int dataLen = length * 2 + 12;
+        field.bz = substring(12, dataLen);
+    }
+    else if (dataType.equals("02")) {
+        # Continuation packet
+        field.bz = field.bz + substring(12, length * 2 + 12);
+    }
+    else if (dataType.equals("03")) {
+        # Finalization packet
+        field.bz = field.bz + substring(12, length * 2 + 12);
+        field.bA = hexStringToBytes(field.bz).toDecimalString();
+        # Update UI
+    }
+    else if (dataType.equals("04")) {
+        # Complete packet
+        field.bz = field.bz + substring(12, length * 2 + 12);
+        field.bA = hexStringToBytes(field.bz).toDecimalString();
+        # Update UI
+    }
+}
+```
+
+**Observed Messages:** `AB071C`, `AB081C`, `AB0B1C`, `AB0D1C`, `AB0E1C`, `AB101C`, `AB111C`
+
+**Message-Specific Purposes:**
+- **AB071C**: Radio parameter data
+- **AB081C**: Music/audio parameter data  
+- **AB0B1C**: Back/Delete acknowledgement
+- **AB0D1C**: Configuration data
+- **AB0E1C**: Stereo/audio settings
+- **AB101C**: State transition data
+- **AB111C**: Extended state information
+
+**C# Parsing Example:**
+
+```csharp
+public class GeneralDataTransfer
+{
+    private Dictionary<string, StringBuilder> dataBuffers = new Dictionary<string, StringBuilder>();
+    
+    public void ProcessMessage(byte[] rawBytes)
+    {
+        string hex = BitConverter.ToString(rawBytes).Replace("-", "").ToLower();
+        
+        if (hex.Substring(0, 2) != "ab" || hex.Substring(4, 2) != "1c")
+            return;
+            
+        string messageType = hex.Substring(2, 2);  // 07, 08, 0B, 0D, 0E, 10, 11
+        string packetType = hex.Substring(6, 2);   // 01, 02, 03, 04 (packet sequence)
+        string dataType = hex.Substring(8, 2);     // Data mode indicator
+        int length = Convert.ToInt32(hex.Substring(10, 2), 16);
+        
+        // Create unique key for this data stream
+        string bufferKey = $"{messageType}_{dataType}";
+        
+        if (!dataBuffers.ContainsKey(bufferKey))
+            dataBuffers[bufferKey] = new StringBuilder();
+        
+        switch (dataType)
+        {
+            case "01":  // First packet
+                dataBuffers[bufferKey].Clear();
+                dataBuffers[bufferKey].Append(hex.Substring(12, length * 2));
+                break;
+                
+            case "02":  // Continuation
+                dataBuffers[bufferKey].Append(hex.Substring(12, length * 2));
+                break;
+                
+            case "03":  // Final packet
+            case "04":  // Complete packet
+                if (dataType == "03" || dataType == "04")
+                {
+                    dataBuffers[bufferKey].Append(hex.Substring(12, length * 2));
+                }
+                
+                string completeData = dataBuffers[bufferKey].ToString();
+                ProcessCompleteData(messageType, dataType, completeData);
+                dataBuffers[bufferKey].Clear();
+                break;
+        }
+    }
+    
+    private void ProcessCompleteData(string messageType, string dataType, string hexData)
+    {
+        switch (messageType)
+        {
+            case "07":  // AB071C - Radio parameters
+                OnRadioParametersReceived?.Invoke(ConvertToDecimalString(hexData));
+                break;
+            case "08":  // AB081C - Music parameters
+                OnMusicParametersReceived?.Invoke(ConvertToDecimalString(hexData));
+                break;
+            case "0b":  // AB0B1C - Back/Delete ack
+                OnBackAcknowledged?.Invoke();
+                break;
+            case "0d":  // AB0D1C - Configuration
+                OnConfigurationReceived?.Invoke(hexData);
+                break;
+            case "0e":  // AB0E1C - Stereo settings
+                OnStereoSettingsReceived?.Invoke(hexData);
+                break;
+            case "10":  // AB101C - State transition
+                OnStateTransitionReceived?.Invoke(hexData);
+                break;
+            case "11":  // AB111C - Extended state
+                OnExtendedStateReceived?.Invoke(hexData);
+                break;
+        }
+    }
+    
+    private string ConvertToDecimalString(string hex)
+    {
+        byte[] bytes = new byte[hex.Length / 2];
+        for (int i = 0; i < bytes.Length; i++)
+            bytes[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
+        return Encoding.ASCII.GetString(bytes);
+    }
+}
+```
+
+---
+
+### 19.5 Transfer Type 0x21 - Display/Button Data Transfer
+
+**Pattern:** `AB XX 21 YY SS LL [data]`
+
+**Purpose:** Transfers data for button displays and numeric indicators.
+
+**Parsing Logic (MainActivity.smali lines 10038-10280):**
+
+```smali
+# Check pattern: AB XX 21
+if (byte[0-1] == "ab" && byte[4-5] == "21" && byte[6-7] == "01") {
+    int length = Integer.parseInt(substring(10, 12), 16);  # Byte 10-11
+    String dataType = substring(8, 10);                     # Byte 8-9
+    
+    if (dataType.equals("01")) {
+        # First packet
+        field.bQ = substring(12, length * 2 + 12);
+    }
+    else if (dataType.equals("02")) {
+        # Continuation packet
+        field.bQ = field.bQ + substring(12, length * 2 + 12);
+    }
+    else if (dataType.equals("03")) {
+        # Finalization packet
+        field.bR = hexStringToBytes(field.bQ + substring(12, ...)).toDecimalString();
+        # Update button text (MainActivity$67)
+    }
+    else if (dataType.equals("04")) {
+        # Complete packet
+        field.bQ = field.bQ + substring(12, length * 2 + 12);
+        field.bR = hexStringToBytes(field.bQ).toDecimalString();
+        # Update button text (MainActivity$69)
+    }
+}
+```
+
+**Observed Messages:** `AB0E21`, `AB0821`
+
+**UI Integration:** The final decimal string (field `bR`) is displayed on a Button widget, suggesting these messages update button labels or numeric displays.
+
+**C# Parsing Example:**
+
+```csharp
+public class DisplayDataTransfer
+{
+    private StringBuilder displayBuffer = new StringBuilder();
+    
+    public void ProcessMessage(byte[] rawBytes)
+    {
+        string hex = BitConverter.ToString(rawBytes).Replace("-", "").ToLower();
+        
+        if (hex.Substring(0, 2) != "ab" || hex.Substring(4, 2) != "21")
+            return;
+            
+        string messageType = hex.Substring(2, 2);  // 08, 0E, etc.
+        string packetType = hex.Substring(6, 2);   // 01, 02, 03, 04
+        string dataMode = hex.Substring(8, 2);
+        int length = Convert.ToInt32(hex.Substring(10, 2), 16);
+        
+        switch (dataMode)
+        {
+            case "01":  // First packet
+                displayBuffer.Clear();
+                displayBuffer.Append(hex.Substring(12, length * 2));
+                break;
+                
+            case "02":  // Continuation
+                displayBuffer.Append(hex.Substring(12, length * 2));
+                break;
+                
+            case "03":  // Final packet
+            case "04":  // Complete packet
+                if (dataMode == "03" || dataMode == "04")
+                {
+                    displayBuffer.Append(hex.Substring(12, length * 2));
+                }
+                
+                string displayText = ConvertHexToDecimalString(displayBuffer.ToString());
+                
+                // Update UI based on message type
+                if (messageType == "0e")
+                    OnStereoDisplayUpdate?.Invoke(displayText);
+                else if (messageType == "08")
+                    OnMusicDisplayUpdate?.Invoke(displayText);
+                    
+                displayBuffer.Clear();
+                break;
+        }
+    }
+    
+    private string ConvertHexToDecimalString(string hex)
+    {
+        byte[] bytes = new byte[hex.Length / 2];
+        for (int i = 0; i < bytes.Length; i++)
+            bytes[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
+        return Encoding.ASCII.GetString(bytes);
+    }
+}
+```
+
+---
+
+### 19.6 Special Case: AB070D - Music Parameters
+
+**Pattern:** `AB 07 0D [data]` (6 bytes total, no variable-length protocol)
+
+This is a **fixed-length message** that doesn't use the 0x19/0x1C/0x21 patterns.
+
+**Structure:**
+```
+Position:  0  1  2  3  4  5  6  7  8  9  10 11
+Hex:       AB 07 0D ?? ?? ?? XX XX YY YY
+
+Where:
+  AB 07 0D = Signature
+  XX XX    = First parameter (byte 6-7, position 6-7 in hex)
+  YY YY    = Second parameter (byte 8-9, position 8-9 in hex)
+```
+
+**Purpose:** "蓝牙传输回当前音乐参数" = "Bluetooth returns current music parameters"
+
+**Parsing Logic (MainActivity.smali lines 5129-5200):**
+
+```smali
+if (signature.equals("ab070d")) {
+    String param1 = substring(6, 8);   # Byte 6-7
+    String param2 = substring(8, 10);  # Byte 8-9
+    
+    String combined = hexToDec(param2) + hexToDec(param1);  # Note: param2 first!
+    long musicParam = Long.parseLong(hexToDec(combined));
+    
+    # Update UI with music parameter (MainActivity$27)
+}
+```
+
+**C# Parsing Example:**
+
+```csharp
+public void ProcessAB070D(byte[] rawBytes)
+{
+    string hex = BitConverter.ToString(rawBytes).Replace("-", "").ToLower();
+    
+    if (hex.Length < 12 || hex.Substring(0, 6) != "ab070d")
+        return;
+        
+    string param1 = hex.Substring(6, 2);  // Byte 3
+    string param2 = hex.Substring(8, 2);  // Byte 4
+    
+    // Convert to decimal (note reversed order!)
+    int p1 = Convert.ToInt32(param1, 16);
+    int p2 = Convert.ToInt32(param2, 16);
+    
+    string combined = $"{p2:D2}{p1:D2}";  // Reverse order
+    long musicParameter = long.Parse(combined);
+    
+    OnMusicParameterReceived?.Invoke(musicParameter);
+}
+```
+
+**Notes:**
+- Parameters are combined in **reverse order** (param2 + param1)
+- Both parameters are converted to decimal before concatenation
+- The final value is parsed as a long integer
+
+---
+
+### 19.7 Message Type Summary Table
+
+| Message Type | Transfer Pattern | Purpose | Observed in Capture |
+|--------------|-----------------|---------|---------------------|
+| AB070D | Fixed 6-byte | Music parameters (direct) | No |
+| AB071C | 0x1C Variable | Radio parameters (multi-packet) | Yes |
+| AB081C | 0x1C Variable | Music parameters (multi-packet) | Yes |
+| AB0821 | 0x21 Display | Music display data | Yes |
+| AB0B1C | 0x1C Variable | Back/Delete acknowledgement | Yes |
+| AB0D1C | 0x1C Variable | Configuration data | Yes |
+| AB0E1C | 0x1C Variable | Stereo settings | Yes |
+| AB0E21 | 0x21 Display | Stereo display data | Yes |
+| AB0F?? | Unknown | Not yet identified | No |
+| AB101C | 0x1C Variable | State transition data | Yes |
+| AB1019 | 0x19 Version | Version/firmware string | Yes |
+| AB111C | 0x1C Variable | Extended state | Yes |
+| AB1119 | 0x19 Version | Version/firmware string | Yes |
+
+---
+
+### 19.8 Packet Sequencing & Reassembly
+
+**Multi-Packet Transfer Flow:**
+
+1. **Packet 1** (dataType = "01"): Initialize buffer, store first chunk
+2. **Packet 2** (dataType = "02"): Append to buffer
+3. **Packet 3** (dataType = "03"): Append final chunk, convert to decimal, trigger callback
+4. **Single Packet** (dataType = "04"): Complete data in one message, process immediately
+
+**Buffer Management:**
+- Each message type/data stream requires separate buffer
+- Buffers must be cleared after finalization (type 03) or complete packet (type 04)
+- Timeout mechanism recommended: clear buffer if no continuation received within 5 seconds
+
+**Error Handling:**
+- Missing packets: Detect gaps in sequence, request retransmission via acknowledgement command
+- Buffer overflow: Set maximum buffer size (e.g., 1KB), discard if exceeded
+- Malformed data: Validate length field matches actual data length
+
+---
+
+### 19.9 Implementation Recommendations
+
+**C# Class Structure:**
+
+```csharp
+public class VariableLengthProtocolHandler
+{
+    private Dictionary<string, DataStreamBuffer> buffers;
+    private Timer timeoutTimer;
+    
+    public event Action<string, string> OnDataComplete;  // (messageType, data)
+    
+    public void ProcessMessage(byte[] rawBytes)
+    {
+        string hex = BitConverter.ToString(rawBytes).Replace("-", "").ToLower();
+        
+        if (hex.Substring(0, 2) != "ab")
+            return;
+            
+        string transferType = hex.Substring(4, 2);
+        
+        switch (transferType)
+        {
+            case "19":
+                ProcessVersionTransfer(hex);
+                break;
+            case "1c":
+                ProcessGeneralTransfer(hex);
+                break;
+            case "21":
+                ProcessDisplayTransfer(hex);
+                break;
+            default:
+                // Try fixed-length patterns (like AB070D)
+                ProcessFixedLengthMessage(hex);
+                break;
+        }
+    }
+    
+    private void ProcessVersionTransfer(string hex) { /* ... */ }
+    private void ProcessGeneralTransfer(string hex) { /* ... */ }
+    private void ProcessDisplayTransfer(string hex) { /* ... */ }
+    private void ProcessFixedLengthMessage(string hex) { /* ... */ }
+}
+
+internal class DataStreamBuffer
+{
+    public StringBuilder Data { get; set; }
+    public DateTime LastUpdate { get; set; }
+    public int ExpectedLength { get; set; }
+}
+```
+
+**State Machine Approach:**
+- Track current packet sequence state (IDLE → RECEIVING → COMPLETE)
+- Validate dataType progression (01 → 02 → 03 or single 04)
+- Reset to IDLE on error or timeout
+
+---
+
+### 19.10 Chinese Log Message Translations
+
+**From MainActivity.smali code comments:**
+- `蓝牙传输回当前音乐参数` = "Bluetooth returns current music parameters" (AB070D)
+- `版本字符串` = "Version string" (0x19 pattern handlers)
+- `数据标识` = "Data identifier" (general parsing context)
+
+These log messages provide hints about the semantic meaning of each message type.
+
+---
+
+### 19.11 Testing & Validation
+
+**Test Scenarios:**
+
+1. **Single-Packet Transfer (dataType 04):**
+   - Send complete data in one message
+   - Verify immediate processing without buffering
+
+2. **Multi-Packet Transfer (dataType 01→02→03):**
+   - Send data split across 3+ packets
+   - Verify correct reassembly and final processing
+
+3. **Interleaved Transfers:**
+   - Send multiple message types concurrently
+   - Verify buffers don't interfere with each other
+
+4. **Timeout Handling:**
+   - Send first packet, wait >5 seconds, send new first packet
+   - Verify old buffer cleared and new transfer starts cleanly
+
+5. **Version String Parsing:**
+   - Send AB1119 or AB1019 messages
+   - Verify version string correctly extracted and displayed
+
+6. **Music Parameter Direct:**
+   - Send AB070D with known parameters
+   - Verify correct decimal conversion and reverse-order combination
+
+**Validation Tools:**
+- Use PROTOCOL_SEQUENCE_SAMPLE.txt as reference for real-world message patterns
+- Log all buffer states during reassembly for debugging
+- Compare parsed output with expected values from known test vectors
+
+````
+
