@@ -9,6 +9,7 @@ using RadioProtocol.Core.Bluetooth;
 using RadioProtocol.Core.Logging;
 using RadioProtocol.Core.Protocol;
 using Spectre.Console;
+using BluetoothDeviceInfo = RadioProtocol.Core.Bluetooth.DeviceInfo;
 
 namespace RadioProtocol.Console;
 
@@ -21,6 +22,7 @@ class Program
     private static IRadioLogger? _logger;
     private static RadioConnection? _radio;
     private static IRadioTransport? _transport;
+    private static RadioProtocolParser? _parser;
     private static readonly CancellationTokenSource _cancellationTokenSource = new();
     
     // Status tracking for display
@@ -29,6 +31,16 @@ class Program
     private static string _currentVolume = "---";
     private static int _currentSignal = 0;
     private static DateTime _lastStatusUpdate = DateTime.MinValue;
+    
+    // New state information for display
+    private static string _lastTextMessage = "---";
+    private static string _demodulationValue = "---";
+    private static string _bandwidthValue = "---";
+    private static string _equalizerType = "---";
+    private static string _modelVersion = "---";
+    private static string _modelVersionNumber = "---";
+    private static string _radioVersion = "---";
+    private static string _radioVersionNumber = "---";
 
     static async Task<int> Main(string[] args)
     {
@@ -93,7 +105,7 @@ class Program
             
             var bluetoothConnection = BluetoothConnectionFactory.Create(_logger);
             
-            IEnumerable<DeviceInfo> devices = Array.Empty<DeviceInfo>();
+            IEnumerable<BluetoothDeviceInfo> devices = Array.Empty<BluetoothDeviceInfo>();
             
             await AnsiConsole.Status()
                 .StartAsync("Scanning for RF320 devices...", async ctx =>
@@ -135,6 +147,15 @@ class Program
 
             // Create transport adapter
             _transport = new TransportAdapter(bluetoothConnection);
+            
+            // Create parser for message parsing
+            _parser = new RadioProtocolParser(_logger);
+            
+            // Subscribe to raw data for additional parsing
+            if (_transport is TransportAdapter adapter)
+            {
+                adapter.RawDataReceived += OnRawDataReceived;
+            }
             
             // Create radio connection
             _radio = new RadioConnection(_transport, _logger);
@@ -207,6 +228,18 @@ class Program
             
             // Track status for display
             if (status.Label == "VolumeValue") _currentVolume = status.Value;
+            if (status.Label == "Demodulation") _demodulationValue = status.Value;
+            if (status.Label == "BandWidth") _bandwidthValue = status.Value;
+            if (status.Label == "Model") 
+            {
+                _modelVersion = status.Value;
+                // Try to extract version number if it's in format like "Model: 320"
+                var parts = status.Value.Split(':');
+                if (parts.Length > 1 && int.TryParse(parts[1].Trim(), out var modelNum))
+                {
+                    _modelVersionNumber = modelNum.ToString();
+                }
+            }
         };
 
         _radio.StateUpdated += (s, state) =>
@@ -234,6 +267,56 @@ class Program
                 _logger?.LogInfo($"Frame: Group={frame.Group} CommandId=0x{frame.CommandId:X2}");
             }
         };
+    }
+
+    private static void OnRawDataReceived(object? sender, byte[] data)
+    {
+        if (_parser == null) return;
+        
+        try
+        {
+            var packet = _parser.ParseReceivedData(data);
+            
+            if (packet.IsValid && packet.ParsedData != null)
+            {
+                switch (packet.ParsedData)
+                {
+                    case RadioProtocol.Core.Models.TextMessageInfo textMsg when textMsg.IsComplete:
+                        _lastTextMessage = textMsg.Message;
+                        _logger?.LogInfo($"Text Message: {textMsg.Message}");
+                        break;
+                        
+                    case RadioProtocol.Core.Models.EqualizerInfo eqInfo:
+                        _equalizerType = eqInfo.Text ?? eqInfo.EqualizerType.ToString();
+                        _logger?.LogInfo($"Equalizer: {_equalizerType}");
+                        break;
+                        
+                    case RadioProtocol.Core.Models.ModelInfo modelInfo:
+                        _modelVersionNumber = modelInfo.VersionNumber.ToString();
+                        _modelVersion = modelInfo.VersionText ?? $"Model {modelInfo.VersionNumber}";
+                        _logger?.LogInfo($"Model Info: {_modelVersion} (#{_modelVersionNumber})");
+                        break;
+                        
+                    case RadioProtocol.Core.Models.RadioVersionInfo radioInfo:
+                        _radioVersionNumber = radioInfo.VersionNumber.ToString();
+                        _radioVersion = radioInfo.VersionText ?? $"Radio {radioInfo.VersionNumber}";
+                        _logger?.LogInfo($"Radio Version: {_radioVersion} (#{_radioVersionNumber})");
+                        break;
+                        
+                    case RadioProtocol.Core.Models.DemodulationInfo demodInfo:
+                        _demodulationValue = demodInfo.Text ?? demodInfo.Value.ToString();
+                        break;
+                        
+                    case RadioProtocol.Core.Models.BandwidthInfo bwInfo:
+                        _bandwidthValue = bwInfo.Text ?? bwInfo.Value.ToString();
+                        break;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "Error parsing raw data");
+        }
     }
 
     private static async Task RunCommandLineMode(List<CanonicalAction> commands)
@@ -315,7 +398,8 @@ class Program
         
         var signalBars = new string('█', _currentSignal) + new string('░', 6 - _currentSignal);
         
-        var table = new Table()
+        // Main status table (existing info)
+        var mainTable = new Table()
             .Border(TableBorder.Heavy)
             .BorderColor(Color.Blue)
             .AddColumn(new TableColumn("[bold]Band[/]").Centered())
@@ -323,17 +407,56 @@ class Program
             .AddColumn(new TableColumn("[bold]Volume[/]").Centered())
             .AddColumn(new TableColumn("[bold]Signal[/]").Centered());
         
-        table.AddRow(
+        mainTable.AddRow(
             $"[cyan]{_currentBand}[/]",
             $"[cyan]{_currentFrequency}[/]",
             $"[cyan]{_currentVolume}[/]",
             $"[cyan]{signalBars}[/]"
         );
         
-        AnsiConsole.Write(table);
+        AnsiConsole.Write(mainTable);
+        
+        // Extended status table (new info) - split into two rows for compactness
+        var extendedTable = new Table()
+            .Border(TableBorder.Rounded)
+            .BorderColor(Color.Green)
+            .AddColumn(new TableColumn("[bold]Demod[/]").Centered())
+            .AddColumn(new TableColumn("[bold]Bandwidth[/]").Centered())
+            .AddColumn(new TableColumn("[bold]Equalizer[/]").Centered())
+            .AddColumn(new TableColumn("[bold]Model[/]").Centered());
+        
+        extendedTable.AddRow(
+            $"[yellow]{_demodulationValue}[/]",
+            $"[yellow]{_bandwidthValue}[/]",
+            $"[yellow]{_equalizerType}[/]",
+            $"[yellow]{_modelVersion}[/]"
+        );
+        
+        AnsiConsole.Write(extendedTable);
+        
+        // Second row of extended info
+        var extendedTable2 = new Table()
+            .Border(TableBorder.Rounded)
+            .BorderColor(Color.Green)
+            .AddColumn(new TableColumn("[bold]Model Ver#[/]").Centered())
+            .AddColumn(new TableColumn("[bold]Radio Ver[/]").Centered())
+            .AddColumn(new TableColumn("[bold]Radio Ver#[/]").Centered())
+            .AddColumn(new TableColumn("[bold]Last Text[/]").LeftAligned());
+        
+        // Truncate text message if too long
+        var truncatedText = _lastTextMessage.Length > 30 ? _lastTextMessage.Substring(0, 27) + "..." : _lastTextMessage;
+        
+        extendedTable2.AddRow(
+            $"[yellow]{_modelVersionNumber}[/]",
+            $"[yellow]{_radioVersion}[/]",
+            $"[yellow]{_radioVersionNumber}[/]",
+            $"[yellow]{truncatedText}[/]"
+        );
+        
+        AnsiConsole.Write(extendedTable2);
         
         // Restore cursor position if we were below the header
-        if (cursorTop > 4)
+        if (cursorTop > 9)  // Increased from 4 to account for new tables
         {
             System.Console.SetCursorPosition(0, cursorTop);
         }
@@ -345,7 +468,9 @@ class Program
         
         while (!_cancellationTokenSource.Token.IsCancellationRequested)
         {
-            var currentStatus = $"{_currentBand}|{_currentFrequency}|{_currentVolume}|{_currentSignal}";
+            var currentStatus = $"{_currentBand}|{_currentFrequency}|{_currentVolume}|{_currentSignal}|" +
+                               $"{_lastTextMessage}|{_demodulationValue}|{_bandwidthValue}|{_equalizerType}|" +
+                               $"{_modelVersion}|{_modelVersionNumber}|{_radioVersion}|{_radioVersionNumber}";
             
             // Only update if status has changed
             if (currentStatus != lastPrintedStatus)
@@ -410,11 +535,16 @@ internal class TransportAdapter : IRadioTransport
     private readonly IBluetoothConnection _connection;
 
     public event EventHandler<byte[]>? NotificationReceived;
+    public event EventHandler<byte[]>? RawDataReceived;  // New event for raw data
 
     public TransportAdapter(IBluetoothConnection connection)
     {
         _connection = connection;
-        _connection.DataReceived += (s, data) => NotificationReceived?.Invoke(this, data);
+        _connection.DataReceived += (s, data) => 
+        {
+            RawDataReceived?.Invoke(this, data);  // Fire raw data event first
+            NotificationReceived?.Invoke(this, data);
+        };
     }
 
     public Task<bool> WriteAsync(byte[] data)
