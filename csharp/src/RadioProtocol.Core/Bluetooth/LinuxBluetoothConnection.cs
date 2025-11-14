@@ -1,4 +1,4 @@
-#if !WINDOWS
+#if !WINDOWS_TARGET
 using HashtagChris.DotNetBlueZ;
 using HashtagChris.DotNetBlueZ.Extensions;
 using Tmds.DBus;
@@ -15,7 +15,7 @@ using DotNetConnectionState = RadioProtocol.Core.Constants.ConnectionState;
 
 namespace RadioProtocol.Core.Bluetooth;
 
-#if !WINDOWS
+#if !WINDOWS_TARGET
 public class LinuxBluetoothConnection : BluetoothConnectionBase
 {
     private static readonly Guid WriteCharacteristicUuid = new("0000ff13-0000-1000-8000-00805f9b34fb");

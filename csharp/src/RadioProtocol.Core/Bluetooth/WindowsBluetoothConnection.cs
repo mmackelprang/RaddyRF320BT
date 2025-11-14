@@ -1,4 +1,4 @@
-#if WINDOWS
+#if WINDOWS_TARGET
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Advertisement;

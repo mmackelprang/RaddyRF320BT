@@ -16,6 +16,7 @@
   
   <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-windows10.0.22621.0'">
     <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <DefineConstants>$(DefineConstants);WINDOWS_TARGET</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
@@ -35,8 +36,17 @@
   </ItemGroup>
 
   <!-- Linux/Raspberry Pi packages -->
-  <ItemGroup Condition="!$([MSBuild]::IsOSPlatform('Windows'))">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
     <PackageReference Include="HashtagChris.DotNetBlueZ" Version="1.3.1" />
+  </ItemGroup>
+
+  <!-- Conditional compilation of platform-specific Bluetooth files -->
+  <ItemGroup>
+    <!-- Remove Windows BT implementation when NOT building for Windows target framework -->
+    <Compile Remove="Bluetooth\WindowsBluetoothConnection.cs" Condition="'$(TargetFramework)' != 'net8.0-windows10.0.22621.0'" />
+    
+    <!-- Remove Linux BT implementation when building for Windows target framework -->
+    <Compile Remove="Bluetooth\LinuxBluetoothConnection.cs" Condition="'$(TargetFramework)' == 'net8.0-windows10.0.22621.0'" />
   </ItemGroup>
 
 </Project>

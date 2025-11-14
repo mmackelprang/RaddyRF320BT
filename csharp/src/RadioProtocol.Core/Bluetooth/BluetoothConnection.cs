@@ -37,7 +37,7 @@ public static class BluetoothConnectionFactory
 {
     public static IBluetoothConnection Create(IRadioLogger logger)
     {
-#if WINDOWS
+#if WINDOWS_TARGET
         return new WindowsBluetoothConnection(logger);
 #else
         if (OperatingSystem.IsLinux())
