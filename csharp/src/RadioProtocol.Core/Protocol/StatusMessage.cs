@@ -153,10 +153,18 @@ public record RadioState(
             int decimalPlaces = GetDecimalPlaces(bandCode);
             double freq = freqRaw / Math.Pow(10, decimalPlaces);
             
-            // Convert KHz to MHz if necessary
+            // For MW band (KHz), keep the value as KHz (don't convert to MHz)
+            // For other bands, the frequency is already in MHz
+            // The isKHz flag should remain false for MW since we're keeping it as KHz
             if (isKHz)
             {
-                freq = freq / 1000.0;  // Convert KHz to MHz for consistent display
+                // MW band: frequency is in KHz, don't convert
+                // freq stays as-is (e.g., 1270 KHz)
+            }
+            else
+            {
+                // Other bands: frequency is in MHz
+                // freq stays as-is (e.g., 102.30 MHz)
             }
             
             // Legacy fields for compatibility

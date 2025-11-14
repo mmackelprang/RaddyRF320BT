@@ -128,7 +128,7 @@ public static class KeyboardMapper
 ┌──────────────────────────────────────────────────────────────────────────┐
 │                    RF320 Radio Test Client - Keyboard Map                │
 ├──────────────────────────────────────────────────────────────────────────┤
-│  NUMBERS:  0-9 = Number keys      │  NAVIGATION: ↑/↓ = Up/Down Short    │
+│  NUMBERS:  0-9 = Number keys       │  NAVIGATION: ↑/↓ = Up/Down Short    │
 │  VOLUME:   +   = Volume Up         │              Shift+↑/↓ = Up/Dn Long │
 │            -   = Volume Down       │  SPECIAL:    . = Decimal Point      │
 │                                    │              ⏎ = Freq Confirm       │

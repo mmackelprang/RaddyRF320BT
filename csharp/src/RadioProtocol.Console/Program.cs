@@ -191,10 +191,17 @@ class Program
         {
             _lastStatusUpdate = DateTime.Now;
             _currentBand = state.BandName;
-            _currentFrequency = $"{state.FrequencyMHz:0.000} {(state.UnitIsMHz ? "MHz" : "KHz")}";
+            // Format frequency based on band: MW has no decimals, FM has 2, others have 3
+            string freqFormat = state.BandCode switch
+            {
+                0x00 => "0.00",  // FM: 2 decimal places
+                0x01 => "0",     // MW: 0 decimal places
+                _ => "0.000"     // All others: 3 decimal places
+            };
+            _currentFrequency = $"{state.FrequencyMHz.ToString(freqFormat)} {(state.UnitIsMHz ? "MHz" : "KHz")}";
             _currentSignal = state.SignalStrength;
             
-            _logger?.LogInfo($"State: Band={state.BandName} Freq={state.FrequencyMHz:0.000} Signal={state.SignalStrength}/6");
+            _logger?.LogInfo($"State: Band={state.BandName} Freq={state.FrequencyMHz.ToString(freqFormat)} {(state.UnitIsMHz ? "MHz" : "KHz")} Signal={state.SignalStrength}/6");
         };
 
         _radio.FrameReceived += (s, frame) =>
