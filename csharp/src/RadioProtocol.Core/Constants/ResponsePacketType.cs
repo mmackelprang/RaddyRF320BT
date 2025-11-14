@@ -22,5 +22,14 @@ public enum ResponsePacketType
     Battery,             // ab07
     DetailedFreq,        // ab09
     Bandwidth,           // ab0d
+    TextMessage,         // ab11 (multi-part)
+    Demodulation,        // ab101c
+    SNR,                 // ab081c
+    Vol,                 // ab071c
+    Model,               // ab111c
+    RadioVersion,        // ab091c
+    EqualizerSettings,   // ab0c1c
+    Heartbeat,           // ab061c
+    TimeAlarm,           // ab05 (time/alarm related)
     Unknown
 }

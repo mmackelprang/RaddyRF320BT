@@ -8,6 +8,7 @@ using RadioProtocol.Core;
 using RadioProtocol.Core.Bluetooth;
 using RadioProtocol.Core.Logging;
 using RadioProtocol.Core.Protocol;
+using Spectre.Console;
 
 namespace RadioProtocol.Console;
 
@@ -69,13 +70,18 @@ class Program
         };
 
         // Display header
-        System.Console.Clear();
-        System.Console.WriteLine("═══════════════════════════════════════════════════════════════════════════");
-        System.Console.WriteLine(commandLineMode 
-            ? $"                RF320 Command-Line Mode ({commandsToSend.Count} commands)"
-            : "                    RF320 Radio Protocol Console");
-        System.Console.WriteLine("═══════════════════════════════════════════════════════════════════════════");
-        System.Console.WriteLine();
+        AnsiConsole.Clear();
+        
+        if (commandLineMode)
+        {
+            AnsiConsole.Write(new Rule($"[bold blue]RF320 Command-Line Mode ({commandsToSend.Count} commands)[/]").Centered());
+        }
+        else
+        {
+            AnsiConsole.Write(new Rule("[bold blue]RF320 Radio Protocol Console[/]").Centered());
+        }
+        
+        AnsiConsole.WriteLine();
         
         _logger.LogInfo("Application started");
         _logger.LogInfo($"Log file: {logFile}");
@@ -86,33 +92,46 @@ class Program
             _logger.LogInfo("Scanning for RF320 devices...");
             
             var bluetoothConnection = BluetoothConnectionFactory.Create(_logger);
-            var devices = await bluetoothConnection.ScanForDevicesAsync(_cancellationTokenSource.Token);
+            
+            IEnumerable<DeviceInfo> devices = Array.Empty<DeviceInfo>();
+            
+            await AnsiConsole.Status()
+                .StartAsync("Scanning for RF320 devices...", async ctx =>
+                {
+                    devices = await bluetoothConnection.ScanForDevicesAsync(_cancellationTokenSource.Token);
+                });
             
             var rf320Device = devices.FirstOrDefault(d => d.Name.Contains("RF320", StringComparison.OrdinalIgnoreCase));
             
             if (rf320Device == null)
             {
-                System.Console.WriteLine("No RF320 device found. Exiting.");
+                AnsiConsole.MarkupLine("[red]No RF320 device found. Exiting.[/]");
                 _logger.LogError(null, "No RF320 device found");
                 return 1;
             }
 
-            System.Console.WriteLine($"Found device: {rf320Device.Name} ({rf320Device.Address})");
+            AnsiConsole.MarkupLine($"[green]Found device: {rf320Device.Name} ({rf320Device.Address})[/]");
             _logger.LogInfo($"Found device: {rf320Device.Name} (Address: {rf320Device.Address})");
-            System.Console.WriteLine();
+            AnsiConsole.WriteLine();
 
             // Connect to device
-            System.Console.WriteLine("Connecting to device...");
-            if (!await bluetoothConnection.ConnectAsync(rf320Device.Address, _cancellationTokenSource.Token))
+            bool connected = false;
+            await AnsiConsole.Status()
+                .StartAsync("Connecting to device...", async ctx =>
+                {
+                    connected = await bluetoothConnection.ConnectAsync(rf320Device.Address, _cancellationTokenSource.Token);
+                });
+            
+            if (!connected)
             {
-                System.Console.WriteLine("Failed to connect to device.");
+                AnsiConsole.MarkupLine("[red]Failed to connect to device.[/]");
                 _logger.LogError(null, "Failed to connect to device");
                 return 1;
             }
 
-            System.Console.WriteLine("Connected successfully!");
+            AnsiConsole.MarkupLine("[green]Connected successfully![/]");
             _logger.LogInfo("Connected to device successfully");
-            System.Console.WriteLine();
+            AnsiConsole.WriteLine();
 
             // Create transport adapter
             _transport = new TransportAdapter(bluetoothConnection);
@@ -124,17 +143,21 @@ class Program
             SetupEventHandlers();
 
             // Initialize radio
-            System.Console.WriteLine("Initializing radio (handshake)...");
-            _logger.LogInfo("Sending handshake");
-            
-            if (!await _radio.InitializeAsync(_cancellationTokenSource.Token))
-            {
-                _logger.LogInfo("No handshake response (expected - device streams status instead)");
-            }
+            bool initialized = false;
+            await AnsiConsole.Status()
+                .StartAsync("Initializing radio (handshake)...", async ctx =>
+                {
+                    _logger.LogInfo("Sending handshake");
+                    initialized = await _radio.InitializeAsync(_cancellationTokenSource.Token);
+                    if (!initialized)
+                    {
+                        _logger.LogInfo("No handshake response (expected - device streams status instead)");
+                    }
+                });
 
-            System.Console.WriteLine("Radio initialized successfully!");
+            AnsiConsole.MarkupLine("[green]Radio initialized successfully![/]");
             _logger.LogInfo("Handshake complete - status stream active");
-            System.Console.WriteLine();
+            AnsiConsole.WriteLine();
 
             if (commandLineMode)
             {
@@ -151,13 +174,13 @@ class Program
         }
         catch (OperationCanceledException)
         {
-            System.Console.WriteLine("\nOperation cancelled.");
+            AnsiConsole.MarkupLine("\n[yellow]Operation cancelled.[/]");
             _logger?.LogInfo("Operation cancelled by user");
             return 0;
         }
         catch (Exception ex)
         {
-            System.Console.WriteLine($"\nError: {ex.Message}");
+            AnsiConsole.MarkupLine($"\n[red]Error: {ex.Message}[/]");
             _logger?.LogError(ex, $"Unhandled exception: {ex.Message}");
             return 1;
         }
@@ -167,10 +190,9 @@ class Program
             _transport?.Dispose();
             _logger?.LogInfo("Application exiting");
             
-            System.Console.WriteLine();
-            System.Console.WriteLine("═══════════════════════════════════════════════════════════════════════════");
-            System.Console.WriteLine($"Log file saved to: {logFile}");
-            System.Console.WriteLine("═══════════════════════════════════════════════════════════════════════════");
+            AnsiConsole.WriteLine();
+            AnsiConsole.Write(new Rule("[dim]Session Complete[/]"));
+            AnsiConsole.MarkupLine($"[dim]Log file saved to: {logFile}[/]");
         }
     }
 
@@ -218,14 +240,24 @@ class Program
     {
         if (_radio == null) return;
 
-        System.Console.WriteLine($"Sending {commands.Count} command(s)...");
-        System.Console.WriteLine("─────────────────────────────────────────────────────────────────────────");
+        var table = new Table()
+            .Border(TableBorder.Rounded)
+            .AddColumn("[bold]Command[/]")
+            .AddColumn("[bold]Status[/]");
+
+        AnsiConsole.MarkupLine($"[yellow]Sending {commands.Count} command(s)...[/]");
+        AnsiConsole.WriteLine();
         
         foreach (var action in commands)
         {
             _logger?.LogInfo($"Command-line mode: Sending {action}");
             
             var success = await _radio.SendAsync(action);
+            
+            table.AddRow(
+                action.ToString(),
+                success ? "[green]✓ Sent[/]" : "[red]✗ Failed[/]"
+            );
             
             if (!success)
             {
@@ -236,11 +268,16 @@ class Program
             await Task.Delay(100);
         }
         
-        System.Console.WriteLine();
-        System.Console.WriteLine("Waiting 5 seconds for responses...");
-        await Task.Delay(5000, _cancellationTokenSource.Token);
+        AnsiConsole.Write(table);
+        AnsiConsole.WriteLine();
         
-        System.Console.WriteLine("Done. Check log file for all messages.");
+        await AnsiConsole.Status()
+            .StartAsync("Waiting 5 seconds for responses...", async ctx =>
+            {
+                await Task.Delay(5000, _cancellationTokenSource.Token);
+            });
+        
+        AnsiConsole.MarkupLine("[green]Done. Check log file for all messages.[/]");
     }
 
     private static async Task RunInteractiveMode()
@@ -248,12 +285,17 @@ class Program
         if (_radio == null) return;
 
         // Clear screen and show interface
-        System.Console.Clear();
+        AnsiConsole.Clear();
         PrintStatusHeader();
-        System.Console.WriteLine(KeyboardMapper.GetKeyboardHelp());
-        System.Console.WriteLine();
-        System.Console.WriteLine("Ready! Press keys to send commands, ESC to exit.");
-        System.Console.WriteLine("─────────────────────────────────────────────────────────────────────────");
+        
+        var panel = new Panel(KeyboardMapper.GetKeyboardHelp())
+            .Border(BoxBorder.Rounded)
+            .Header("[yellow]Keyboard Commands[/]")
+            .BorderColor(Color.Yellow);
+        
+        AnsiConsole.Write(panel);
+        AnsiConsole.WriteLine();
+        AnsiConsole.MarkupLine("[green]Ready! Press keys to send commands, ESC to exit.[/]");
         
         // Start background status updater
         _ = Task.Run(async () => await StatusUpdateLoop());
@@ -261,8 +303,8 @@ class Program
         // Main keyboard loop
         await KeyboardLoopAsync();
 
-        System.Console.WriteLine();
-        System.Console.WriteLine("Shutting down...");
+        AnsiConsole.WriteLine();
+        AnsiConsole.MarkupLine("[yellow]Shutting down...[/]");
         _logger?.LogInfo("Shutting down");
     }
 
@@ -272,14 +314,26 @@ class Program
         System.Console.SetCursorPosition(0, 0);
         
         var signalBars = new string('█', _currentSignal) + new string('░', 6 - _currentSignal);
-        var statusLine = $"│ Band: {_currentBand,-6} │ Freq: {_currentFrequency,-14} │ Vol: {_currentVolume,-3} │ Signal: [{signalBars}] │";
         
-        System.Console.WriteLine("┌─────────────────────────────────────────────────────────────────────────┐");
-        System.Console.WriteLine(statusLine);
-        System.Console.WriteLine("└─────────────────────────────────────────────────────────────────────────┘");
+        var table = new Table()
+            .Border(TableBorder.Heavy)
+            .BorderColor(Color.Blue)
+            .AddColumn(new TableColumn("[bold]Band[/]").Centered())
+            .AddColumn(new TableColumn("[bold]Frequency[/]").Centered())
+            .AddColumn(new TableColumn("[bold]Volume[/]").Centered())
+            .AddColumn(new TableColumn("[bold]Signal[/]").Centered());
+        
+        table.AddRow(
+            $"[cyan]{_currentBand}[/]",
+            $"[cyan]{_currentFrequency}[/]",
+            $"[cyan]{_currentVolume}[/]",
+            $"[cyan]{signalBars}[/]"
+        );
+        
+        AnsiConsole.Write(table);
         
         // Restore cursor position if we were below the header
-        if (cursorTop > 2)
+        if (cursorTop > 4)
         {
             System.Console.SetCursorPosition(0, cursorTop);
         }

@@ -12,4 +12,14 @@ public record MultiPartMessage
     public bool IsComplete { get; init; }
     public DateTime StartTime { get; init; } = DateTime.Now;
     public DateTime LastUpdate { get; init; } = DateTime.Now;
+    
+    /// <summary>
+    /// Sequence identifier for multi-part messages
+    /// </summary>
+    public string SequenceId { get; init; } = string.Empty;
+    
+    /// <summary>
+    /// Parts received so far (for debugging and validation)
+    /// </summary>
+    public List<string> ReceivedParts { get; init; } = new();
 }

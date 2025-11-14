@@ -18,4 +18,16 @@ public record RadioStatus
     public bool IsPowerOn { get; init; }           // Power state
     public string? RawData { get; init; }          // Raw hex data for debugging
     public DateTime Timestamp { get; init; } = DateTime.Now;
+    
+    // New fields for extended protocol support
+    public string? TextMessage { get; init; }      // Assembled text message from AB11 messages
+    public int? DemodulationValue { get; init; }   // Demodulation numeric value
+    public int? BandwidthValue { get; init; }      // Bandwidth numeric value
+    public int? SNRValue { get; init; }            // SNR numeric value
+    public int? VolValue { get; init; }            // Volume numeric value
+    public string? ModelVersion { get; init; }     // Model version string
+    public int? ModelVersionNumber { get; init; }  // Model version number
+    public string? RadioVersion { get; init; }     // Radio version string
+    public int? RadioVersionNumber { get; init; }  // Radio version number
+    public EqualizerType? EqualizerType { get; init; } // Equalizer type setting
 }
