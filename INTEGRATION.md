@@ -1,4 +1,4 @@
-# RTest Integration Plan: RadioControl.Core to IRadioControls Shim
+# RTest Integration Plan: RadioProtocol.Core to IRadioControls Shim
 
 ## Overview
 
@@ -724,7 +724,14 @@ services.AddSingleton<IRadioControls, RadioControlsAdapter>();
 
 ### Known Limitations
 
-1. **Volume Level Granularity**: The radio uses 0-15 volume levels; the interface exposes 0-100. A scaling factor will be applied.
+1. **Volume Level Granularity**: The radio uses 0-15 volume levels; the interface exposes 0-100. A scaling factor will be applied:
+   ```csharp
+   // Convert from radio (0-15) to interface (0-100)
+   int volumePercent = (int)Math.Round((radioVolume / 15.0) * 100);
+   
+   // Convert from interface (0-100) to radio (0-15)
+   int radioVolume = (int)Math.Round((volumePercent / 100.0) * 15);
+   ```
 
 2. **Mute Implementation**: The radio may not have a dedicated mute command. Implementation may use volume=0 or a specific button.
 
@@ -787,18 +794,21 @@ Run comprehensive tests to verify functionality.
 
 When implementing this plan, create or modify these files:
 
-- [ ] `RTest/src/Radio.Core/Interfaces/Audio/IRadioControls.cs`
-- [ ] `RTest/src/Radio.Core/Interfaces/Audio/EventArgs/RadioConnectionChangedEventArgs.cs`
-- [ ] `RTest/src/Radio.Core/Interfaces/Audio/EventArgs/RadioStatusChangedEventArgs.cs`
-- [ ] `RTest/src/Radio.Core/Interfaces/Audio/EventArgs/VolumeChangedEventArgs.cs`
-- [ ] `RTest/src/Radio.Core/Interfaces/Audio/EventArgs/FrequencyChangedEventArgs.cs`
-- [ ] `csharp/src/RadioProtocol.RTest.Shim/RadioProtocol.RTest.Shim.csproj`
-- [ ] `csharp/src/RadioProtocol.RTest.Shim/Adapters/RadioControlsAdapter.cs`
-- [ ] `csharp/src/RadioProtocol.RTest.Shim/Extensions/RadioManagerExtensions.cs`
-- [ ] `csharp/src/RadioProtocol.RTest.Shim/Utilities/FrequencyConverter.cs`
-- [ ] `csharp/src/RadioProtocol.RTest.Shim/Exceptions/RadioControlException.cs`
-- [ ] `csharp/tests/RadioProtocol.RTest.Shim.Tests/RadioControlsAdapterTests.cs`
-- [ ] Update `csharp/RadioProtocol.sln` to include new projects
+**In RTest project (paths relative to RTest root):**
+- [ ] `src/Radio.Core/Interfaces/Audio/IRadioControls.cs`
+- [ ] `src/Radio.Core/Interfaces/Audio/EventArgs/RadioConnectionChangedEventArgs.cs`
+- [ ] `src/Radio.Core/Interfaces/Audio/EventArgs/RadioStatusChangedEventArgs.cs`
+- [ ] `src/Radio.Core/Interfaces/Audio/EventArgs/VolumeChangedEventArgs.cs`
+- [ ] `src/Radio.Core/Interfaces/Audio/EventArgs/FrequencyChangedEventArgs.cs`
+
+**In RadioProtocol repository (paths relative to csharp/ folder):**
+- [ ] `src/RadioProtocol.RTest.Shim/RadioProtocol.RTest.Shim.csproj`
+- [ ] `src/RadioProtocol.RTest.Shim/Adapters/RadioControlsAdapter.cs`
+- [ ] `src/RadioProtocol.RTest.Shim/Extensions/RadioManagerExtensions.cs`
+- [ ] `src/RadioProtocol.RTest.Shim/Utilities/FrequencyConverter.cs`
+- [ ] `src/RadioProtocol.RTest.Shim/Exceptions/RadioControlException.cs`
+- [ ] `tests/RadioProtocol.RTest.Shim.Tests/RadioControlsAdapterTests.cs`
+- [ ] Update `RadioProtocol.sln` to include new projects
 
 ---
 
