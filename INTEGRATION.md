@@ -395,6 +395,12 @@ namespace RTest.Radio.Core.Interfaces.Audio
 
 ## Implementation Plan
 
+> **Note on GitHub Copilot Prompts**: The prompts below use GitHub Copilot's agent commands:
+> - `@workspace` - Asks Copilot to work with files and projects in your workspace
+> - `@terminal` - Asks Copilot to execute commands in the integrated terminal
+> 
+> These prompts are designed for use with GitHub Copilot Chat in VS Code or compatible IDEs.
+
 ### Phase 1: Create Shim Project Structure
 
 Create a new project `RadioProtocol.RTest.Shim` that bridges `RadioProtocol.Core` to `IRadioControls`:
@@ -412,7 +418,7 @@ RadioProtocol.RTest.Shim/
 │   ├── VolumeChangedEventArgs.cs
 │   └── FrequencyChangedEventArgs.cs
 ├── Extensions/
-│   └── RadioManagerExtensions.cs   # Helper extension methods
+│   └── RadioManagerExtensions.ms   # Helper extension methods
 └── Utilities/
     └── FrequencyConverter.cs       # Frequency format utilities
 ```
@@ -1060,12 +1066,15 @@ public async Task VolumeDownAsync_CallsAdjustVolumeWithUpFalse()
 
 #### 3. Volume Scaling Tests
 
+> **Rounding Method**: Uses `Math.Round()` with default MidpointRounding.ToEven (banker's rounding).
+> For consistent results, consider using `Math.Round(value, MidpointRounding.AwayFromZero)`.
+
 ```csharp
 [Theory]
-[InlineData(0, 0)]
-[InlineData(15, 100)]
-[InlineData(7, 47)]  // 7/15 * 100 ≈ 47
-[InlineData(8, 53)]  // 8/15 * 100 ≈ 53
+[InlineData(0, 0)]     // 0/15 * 100 = 0
+[InlineData(15, 100)]  // 15/15 * 100 = 100
+[InlineData(7, 47)]    // 7/15 * 100 = 46.67 → rounds to 47
+[InlineData(8, 53)]    // 8/15 * 100 = 53.33 → rounds to 53
 public void Volume_ReturnsScaledValue(int radioVolume, int expectedPercent)
 {
     // Arrange
@@ -1082,10 +1091,10 @@ public void Volume_ReturnsScaledValue(int radioVolume, int expectedPercent)
 }
 
 [Theory]
-[InlineData(0, 0)]
-[InlineData(100, 15)]
-[InlineData(50, 8)]  // 50/100 * 15 = 7.5 → 8
-[InlineData(33, 5)]  // 33/100 * 15 = 4.95 → 5
+[InlineData(0, 0)]     // 0/100 * 15 = 0
+[InlineData(100, 15)]  // 100/100 * 15 = 15
+[InlineData(50, 8)]    // 50/100 * 15 = 7.5 → rounds to 8 (MidpointRounding.AwayFromZero)
+[InlineData(33, 5)]    // 33/100 * 15 = 4.95 → rounds to 5
 public async Task SetVolumeAsync_CalculatesCorrectSteps(int targetPercent, int expectedRadioLevel)
 {
     // Arrange
@@ -1408,6 +1417,10 @@ public async Task SetFrequency_SendsCorrectButtonSequence()
 @terminal Run the test suite and verify coverage:
 cd csharp
 dotnet test tests/RadioProtocol.RTest.Shim.Tests --collect:"XPlat Code Coverage"
+
+# Install reportgenerator if not already installed:
+# dotnet tool install -g dotnet-reportgenerator-globaltool
+
 dotnet reportgenerator -reports:"**/coverage.cobertura.xml" -targetdir:"coveragereport" -reporttypes:Html
 ```
 
