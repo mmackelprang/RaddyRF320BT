@@ -417,6 +417,42 @@ RadioProtocol.RTest.Shim/
     └── FrequencyConverter.cs       # Frequency format utilities
 ```
 
+#### GitHub Copilot Prompts for Phase 1
+
+**Prompt 1.1: Create the project structure**
+```
+@workspace Create a new .NET 8.0 class library project called RadioProtocol.RTest.Shim in the 
+csharp/src directory with the following folder structure:
+- Interfaces/
+- Adapters/
+- EventArgs/
+- Extensions/
+- Utilities/
+- Exceptions/
+
+Add a project reference to RadioProtocol.Core and update the solution file.
+```
+
+**Prompt 1.2: Verify project creation**
+```
+@terminal Run the following commands to verify the project was created correctly:
+cd csharp && dotnet build RadioProtocol.RTest.Shim/RadioProtocol.RTest.Shim.csproj
+```
+
+**Prompt 1.3: Add test project**
+```
+@workspace Create a new xUnit test project called RadioProtocol.RTest.Shim.Tests in the 
+csharp/tests directory. Add references to RadioProtocol.RTest.Shim, Moq, and FluentAssertions.
+Update the solution file to include the test project.
+```
+
+**Verification Checklist for Phase 1:**
+- [ ] Project `RadioProtocol.RTest.Shim.csproj` exists and builds
+- [ ] Project has reference to `RadioProtocol.Core`
+- [ ] Test project `RadioProtocol.RTest.Shim.Tests.csproj` exists and builds
+- [ ] Solution file includes both new projects
+- [ ] All folder structures are in place
+
 ### Phase 2: Implement RadioControlsAdapter
 
 The adapter will wrap `IRadioManager` and implement `IRadioControls`:
@@ -461,6 +497,53 @@ namespace RadioProtocol.RTest.Shim.Adapters
     }
 }
 ```
+
+#### GitHub Copilot Prompts for Phase 2
+
+**Prompt 2.1: Create the IRadioControls interface**
+```
+@workspace Create the IRadioControls interface in 
+csharp/src/RadioProtocol.RTest.Shim/Interfaces/IRadioControls.cs based on the interface 
+definition in INTEGRATION.md. Include all regions: Connection Management, Audio Controls, 
+Frequency/Tuning Controls, Preset/Memory Channels, Audio Mode Controls, Signal Information, 
+Power Controls, Recording Controls, and Events.
+```
+
+**Prompt 2.2: Create the EventArgs classes**
+```
+@workspace Create all four EventArgs classes in csharp/src/RadioProtocol.RTest.Shim/EventArgs/:
+- RadioConnectionChangedEventArgs.cs
+- RadioStatusChangedEventArgs.cs  
+- VolumeChangedEventArgs.cs
+- FrequencyChangedEventArgs.cs
+
+Each should be a public class inheriting from EventArgs with init-only properties.
+```
+
+**Prompt 2.3: Create the RadioControlsAdapter implementation**
+```
+@workspace Create the RadioControlsAdapter class in 
+csharp/src/RadioProtocol.RTest.Shim/Adapters/RadioControlsAdapter.cs that:
+1. Implements IRadioControls
+2. Takes IRadioManager and IRadioLogger in constructor
+3. Subscribes to IRadioManager events and bridges them to IRadioControls events
+4. Implements all interface methods by delegating to IRadioManager
+5. Maintains thread-safe cached state for all properties
+6. Implements IDisposable with proper cleanup
+```
+
+**Prompt 2.4: Verify adapter compilation**
+```
+@terminal Build the shim project and fix any compilation errors:
+cd csharp && dotnet build src/RadioProtocol.RTest.Shim/RadioProtocol.RTest.Shim.csproj
+```
+
+**Verification Checklist for Phase 2:**
+- [ ] `IRadioControls.cs` interface compiles with all method signatures
+- [ ] All four EventArgs classes are created and compile
+- [ ] `RadioControlsAdapter.cs` implements all interface members
+- [ ] No compilation errors in the shim project
+- [ ] Constructor properly validates arguments and subscribes to events
 
 ### Phase 3: Map RadioProtocol.Core Functionality to IRadioControls
 
@@ -514,6 +597,62 @@ namespace RadioProtocol.RTest.Shim.Adapters
 |----------------------|-----------------------------------|
 | `ToggleRecordingAsync()` | `PressButtonAsync(ButtonType.Record)` |
 
+#### GitHub Copilot Prompts for Phase 3
+
+**Prompt 3.1: Implement connection methods**
+```
+@workspace In RadioControlsAdapter.cs, implement the connection management methods:
+- ConnectAsync should delegate to _radioManager.ConnectAsync and return the result
+- DisconnectAsync should delegate to _radioManager.DisconnectAsync  
+- IsConnected property should return _radioManager.IsConnected
+
+Ensure proper error handling and logging.
+```
+
+**Prompt 3.2: Implement volume control methods**
+```
+@workspace In RadioControlsAdapter.cs, implement the volume control methods:
+- Volume property returns scaled value (radio 0-15 to interface 0-100)
+- SetVolumeAsync calculates steps needed and calls AdjustVolumeAsync in a loop
+- VolumeUpAsync and VolumeDownAsync delegate to AdjustVolumeAsync
+- ToggleMuteAsync tracks mute state and sets volume to 0 or restores previous
+
+Use the scaling formulas:
+- volumePercent = (int)Math.Round((radioVolume / 15.0) * 100)
+- radioVolume = (int)Math.Round((volumePercent / 100.0) * 15)
+```
+
+**Prompt 3.3: Implement frequency/tuning methods**
+```
+@workspace In RadioControlsAdapter.cs, implement the frequency control methods:
+- CurrentFrequency returns cached frequency value
+- CurrentFrequencyDisplay returns formatted string based on band
+- TuneUpAsync calls NavigateAsync(up: true)
+- TuneDownAsync calls NavigateAsync(up: false)  
+- ChangeBandAsync calls PressButtonAsync(ButtonType.Band)
+- SetFrequencyAsync uses digit-by-digit entry via PressNumberAsync
+
+Use FormatFrequencyForEntry helper method for proper formatting per band.
+```
+
+**Prompt 3.4: Implement remaining control methods**
+```
+@workspace In RadioControlsAdapter.cs, implement:
+- Preset methods: RecallPresetAsync, SavePresetAsync
+- Audio mode methods: CycleDemodulationAsync, CycleBandwidthAsync, ToggleStereoAsync, CycleEqualizerAsync
+- Power methods: TogglePowerAsync, PowerOffAsync
+- Recording methods: ToggleRecordingAsync
+
+Each should delegate to the appropriate IRadioManager method with proper error handling.
+```
+
+**Verification Checklist for Phase 3:**
+- [ ] All connection methods implemented and tested
+- [ ] Volume scaling works correctly (0-15 ↔ 0-100)
+- [ ] Frequency entry produces correct button sequence
+- [ ] All button-based methods delegate to correct ButtonType
+- [ ] Error handling returns meaningful messages
+
 ### Phase 4: Event Bridging
 
 ```csharp
@@ -565,6 +704,51 @@ private void OnStatusUpdated(object? sender, RadioStatus status)
 }
 ```
 
+#### GitHub Copilot Prompts for Phase 4
+
+**Prompt 4.1: Implement event handlers**
+```
+@workspace In RadioControlsAdapter.cs, implement the event handler methods:
+- OnConnectionStateChanged: Bridge ConnectionInfo to RadioConnectionChangedEventArgs
+- OnStatusUpdated: Update all cached state fields and raise StatusChanged event
+- Track volume changes and raise VolumeChanged when volume differs
+- Track frequency changes and raise FrequencyChanged when frequency differs
+
+Ensure thread-safe updates to cached state using a lock object.
+```
+
+**Prompt 4.2: Implement IDisposable pattern**
+```
+@workspace In RadioControlsAdapter.cs, implement the IDisposable pattern:
+- Add _disposed field to track disposal state
+- Implement Dispose() method that:
+  1. Unsubscribes from all IRadioManager events
+  2. Sets _disposed = true
+  3. Does NOT dispose the IRadioManager (it may be shared)
+- Add ThrowIfDisposed() helper for use in public methods
+```
+
+**Prompt 4.3: Add disposal checks to all methods**
+```
+@workspace In RadioControlsAdapter.cs, add ThrowIfDisposed() calls at the start of:
+- All async methods (ConnectAsync, DisconnectAsync, VolumeUpAsync, etc.)
+- All property getters that access managed resources
+
+Pattern:
+private void ThrowIfDisposed()
+{
+    if (_disposed) throw new ObjectDisposedException(nameof(RadioControlsAdapter));
+}
+```
+
+**Verification Checklist for Phase 4:**
+- [ ] Events properly bridge from IRadioManager to IRadioControls events
+- [ ] Cached state updates are thread-safe
+- [ ] VolumeChanged fires only when volume actually changes
+- [ ] FrequencyChanged fires only when frequency actually changes
+- [ ] Dispose properly unsubscribes from events
+- [ ] All public methods check for disposal state
+
 ### Phase 5: Frequency Entry Helper
 
 ```csharp
@@ -606,6 +790,42 @@ private string FormatFrequencyForEntry(double frequencyHz, string band)
     };
 }
 ```
+
+#### GitHub Copilot Prompts for Phase 5
+
+**Prompt 5.1: Create FrequencyConverter utility**
+```
+@workspace Create csharp/src/RadioProtocol.RTest.Shim/Utilities/FrequencyConverter.cs with:
+- Static method FormatFrequencyForEntry(double frequencyHz, string band) -> string
+- Static method ParseFrequencyDisplay(string display, string band) -> double
+- Band-specific formatting (FM: 2 decimals MHz, MW: 0 decimals KHz, others: 3 decimals MHz)
+- Unit tests in the test project for edge cases
+```
+
+**Prompt 5.2: Create RadioControlException**
+```
+@workspace Create csharp/src/RadioProtocol.RTest.Shim/Exceptions/RadioControlException.cs:
+- Inherit from Exception
+- Add ErrorCode property
+- Add InnerErrorMessage property for RadioProtocol.Core error details
+- Implement standard exception constructors
+```
+
+**Prompt 5.3: Add logging to SetFrequencyAsync**
+```
+@workspace In RadioControlsAdapter.SetFrequencyAsync, add comprehensive logging:
+- Log the target frequency and formatted string before entry
+- Log each digit/button press during entry
+- Log success or failure after completion
+- Handle and log any exceptions from PressNumberAsync or PressButtonAsync
+```
+
+**Verification Checklist for Phase 5:**
+- [ ] FrequencyConverter produces correct formats for FM, MW, and other bands
+- [ ] SetFrequencyAsync sends correct button sequence for "102.30"
+- [ ] SetFrequencyAsync sends correct sequence for MW frequency "1270"
+- [ ] RadioControlException captures inner error details
+- [ ] Logging provides clear trace of frequency entry process
 
 ---
 
@@ -692,31 +912,520 @@ services.AddSingleton<IRadioControls, RadioControlsAdapter>();
 
 ### Unit Tests
 
-1. **Adapter Initialization Tests**
-   - Verify proper subscription to RadioManager events
-   - Test null argument handling
+#### GitHub Copilot Prompts for Test Creation
 
-2. **Method Delegation Tests**
-   - Mock `IRadioManager` and verify correct method calls
-   - Test command translation (e.g., `VolumeUpAsync` calls `AdjustVolumeAsync(true)`)
+**Prompt T1: Create test project structure**
+```
+@workspace Create the test file structure in csharp/tests/RadioProtocol.RTest.Shim.Tests/:
+- Adapters/RadioControlsAdapterTests.cs
+- Utilities/FrequencyConverterTests.cs
+- Mocks/MockRadioManager.cs
+- Mocks/MockRadioLogger.cs
 
-3. **State Management Tests**
-   - Verify cached properties update on status events
-   - Test thread safety of state updates
+Add package references: xunit, xunit.runner.visualstudio, Moq, FluentAssertions, coverlet.collector
+```
 
-4. **Event Bridge Tests**
-   - Verify events are properly translated and raised
-   - Test event args population
+**Prompt T2: Create MockRadioManager**
+```
+@workspace Create MockRadioManager.cs in csharp/tests/RadioProtocol.RTest.Shim.Tests/Mocks/ that:
+- Implements IRadioManager interface
+- Allows setting IsConnected, CurrentStatus, etc. via properties
+- Records all method calls for verification
+- Allows triggering events (ConnectionStateChanged, StatusUpdated) for testing
+- Includes helper methods: SimulateConnect(), SimulateStatusUpdate(), etc.
+```
+
+### Test Coverage Requirements
+
+#### 1. Adapter Initialization Tests
+
+```csharp
+[Fact]
+public void Constructor_WithValidArguments_SubscribesToEvents()
+{
+    // Arrange
+    var mockManager = new Mock<IRadioManager>();
+    var mockLogger = new Mock<IRadioLogger>();
+    
+    // Act
+    using var adapter = new RadioControlsAdapter(mockManager.Object, mockLogger.Object);
+    
+    // Assert
+    mockManager.VerifyAdd(m => m.ConnectionStateChanged += It.IsAny<EventHandler<ConnectionInfo>>(), Times.Once);
+    mockManager.VerifyAdd(m => m.StatusUpdated += It.IsAny<EventHandler<RadioStatus>>(), Times.Once);
+}
+
+[Fact]
+public void Constructor_WithNullRadioManager_ThrowsArgumentNullException()
+{
+    // Arrange
+    var mockLogger = new Mock<IRadioLogger>();
+    
+    // Act & Assert
+    Assert.Throws<ArgumentNullException>(() => new RadioControlsAdapter(null!, mockLogger.Object));
+}
+
+[Fact]
+public void Constructor_WithNullLogger_ThrowsArgumentNullException()
+{
+    // Arrange
+    var mockManager = new Mock<IRadioManager>();
+    
+    // Act & Assert
+    Assert.Throws<ArgumentNullException>(() => new RadioControlsAdapter(mockManager.Object, null!));
+}
+```
+
+**Prompt T3: Generate initialization tests**
+```
+@workspace Create RadioControlsAdapterTests.cs with initialization tests:
+- Constructor_WithValidArguments_SubscribesToEvents
+- Constructor_WithNullRadioManager_ThrowsArgumentNullException
+- Constructor_WithNullLogger_ThrowsArgumentNullException
+- Dispose_UnsubscribesFromEvents
+- DisposedAdapter_ThrowsObjectDisposedException
+```
+
+#### 2. Method Delegation Tests
+
+```csharp
+[Fact]
+public async Task ConnectAsync_DelegatesToRadioManager()
+{
+    // Arrange
+    var mockManager = new Mock<IRadioManager>();
+    mockManager.Setup(m => m.ConnectAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+               .ReturnsAsync(true);
+    var mockLogger = new Mock<IRadioLogger>();
+    using var adapter = new RadioControlsAdapter(mockManager.Object, mockLogger.Object);
+    
+    // Act
+    var result = await adapter.ConnectAsync("AA:BB:CC:DD:EE:FF");
+    
+    // Assert
+    result.Should().BeTrue();
+    mockManager.Verify(m => m.ConnectAsync("AA:BB:CC:DD:EE:FF", It.IsAny<CancellationToken>()), Times.Once);
+}
+
+[Fact]
+public async Task VolumeUpAsync_CallsAdjustVolumeWithUpTrue()
+{
+    // Arrange
+    var mockManager = new Mock<IRadioManager>();
+    mockManager.Setup(m => m.AdjustVolumeAsync(true, It.IsAny<CancellationToken>()))
+               .ReturnsAsync(new CommandResult { Success = true });
+    var mockLogger = new Mock<IRadioLogger>();
+    using var adapter = new RadioControlsAdapter(mockManager.Object, mockLogger.Object);
+    
+    // Act
+    await adapter.VolumeUpAsync();
+    
+    // Assert
+    mockManager.Verify(m => m.AdjustVolumeAsync(true, It.IsAny<CancellationToken>()), Times.Once);
+}
+
+[Fact]
+public async Task VolumeDownAsync_CallsAdjustVolumeWithUpFalse()
+{
+    // Arrange
+    var mockManager = new Mock<IRadioManager>();
+    mockManager.Setup(m => m.AdjustVolumeAsync(false, It.IsAny<CancellationToken>()))
+               .ReturnsAsync(new CommandResult { Success = true });
+    var mockLogger = new Mock<IRadioLogger>();
+    using var adapter = new RadioControlsAdapter(mockManager.Object, mockLogger.Object);
+    
+    // Act
+    await adapter.VolumeDownAsync();
+    
+    // Assert
+    mockManager.Verify(m => m.AdjustVolumeAsync(false, It.IsAny<CancellationToken>()), Times.Once);
+}
+```
+
+**Prompt T4: Generate delegation tests**
+```
+@workspace Create tests in RadioControlsAdapterTests.cs for method delegation:
+- ConnectAsync_DelegatesToRadioManager
+- DisconnectAsync_DelegatesToRadioManager
+- VolumeUpAsync_CallsAdjustVolumeWithUpTrue
+- VolumeDownAsync_CallsAdjustVolumeWithUpFalse
+- TuneUpAsync_CallsNavigateWithUpTrue
+- TuneDownAsync_CallsNavigateWithUpFalse
+- ChangeBandAsync_CallsPressButtonWithBandType
+- RecallPresetAsync_CallsPressNumberWithoutLongPress
+- SavePresetAsync_CallsPressNumberWithLongPress
+- TogglePowerAsync_CallsPressButtonWithPowerType
+- PowerOffAsync_CallsPressButtonWithPowerLongType
+```
+
+#### 3. Volume Scaling Tests
+
+```csharp
+[Theory]
+[InlineData(0, 0)]
+[InlineData(15, 100)]
+[InlineData(7, 47)]  // 7/15 * 100 ≈ 47
+[InlineData(8, 53)]  // 8/15 * 100 ≈ 53
+public void Volume_ReturnsScaledValue(int radioVolume, int expectedPercent)
+{
+    // Arrange
+    var mockManager = new Mock<IRadioManager>();
+    var mockLogger = new Mock<IRadioLogger>();
+    using var adapter = new RadioControlsAdapter(mockManager.Object, mockLogger.Object);
+    
+    // Simulate status update with radio volume
+    var status = new RadioStatus { VolumeLevel = radioVolume };
+    mockManager.Raise(m => m.StatusUpdated += null, mockManager.Object, status);
+    
+    // Act & Assert
+    adapter.Volume.Should().Be(expectedPercent);
+}
+
+[Theory]
+[InlineData(0, 0)]
+[InlineData(100, 15)]
+[InlineData(50, 8)]  // 50/100 * 15 = 7.5 → 8
+[InlineData(33, 5)]  // 33/100 * 15 = 4.95 → 5
+public async Task SetVolumeAsync_CalculatesCorrectSteps(int targetPercent, int expectedRadioLevel)
+{
+    // Arrange
+    var mockManager = new Mock<IRadioManager>();
+    mockManager.Setup(m => m.AdjustVolumeAsync(It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+               .ReturnsAsync(new CommandResult { Success = true });
+    var mockLogger = new Mock<IRadioLogger>();
+    using var adapter = new RadioControlsAdapter(mockManager.Object, mockLogger.Object);
+    
+    // Set initial state to 0
+    var status = new RadioStatus { VolumeLevel = 0 };
+    mockManager.Raise(m => m.StatusUpdated += null, mockManager.Object, status);
+    
+    // Act
+    await adapter.SetVolumeAsync(targetPercent);
+    
+    // Assert - should call AdjustVolumeAsync(up: true) expectedRadioLevel times
+    mockManager.Verify(m => m.AdjustVolumeAsync(true, It.IsAny<CancellationToken>()), 
+                       Times.Exactly(expectedRadioLevel));
+}
+```
+
+**Prompt T5: Generate volume scaling tests**
+```
+@workspace Create volume scaling tests in RadioControlsAdapterTests.cs:
+- Volume_ReturnsScaledValue with Theory for 0, 7, 8, 15 radio values
+- SetVolumeAsync_CalculatesCorrectSteps for 0, 50, 100 percent targets
+- SetVolumeAsync_DecrementsWhenCurrentHigher
+- ToggleMuteAsync_SetsVolumeToZero_WhenNotMuted
+- ToggleMuteAsync_RestoresVolume_WhenMuted
+```
+
+#### 4. State Management Tests
+
+```csharp
+[Fact]
+public void StatusUpdated_UpdatesCachedState()
+{
+    // Arrange
+    var mockManager = new Mock<IRadioManager>();
+    var mockLogger = new Mock<IRadioLogger>();
+    using var adapter = new RadioControlsAdapter(mockManager.Object, mockLogger.Object);
+    
+    var status = new RadioStatus
+    {
+        VolumeLevel = 10,
+        Band = "FM",
+        Demodulation = "STEREO",
+        IsStereo = true,
+        IsPowerOn = true,
+        Frequency = "102300000"
+    };
+    
+    // Act
+    mockManager.Raise(m => m.StatusUpdated += null, mockManager.Object, status);
+    
+    // Assert
+    adapter.Volume.Should().Be(67); // 10/15 * 100 ≈ 67
+    adapter.CurrentBand.Should().Be("FM");
+    adapter.DemodulationMode.Should().Be("STEREO");
+    adapter.IsStereo.Should().BeTrue();
+    adapter.IsPoweredOn.Should().BeTrue();
+    adapter.CurrentFrequency.Should().Be(102300000);
+}
+
+[Fact]
+public void IsConnected_DelegatesToRadioManager()
+{
+    // Arrange
+    var mockManager = new Mock<IRadioManager>();
+    mockManager.Setup(m => m.IsConnected).Returns(true);
+    var mockLogger = new Mock<IRadioLogger>();
+    using var adapter = new RadioControlsAdapter(mockManager.Object, mockLogger.Object);
+    
+    // Act & Assert
+    adapter.IsConnected.Should().BeTrue();
+}
+```
+
+**Prompt T6: Generate state management tests**
+```
+@workspace Create state management tests in RadioControlsAdapterTests.cs:
+- StatusUpdated_UpdatesCachedState for all properties
+- StatusUpdated_ThreadSafe when called from multiple threads
+- IsConnected_DelegatesToRadioManager
+- CurrentStatus_ReflectsLatestUpdate
+```
+
+#### 5. Event Bridge Tests
+
+```csharp
+[Fact]
+public void ConnectionStateChanged_RaisesConnectionChanged()
+{
+    // Arrange
+    var mockManager = new Mock<IRadioManager>();
+    var mockLogger = new Mock<IRadioLogger>();
+    using var adapter = new RadioControlsAdapter(mockManager.Object, mockLogger.Object);
+    
+    RadioConnectionChangedEventArgs? receivedArgs = null;
+    adapter.ConnectionChanged += (s, e) => receivedArgs = e;
+    
+    var connectionInfo = new ConnectionInfo(ConnectionState.Connected, "AA:BB:CC:DD:EE:FF", DateTime.Now, null);
+    
+    // Act
+    mockManager.Raise(m => m.ConnectionStateChanged += null, mockManager.Object, connectionInfo);
+    
+    // Assert
+    receivedArgs.Should().NotBeNull();
+    receivedArgs!.IsConnected.Should().BeTrue();
+    receivedArgs.DeviceAddress.Should().Be("AA:BB:CC:DD:EE:FF");
+}
+
+[Fact]
+public void StatusUpdated_RaisesStatusChanged()
+{
+    // Arrange
+    var mockManager = new Mock<IRadioManager>();
+    var mockLogger = new Mock<IRadioLogger>();
+    using var adapter = new RadioControlsAdapter(mockManager.Object, mockLogger.Object);
+    
+    RadioStatusChangedEventArgs? receivedArgs = null;
+    adapter.StatusChanged += (s, e) => receivedArgs = e;
+    
+    var status = new RadioStatus { VolumeLevel = 10, Band = "FM" };
+    
+    // Act
+    mockManager.Raise(m => m.StatusUpdated += null, mockManager.Object, status);
+    
+    // Assert
+    receivedArgs.Should().NotBeNull();
+    receivedArgs!.Volume.Should().Be(67); // Scaled
+    receivedArgs.Band.Should().Be("FM");
+}
+
+[Fact]
+public void FrequencyChange_RaisesFrequencyChanged()
+{
+    // Arrange
+    var mockManager = new Mock<IRadioManager>();
+    var mockLogger = new Mock<IRadioLogger>();
+    using var adapter = new RadioControlsAdapter(mockManager.Object, mockLogger.Object);
+    
+    FrequencyChangedEventArgs? receivedArgs = null;
+    adapter.FrequencyChanged += (s, e) => receivedArgs = e;
+    
+    // First status to set initial frequency
+    mockManager.Raise(m => m.StatusUpdated += null, mockManager.Object, 
+                      new RadioStatus { Frequency = "102300000" });
+    receivedArgs = null; // Reset
+    
+    // Act - Update to new frequency
+    mockManager.Raise(m => m.StatusUpdated += null, mockManager.Object, 
+                      new RadioStatus { Frequency = "103500000", Band = "FM" });
+    
+    // Assert
+    receivedArgs.Should().NotBeNull();
+    receivedArgs!.OldFrequencyHz.Should().Be(102300000);
+    receivedArgs.NewFrequencyHz.Should().Be(103500000);
+    receivedArgs.Band.Should().Be("FM");
+}
+
+[Fact]
+public void SameFrequency_DoesNotRaiseFrequencyChanged()
+{
+    // Arrange
+    var mockManager = new Mock<IRadioManager>();
+    var mockLogger = new Mock<IRadioLogger>();
+    using var adapter = new RadioControlsAdapter(mockManager.Object, mockLogger.Object);
+    
+    int eventCount = 0;
+    adapter.FrequencyChanged += (s, e) => eventCount++;
+    
+    // Act - Send same frequency twice
+    mockManager.Raise(m => m.StatusUpdated += null, mockManager.Object, 
+                      new RadioStatus { Frequency = "102300000" });
+    mockManager.Raise(m => m.StatusUpdated += null, mockManager.Object, 
+                      new RadioStatus { Frequency = "102300000" });
+    
+    // Assert - Should only fire once (first time)
+    eventCount.Should().Be(1);
+}
+```
+
+**Prompt T7: Generate event bridge tests**
+```
+@workspace Create event bridge tests in RadioControlsAdapterTests.cs:
+- ConnectionStateChanged_RaisesConnectionChanged
+- StatusUpdated_RaisesStatusChanged
+- FrequencyChange_RaisesFrequencyChanged
+- SameFrequency_DoesNotRaiseFrequencyChanged
+- VolumeChange_RaisesVolumeChanged
+- SameVolume_DoesNotRaiseVolumeChanged
+- Dispose_StopsRaisingEvents
+```
+
+#### 6. Frequency Converter Tests
+
+```csharp
+[Theory]
+[InlineData(102300000, "FM", "102.30")]
+[InlineData(88100000, "FM", "88.10")]
+[InlineData(1270000, "MW", "1270")]
+[InlineData(530000, "MW", "530")]
+[InlineData(146520000, "VHF", "146.520")]
+[InlineData(119100000, "AIR", "119.100")]
+public void FormatFrequencyForEntry_FormatsCorrectly(double frequencyHz, string band, string expected)
+{
+    // Act
+    var result = FrequencyConverter.FormatFrequencyForEntry(frequencyHz, band);
+    
+    // Assert
+    result.Should().Be(expected);
+}
+
+[Theory]
+[InlineData("102.30", "FM", 102300000)]
+[InlineData("1270", "MW", 1270000)]
+[InlineData("146.520", "VHF", 146520000)]
+public void ParseFrequencyDisplay_ParsesCorrectly(string display, string band, double expectedHz)
+{
+    // Act
+    var result = FrequencyConverter.ParseFrequencyDisplay(display, band);
+    
+    // Assert
+    result.Should().BeApproximately(expectedHz, 1);
+}
+```
+
+**Prompt T8: Generate frequency converter tests**
+```
+@workspace Create FrequencyConverterTests.cs with:
+- FormatFrequencyForEntry tests for FM, MW, VHF, AIR bands
+- ParseFrequencyDisplay tests for reverse conversion
+- Edge cases: very low frequencies, very high frequencies
+- Invalid input handling (null, empty, invalid format)
+```
 
 ### Integration Tests
 
-1. **Connection Lifecycle**
-   - Connect/disconnect scenarios
-   - Reconnection handling
+```csharp
+[Fact]
+public async Task FullConnectionLifecycle_WorksCorrectly()
+{
+    // Arrange
+    var mockManager = new MockRadioManager();
+    var mockLogger = new Mock<IRadioLogger>();
+    using var adapter = new RadioControlsAdapter(mockManager, mockLogger.Object);
+    
+    var connectionEvents = new List<bool>();
+    adapter.ConnectionChanged += (s, e) => connectionEvents.Add(e.IsConnected);
+    
+    // Act - Connect
+    mockManager.SimulateConnectSuccess();
+    var connectResult = await adapter.ConnectAsync("AA:BB:CC:DD:EE:FF");
+    
+    // Assert - Connected
+    connectResult.Should().BeTrue();
+    adapter.IsConnected.Should().BeTrue();
+    connectionEvents.Should().Contain(true);
+    
+    // Act - Disconnect
+    await adapter.DisconnectAsync();
+    mockManager.SimulateDisconnect();
+    
+    // Assert - Disconnected
+    adapter.IsConnected.Should().BeFalse();
+    connectionEvents.Should().Contain(false);
+}
 
-2. **End-to-End Control Flow**
-   - Full frequency entry sequence
-   - Preset save/recall cycles
+[Fact]
+public async Task SetFrequency_SendsCorrectButtonSequence()
+{
+    // Arrange
+    var mockManager = new Mock<IRadioManager>();
+    var buttonPresses = new List<(int? number, ButtonType? button, bool longPress)>();
+    
+    mockManager.Setup(m => m.PressNumberAsync(It.IsAny<int>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+               .Callback<int, bool, CancellationToken>((n, lp, ct) => buttonPresses.Add((n, null, lp)))
+               .ReturnsAsync(new CommandResult { Success = true });
+    
+    mockManager.Setup(m => m.PressButtonAsync(It.IsAny<ButtonType>(), It.IsAny<CancellationToken>()))
+               .Callback<ButtonType, CancellationToken>((bt, ct) => buttonPresses.Add((null, bt, false)))
+               .ReturnsAsync(new CommandResult { Success = true });
+    
+    var mockLogger = new Mock<IRadioLogger>();
+    using var adapter = new RadioControlsAdapter(mockManager.Object, mockLogger.Object);
+    
+    // Set band to FM
+    mockManager.Raise(m => m.StatusUpdated += null, mockManager.Object, new RadioStatus { Band = "FM" });
+    
+    // Act - Enter 102.30 MHz
+    await adapter.SetFrequencyAsync(102300000);
+    
+    // Assert - Should press: 1, 0, 2, ., 3, 0, Frequency
+    buttonPresses.Should().HaveCount(7);
+    buttonPresses[0].number.Should().Be(1);
+    buttonPresses[1].number.Should().Be(0);
+    buttonPresses[2].number.Should().Be(2);
+    buttonPresses[3].button.Should().Be(ButtonType.Point);
+    buttonPresses[4].number.Should().Be(3);
+    buttonPresses[5].number.Should().Be(0);
+    buttonPresses[6].button.Should().Be(ButtonType.Frequency);
+}
+```
+
+**Prompt T9: Generate integration tests**
+```
+@workspace Create integration tests in RadioControlsAdapterTests.cs:
+- FullConnectionLifecycle_WorksCorrectly
+- SetFrequency_SendsCorrectButtonSequence for FM and MW bands
+- PresetSaveRecall_WorksCorrectly
+- ErrorHandling_PropagatesExceptions
+```
+
+### Running Tests
+
+**Prompt T10: Run and verify all tests**
+```
+@terminal Run the test suite and verify coverage:
+cd csharp
+dotnet test tests/RadioProtocol.RTest.Shim.Tests --collect:"XPlat Code Coverage"
+dotnet reportgenerator -reports:"**/coverage.cobertura.xml" -targetdir:"coveragereport" -reporttypes:Html
+```
+
+### Test Coverage Targets
+
+| Component | Target Coverage |
+|-----------|-----------------|
+| RadioControlsAdapter | 90%+ |
+| FrequencyConverter | 100% |
+| EventArgs classes | 100% |
+| RadioControlException | 100% |
+
+**Verification Checklist for Tests:**
+- [ ] All unit tests pass
+- [ ] Integration tests pass
+- [ ] Code coverage meets targets
+- [ ] No flaky tests
+- [ ] Tests run in CI/CD pipeline
 
 ---
 
@@ -776,17 +1485,73 @@ public async Task VolumeUpAsync()
 ### Step 1: Create Interface Project
 Create `RTest.Radio.Core.Interfaces` project with `IRadioControls` and event args.
 
+**GitHub Copilot Prompt:**
+```
+@workspace Execute Phase 1 prompts 1.1-1.3 to create the project structure and test project.
+Verify with: dotnet build csharp/RadioProtocol.sln
+```
+
 ### Step 2: Create Shim Project
 Create `RadioProtocol.RTest.Shim` with `RadioControlsAdapter` implementation.
 
-### Step 3: Update RTest Project
-Reference the shim project and configure DI.
+**GitHub Copilot Prompt:**
+```
+@workspace Execute Phase 2 prompts 2.1-2.4 to create the IRadioControls interface, 
+EventArgs classes, and RadioControlsAdapter implementation.
+Verify with: dotnet build csharp/src/RadioProtocol.RTest.Shim
+```
 
-### Step 4: Replace Direct Dependencies
-Replace any direct `RadioProtocol.Core` usage in `RTest` with `IRadioControls`.
+### Step 3: Implement All Methods
+Complete the method implementations and event bridging.
 
-### Step 5: Testing
-Run comprehensive tests to verify functionality.
+**GitHub Copilot Prompt:**
+```
+@workspace Execute Phase 3 prompts 3.1-3.4 and Phase 4 prompts 4.1-4.3 to implement 
+all adapter methods, event handlers, and IDisposable pattern.
+Verify with: dotnet build csharp/src/RadioProtocol.RTest.Shim
+```
+
+### Step 4: Add Utilities and Exception Handling
+Create helper utilities and custom exceptions.
+
+**GitHub Copilot Prompt:**
+```
+@workspace Execute Phase 5 prompts 5.1-5.3 to create FrequencyConverter, 
+RadioControlException, and add comprehensive logging.
+Verify with: dotnet build csharp/src/RadioProtocol.RTest.Shim
+```
+
+### Step 5: Create and Run Tests
+Implement comprehensive test coverage.
+
+**GitHub Copilot Prompt:**
+```
+@workspace Execute Test prompts T1-T10 to create all test classes and run them.
+Verify with: dotnet test csharp/tests/RadioProtocol.RTest.Shim.Tests --verbosity normal
+```
+
+### Step 6: Update RTest Project
+Reference the shim project and configure DI in RTest.
+
+**GitHub Copilot Prompt:**
+```
+@workspace In the RTest project:
+1. Add a project reference to RadioProtocol.RTest.Shim
+2. Configure dependency injection for IRadioControls
+3. Replace any direct RadioProtocol.Core usage with IRadioControls
+```
+
+### Step 7: Final Verification
+Run all tests and verify the complete integration.
+
+**GitHub Copilot Prompt:**
+```
+@terminal Run the complete verification:
+cd csharp
+dotnet build RadioProtocol.sln
+dotnet test --collect:"XPlat Code Coverage"
+echo "Verify all tests pass and coverage targets are met"
+```
 
 ---
 
