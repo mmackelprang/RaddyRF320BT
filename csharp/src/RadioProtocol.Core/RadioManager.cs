@@ -423,6 +423,8 @@ public class RadioManager : IRadioManager, IRadioControls
     /// <remarks>
     /// TODO: Implement to return the current scan direction when scanning is active.
     /// Should return null when not scanning.
+    /// Note: This property uses explicit interface implementation because the property name
+    /// conflicts with the <see cref="Radio.Core.Models.Audio.ScanDirection"/> type name.
     /// </remarks>
     /// <exception cref="NotImplementedException">This property is not yet implemented.</exception>
     ScanDirection? IRadioControls.ScanDirection => throw new NotImplementedException("ScanDirection is not yet implemented. TODO: Return the current scan direction or null.");
