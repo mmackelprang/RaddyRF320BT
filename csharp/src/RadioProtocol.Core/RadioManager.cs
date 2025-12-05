@@ -309,6 +309,17 @@ public class RadioManager : IRadioManager
                 _status = status;
                 StatusUpdated?.Invoke(this, _status);
                 break;
+            case ResponsePacketType.TextMessage when responsePacket.ParsedData is TextMessageInfo textMsg:
+                // Handle multi-part text messages (e.g., model name, version info)
+                if (textMsg.IsComplete && !string.IsNullOrEmpty(textMsg.Message))
+                {
+                    _logger.LogInfo($"Text message complete: {textMsg.Message}");
+                    // Update device info with the assembled text message
+                    _deviceInfo ??= new Models.DeviceInfo();
+                    _deviceInfo = _deviceInfo with { ModelName = textMsg.Message };
+                    DeviceInfoReceived?.Invoke(this, _deviceInfo);
+                }
+                break;
         }
     }
 

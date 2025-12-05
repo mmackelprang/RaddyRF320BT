@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using RadioProtocol.Core.Bluetooth;
+using RadioProtocol.Core.Constants;
 using RadioProtocol.Core.Logging;
+using RadioProtocol.Core.Models;
 
 namespace RadioProtocol.Core.Protocol;
 
@@ -15,6 +17,7 @@ public sealed class RadioConnection : IDisposable
 {
     private readonly IRadioTransport _transport;
     private readonly IRadioLogger _logger;
+    private readonly RadioProtocolParser _parser;
     private readonly ConcurrentQueue<RadioFrame> _inboundFrames = new();
     private readonly ConcurrentQueue<RadioState> _stateSnapshots = new();
     private readonly TimeSpan _heartbeatThreshold = TimeSpan.FromSeconds(2);
@@ -24,12 +27,14 @@ public sealed class RadioConnection : IDisposable
     public event EventHandler<RadioFrame>? FrameReceived;
     public event EventHandler<RadioState>? StateUpdated;
     public event EventHandler<StatusMessage>? StatusReceived;
+    public event EventHandler<TextMessageInfo>? TextMessageReceived;
     public bool IsHandshakeComplete { get; private set; }
 
     public RadioConnection(IRadioTransport transport, IRadioLogger logger)
     {
         _transport = transport;
         _logger = logger;
+        _parser = new RadioProtocolParser(logger);
         _transport.NotificationReceived += OnNotification;
     }
 
@@ -71,6 +76,18 @@ public sealed class RadioConnection : IDisposable
 
     private void OnNotification(object? sender, byte[] data)
     {
+        // Try parsing with RadioProtocolParser first to catch TextMessage packets
+        var packet = _parser.ParseReceivedData(data);
+        if (packet != null && packet.PacketType == ResponsePacketType.TextMessage && packet.ParsedData is TextMessageInfo textMsg)
+        {
+            // Only fire event if the message is complete
+            if (textMsg.IsComplete && !string.IsNullOrEmpty(textMsg.Message))
+            {
+                TextMessageReceived?.Invoke(this, textMsg);
+            }
+            return;
+        }
+        
         if (RadioFrame.TryParse(data, out var frame) && frame != null)
         {
             _inboundFrames.Enqueue(frame);

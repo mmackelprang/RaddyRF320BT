@@ -66,8 +66,8 @@ class Program
             }
         }
 
-        // Setup logger
-        var logDir = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RadioProtocol", "Logs");
+        // Setup logger - use local logs directory in project
+        var logDir = System.IO.Path.Combine(AppContext.BaseDirectory, "logs");
         System.IO.Directory.CreateDirectory(logDir);
         var logFile = System.IO.Path.Combine(logDir, $"RadioProtocol_{DateTime.Now:yyyyMMdd_HHmmss}.log");
         
@@ -238,6 +238,32 @@ class Program
                 if (parts.Length > 1 && int.TryParse(parts[1].Trim(), out var modelNum))
                 {
                     _modelVersionNumber = modelNum.ToString();
+                }
+            }
+        };
+
+        _radio.TextMessageReceived += (s, textMsg) =>
+        {
+            _lastStatusUpdate = DateTime.Now;
+            _logger?.LogInfo($"Text message received: {textMsg.Message}");
+            
+            // Store the complete text message (contains model name and version info)
+            _radioVersion = textMsg.Message ?? "";
+            
+            // Try to parse out specific info from the text
+            if (textMsg.Message?.Contains("Model") == true)
+            {
+                var lines = textMsg.Message.Split('\n');
+                foreach (var line in lines)
+                {
+                    if (line.Contains("Model"))
+                    {
+                        _modelVersion = line.Trim();
+                    }
+                    else if (line.Contains("version"))
+                    {
+                        _radioVersionNumber = line.Trim();
+                    }
                 }
             }
         };
