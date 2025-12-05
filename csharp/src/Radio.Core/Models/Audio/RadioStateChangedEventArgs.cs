@@ -1,35 +1,27 @@
 namespace Radio.Core.Models.Audio;
 
 /// <summary>
-/// Provides data for the <see cref="Radio.Core.Interfaces.Audio.IRadioControls.StateChanged"/> event.
+/// Event arguments for radio state change events.
 /// </summary>
 public class RadioStateChangedEventArgs : EventArgs
 {
-    /// <summary>
-    /// Gets the name of the property that changed.
-    /// </summary>
-    public string PropertyName { get; }
+  /// <summary>
+  /// Gets the current frequency in MHz (for FM) or kHz (for AM).
+  /// </summary>
+  public double Frequency { get; init; }
 
-    /// <summary>
-    /// Gets the previous value of the property, if available.
-    /// </summary>
-    public object? OldValue { get; }
+  /// <summary>
+  /// Gets the current radio band (AM or FM).
+  /// </summary>
+  public RadioBand Band { get; init; }
 
-    /// <summary>
-    /// Gets the new value of the property.
-    /// </summary>
-    public object? NewValue { get; }
+  /// <summary>
+  /// Gets the signal strength as a percentage (0-100).
+  /// </summary>
+  public int SignalStrength { get; init; }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RadioStateChangedEventArgs"/> class.
-    /// </summary>
-    /// <param name="propertyName">The name of the property that changed.</param>
-    /// <param name="oldValue">The previous value of the property.</param>
-    /// <param name="newValue">The new value of the property.</param>
-    public RadioStateChangedEventArgs(string propertyName, object? oldValue = null, object? newValue = null)
-    {
-        PropertyName = propertyName;
-        OldValue = oldValue;
-        NewValue = newValue;
-    }
+  /// <summary>
+  /// Gets a value indicating whether the radio is receiving a stereo signal (FM only).
+  /// </summary>
+  public bool IsStereo { get; init; }
 }
