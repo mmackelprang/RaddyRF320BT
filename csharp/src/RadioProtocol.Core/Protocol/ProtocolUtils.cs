@@ -11,7 +11,7 @@ public static class ProtocolUtils
     /// Calculate checksum for protocol data
     /// </summary>
     /// <param name="data">Data bytes to checksum</param>
-    /// <returns>Checksum byte (sum of all bytes & 0xFF)</returns>
+    /// <returns>Checksum byte (sum of all bytes &amp; 0xFF)</returns>
     public static byte CalculateChecksum(byte[] data)
     {
         if (data == null || data.Length == 0)

@@ -51,7 +51,7 @@
 
   <!-- Include Radio.Core interfaces and models -->
   <ItemGroup>
-    <Compile Include="..\Radio.Core\**\*.cs" Link="Radio.Core\%(RecursiveDir)%(Filename)%(Extension)" />
+    <ProjectReference Include="..\..\..\..\..\src\Radio.Core\Radio.Core.csproj" />
   </ItemGroup>
 
 </Project>

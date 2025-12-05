@@ -705,7 +705,7 @@ public class RadioManagerBuilder
 }
 
 /// <summary>
-/// Simple logger wrapper that implements ILogger<RadioLogger> and uses FileLogger for file output
+/// Simple logger wrapper that implements ILogger&lt;RadioLogger&gt; and uses FileLogger for file output
 /// </summary>
 internal class SimpleLoggerWrapper : Microsoft.Extensions.Logging.ILogger<RadioLogger>
 {
