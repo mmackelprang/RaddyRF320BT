@@ -8,6 +8,8 @@ using System.Collections.Concurrent;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using RadioProtocol.Core.Constants;
+using Radio.Core.Interfaces.Audio;
+using Radio.Core.Models.Audio;
 
 namespace RadioProtocol.Core;
 
@@ -40,9 +42,17 @@ public interface IRadioManager : IDisposable
 }
 
 /// <summary>
-/// Main radio manager implementation
+/// Main radio manager implementation that provides both radio protocol management
+/// and radio control functionality.
 /// </summary>
-public class RadioManager : IRadioManager
+/// <remarks>
+/// This class implements <see cref="IRadioManager"/> for radio protocol management
+/// and <see cref="IRadioControls"/> for radio-specific controls.
+/// The IRadioControls implementation is currently stubbed out and will throw
+/// <see cref="NotImplementedException"/> for all IRadioControls members.
+/// These methods are marked with TODO comments for future implementation.
+/// </remarks>
+public class RadioManager : IRadioManager, IRadioControls
 {
     private readonly IBluetoothConnection _bluetoothConnection;
     private readonly RadioCommandBuilder _commandBuilder;
@@ -322,6 +332,255 @@ public class RadioManager : IRadioManager
                 break;
         }
     }
+
+    #region IRadioControls Implementation (Stubbed - Not Implemented)
+
+    /// <summary>
+    /// Occurs when any radio state property changes (frequency, band, signal strength, stereo status).
+    /// </summary>
+    /// <remarks>
+    /// TODO: Implement this event to fire when radio state changes are detected.
+    /// This should integrate with the existing status update mechanism.
+    /// </remarks>
+    public event EventHandler<RadioStateChangedEventArgs>? StateChanged;
+
+    /// <summary>
+    /// Gets the current tuned frequency in MHz (for FM) or kHz (for AM).
+    /// </summary>
+    /// <remarks>
+    /// TODO: Implement to return the actual current frequency from the radio device.
+    /// Consider integrating with the existing CurrentStatus property.
+    /// </remarks>
+    /// <exception cref="NotImplementedException">This property is not yet implemented.</exception>
+    public double CurrentFrequency => throw new NotImplementedException("CurrentFrequency is not yet implemented. TODO: Return the current radio frequency.");
+
+    /// <summary>
+    /// Gets the current radio band (AM or FM).
+    /// </summary>
+    /// <remarks>
+    /// TODO: Implement to return the actual current band from the radio device.
+    /// Consider integrating with the existing status tracking mechanism.
+    /// </remarks>
+    /// <exception cref="NotImplementedException">This property is not yet implemented.</exception>
+    public RadioBand CurrentBand => throw new NotImplementedException("CurrentBand is not yet implemented. TODO: Return the current radio band (AM/FM).");
+
+    /// <summary>
+    /// Gets the frequency step size used for tuning up/down in MHz (FM) or kHz (AM).
+    /// </summary>
+    /// <remarks>
+    /// TODO: Implement to return the configured frequency step size.
+    /// Default values are typically 0.1 MHz for FM and 9/10 kHz for AM.
+    /// </remarks>
+    /// <exception cref="NotImplementedException">This property is not yet implemented.</exception>
+    public double FrequencyStep => throw new NotImplementedException("FrequencyStep is not yet implemented. TODO: Return the frequency step size.");
+
+    /// <summary>
+    /// Gets the current signal strength as a percentage (0-100).
+    /// </summary>
+    /// <remarks>
+    /// TODO: Implement to return the actual signal strength from the radio device.
+    /// This may require periodic polling or status updates from the device.
+    /// </remarks>
+    /// <exception cref="NotImplementedException">This property is not yet implemented.</exception>
+    public int SignalStrength => throw new NotImplementedException("SignalStrength is not yet implemented. TODO: Return the signal strength percentage.");
+
+    /// <summary>
+    /// Gets a value indicating whether the radio is receiving a stereo signal (FM only).
+    /// </summary>
+    /// <remarks>
+    /// TODO: Implement to return the actual stereo status from the radio device.
+    /// This is typically only applicable to FM band reception.
+    /// </remarks>
+    /// <exception cref="NotImplementedException">This property is not yet implemented.</exception>
+    public bool IsStereo => throw new NotImplementedException("IsStereo is not yet implemented. TODO: Return whether the signal is stereo.");
+
+    /// <summary>
+    /// Gets the current equalizer mode applied to the radio device.
+    /// </summary>
+    /// <remarks>
+    /// TODO: Implement to return the current equalizer mode setting.
+    /// This may need to be stored locally and synced with device state.
+    /// </remarks>
+    /// <exception cref="NotImplementedException">This property is not yet implemented.</exception>
+    public RadioEqualizerMode EqualizerMode => throw new NotImplementedException("EqualizerMode is not yet implemented. TODO: Return the current equalizer mode.");
+
+    /// <summary>
+    /// Gets or sets the device-specific volume level (0-100).
+    /// </summary>
+    /// <remarks>
+    /// TODO: Implement to get/set the radio device volume.
+    /// This should interact with the existing volume control commands.
+    /// </remarks>
+    /// <exception cref="NotImplementedException">This property is not yet implemented.</exception>
+    public int DeviceVolume
+    {
+        get => throw new NotImplementedException("DeviceVolume getter is not yet implemented. TODO: Return the current device volume level.");
+        set => throw new NotImplementedException("DeviceVolume setter is not yet implemented. TODO: Set the device volume level.");
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the radio is currently scanning for stations.
+    /// </summary>
+    /// <remarks>
+    /// TODO: Implement to track scanning state.
+    /// This should be updated when StartScanAsync/StopScanAsync are called.
+    /// </remarks>
+    /// <exception cref="NotImplementedException">This property is not yet implemented.</exception>
+    public bool IsScanning => throw new NotImplementedException("IsScanning is not yet implemented. TODO: Return whether the radio is scanning.");
+
+    /// <summary>
+    /// Gets the current scan direction if scanning is active; otherwise, null.
+    /// </summary>
+    /// <remarks>
+    /// TODO: Implement to return the current scan direction when scanning is active.
+    /// Should return null when not scanning.
+    /// Note: This property uses explicit interface implementation because the property name
+    /// conflicts with the <see cref="Radio.Core.Models.Audio.ScanDirection"/> type name.
+    /// </remarks>
+    /// <exception cref="NotImplementedException">This property is not yet implemented.</exception>
+    ScanDirection? IRadioControls.ScanDirection => throw new NotImplementedException("ScanDirection is not yet implemented. TODO: Return the current scan direction or null.");
+
+    /// <summary>
+    /// Sets the radio frequency to a specific value.
+    /// </summary>
+    /// <param name="frequency">The frequency to tune to in MHz (FM) or kHz (AM).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <remarks>
+    /// TODO: Implement to send the appropriate command to tune to the specified frequency.
+    /// Should validate frequency is within band limits before sending.
+    /// </remarks>
+    /// <exception cref="NotImplementedException">This method is not yet implemented.</exception>
+    public Task SetFrequencyAsync(double frequency, CancellationToken ct = default)
+    {
+        throw new NotImplementedException("SetFrequencyAsync is not yet implemented. TODO: Implement frequency tuning command.");
+    }
+
+    /// <summary>
+    /// Steps the radio frequency up by one frequency step.
+    /// </summary>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <remarks>
+    /// TODO: Implement to send the frequency step up command.
+    /// Consider using existing NavigateAsync method as a starting point.
+    /// </remarks>
+    /// <exception cref="NotImplementedException">This method is not yet implemented.</exception>
+    public Task StepFrequencyUpAsync(CancellationToken ct = default)
+    {
+        throw new NotImplementedException("StepFrequencyUpAsync is not yet implemented. TODO: Implement frequency step up command.");
+    }
+
+    /// <summary>
+    /// Steps the radio frequency down by one frequency step.
+    /// </summary>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <remarks>
+    /// TODO: Implement to send the frequency step down command.
+    /// Consider using existing NavigateAsync method as a starting point.
+    /// </remarks>
+    /// <exception cref="NotImplementedException">This method is not yet implemented.</exception>
+    public Task StepFrequencyDownAsync(CancellationToken ct = default)
+    {
+        throw new NotImplementedException("StepFrequencyDownAsync is not yet implemented. TODO: Implement frequency step down command.");
+    }
+
+    /// <summary>
+    /// Sets the radio band (AM or FM).
+    /// </summary>
+    /// <param name="band">The band to switch to.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <remarks>
+    /// TODO: Implement to send the band switch command.
+    /// Should update internal state tracking after successful switch.
+    /// </remarks>
+    /// <exception cref="NotImplementedException">This method is not yet implemented.</exception>
+    public Task SetBandAsync(RadioBand band, CancellationToken ct = default)
+    {
+        throw new NotImplementedException("SetBandAsync is not yet implemented. TODO: Implement band switching command.");
+    }
+
+    /// <summary>
+    /// Sets the frequency step size for tuning up/down.
+    /// </summary>
+    /// <param name="step">The step size in MHz (FM) or kHz (AM).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <remarks>
+    /// TODO: Implement to configure the frequency step size.
+    /// Should validate step size is appropriate for current band.
+    /// </remarks>
+    /// <exception cref="NotImplementedException">This method is not yet implemented.</exception>
+    public Task SetFrequencyStepAsync(double step, CancellationToken ct = default)
+    {
+        throw new NotImplementedException("SetFrequencyStepAsync is not yet implemented. TODO: Implement frequency step configuration.");
+    }
+
+    /// <summary>
+    /// Sets the equalizer mode for the radio device.
+    /// </summary>
+    /// <param name="mode">The equalizer mode to apply.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <remarks>
+    /// TODO: Implement to send the equalizer mode command.
+    /// Should update internal state tracking after successful change.
+    /// </remarks>
+    /// <exception cref="NotImplementedException">This method is not yet implemented.</exception>
+    public Task SetEqualizerModeAsync(RadioEqualizerMode mode, CancellationToken ct = default)
+    {
+        throw new NotImplementedException("SetEqualizerModeAsync is not yet implemented. TODO: Implement equalizer mode command.");
+    }
+
+    /// <summary>
+    /// Starts scanning for stations in the specified direction.
+    /// </summary>
+    /// <param name="direction">The direction to scan (up or down).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <remarks>
+    /// TODO: Implement to start frequency scanning.
+    /// Should update IsScanning and ScanDirection properties.
+    /// Consider using long press navigation commands as a starting point.
+    /// </remarks>
+    /// <exception cref="NotImplementedException">This method is not yet implemented.</exception>
+    public Task StartScanAsync(ScanDirection direction, CancellationToken ct = default)
+    {
+        throw new NotImplementedException("StartScanAsync is not yet implemented. TODO: Implement station scanning command.");
+    }
+
+    /// <summary>
+    /// Stops the current scanning operation.
+    /// </summary>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <remarks>
+    /// TODO: Implement to stop frequency scanning.
+    /// Should update IsScanning and ScanDirection properties.
+    /// </remarks>
+    /// <exception cref="NotImplementedException">This method is not yet implemented.</exception>
+    public Task StopScanAsync(CancellationToken ct = default)
+    {
+        throw new NotImplementedException("StopScanAsync is not yet implemented. TODO: Implement stop scanning command.");
+    }
+
+    /// <summary>
+    /// Raises the StateChanged event.
+    /// </summary>
+    /// <param name="propertyName">The name of the property that changed.</param>
+    /// <param name="oldValue">The previous value.</param>
+    /// <param name="newValue">The new value.</param>
+    /// <remarks>
+    /// This helper method should be called when any IRadioControls property changes.
+    /// </remarks>
+    protected virtual void OnStateChanged(string propertyName, object? oldValue = null, object? newValue = null)
+    {
+        StateChanged?.Invoke(this, new RadioStateChangedEventArgs(propertyName, oldValue, newValue));
+    }
+
+    #endregion
 
     protected virtual void Dispose(bool disposing)
     {
