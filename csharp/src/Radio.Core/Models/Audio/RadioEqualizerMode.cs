@@ -11,12 +11,7 @@ public enum RadioEqualizerMode
     Normal,
 
     /// <summary>
-    /// Enhanced bass frequencies.
-    /// </summary>
-    Bass,
-
-    /// <summary>
-    /// Optimized for popular music.
+    /// Enhanced pop frequencies.
     /// </summary>
     Pop,
 
@@ -31,7 +26,12 @@ public enum RadioEqualizerMode
     Jazz,
 
     /// <summary>
-    /// Optimized for classical music.
+    /// Optimized for cloassical music.
     /// </summary>
-    Classical
+    Classical,
+
+    /// <summary>
+    /// Optimized for country music.
+    /// </summary>
+    Country
 }
