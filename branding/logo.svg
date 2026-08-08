@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1096 256">
+  <g transform="translate(0,40) scale(0.6875)">
+    <rect width="256" height="256" rx="56" fill="#2E4057"/>
+
+<rect x="52" y="108" width="124" height="78" rx="10" fill="#F5EBDD"/>
+<circle cx="88" cy="147" r="17" fill="none" stroke="#2E4057" stroke-width="7"/>
+<g stroke="#2E4057" stroke-width="6" stroke-linecap="round"><line x1="118" y1="132" x2="160" y2="132"/><line x1="118" y1="147" x2="160" y2="147"/><line x1="118" y1="162" x2="160" y2="162"/></g>
+<line x1="162" y1="108" x2="196" y2="62" stroke="#F5EBDD" stroke-width="8" stroke-linecap="round"/>
+<g stroke="#4CC9F0" stroke-width="6" fill="none" stroke-linecap="round">
+  <path d="M204 60 a22 22 0 0 1 12 28"/>
+  <path d="M216 46 a38 38 0 0 1 20 48"/>
+</g>
+
+  </g>
+  <text x="224" y="140" font-family="Montserrat, 'Segoe UI', 'DejaVu Sans', system-ui, sans-serif" font-size="84" font-weight="700" fill="#1B1F26">RF320 Protocol</text>
+  <text x="224" y="192" font-family="Montserrat, 'Segoe UI', 'DejaVu Sans', system-ui, sans-serif" font-size="32" font-weight="500" fill="#5A6472">The radio's secret dialect, documented.</text>
+</svg>
